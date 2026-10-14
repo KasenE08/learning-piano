@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Concept C — Grid</title>
+<link rel="stylesheet" href="node_modules/@fontsource/space-mono/400.css">
+<link rel="stylesheet" href="node_modules/@fontsource/space-mono/700.css">
+<link rel="stylesheet" href="node_modules/@fontsource/silkscreen/400.css">
+<link rel="stylesheet" href="node_modules/@fontsource/silkscreen/700.css">
+<style>
+:root {
+  --bg: #fff; --ink: #000; --g: #e6e6e6; --g2: #9a9a9a;
+  --ok: #19a14a; --bad: #e0262f;
+  --hit: #19a14a; --miss: #e0262f; --next: #000; --ink-faded: #000;
+  --mono: 'Space Mono', monospace; --px: 'Silkscreen', monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--ink); font-family: var(--mono); -webkit-font-smoothing: antialiased; height: 100%; overflow: hidden; }
+[hidden] { display: none !important; }
+.px { font-family: var(--px); text-transform: uppercase; }
+.dotbg { background-image: radial-gradient(#cfcfcf 1px, transparent 1.2px); background-size: 12px 12px; }
+.box { border: 3px solid var(--ink); background: #fff; box-shadow: 5px 5px 0 var(--ink); }
+.tag { font: 400 11px/1 var(--px); text-transform: uppercase; letter-spacing: .04em; }
+
+.portrait { height: 844px; padding: 52px 18px 0; position: relative; display: flex; flex-direction: column; }
+.hdr { display: flex; gap: 10px; align-items: stretch; }
+.lvbadge { width: 76px; height: 76px; background: var(--ink); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.lvbadge b { font: 700 38px/1 var(--px); }
+.lvbadge span { font: 400 10px/1 var(--px); }
+.xpbox { flex: 1; padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between; }
+.cells { display: grid; grid-template-columns: repeat(20, 1fr); gap: 2px; height: 16px; }
+.cells i { background: var(--g); }
+.cells i.f { background: var(--ink); }
+.xpbox .r { display: flex; justify-content: space-between; font-size: 11px; }
+.xpbox .r b { font-weight: 700; }
+
+.play { margin-top: 22px; padding: 16px; position: relative; }
+.play .crumb { display: flex; justify-content: space-between; }
+.play h2 { font: 700 40px/0.95 var(--mono); letter-spacing: -0.04em; margin: 14px 0 8px; }
+.play p { font-size: 12.5px; line-height: 1.5; color: #333; }
+.mini { display: flex; gap: 4px; margin: 14px 0 16px; }
+.mini i { width: 22px; height: 22px; border: 2px solid var(--ink); display: grid; place-items: center; font: 700 10px var(--mono); font-style: normal; }
+.mini i.n { background: var(--ink); color: #fff; }
+.go { display: flex; gap: 10px; }
+.btn { height: 52px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; font: 700 15px var(--mono); border: 3px solid var(--ink); padding: 0 16px; background: #fff; }
+.btn.k { background: var(--ink); color: #fff; flex: 1; box-shadow: 4px 4px 0 #9a9a9a; }
+
+.grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 24px; }
+.sec { padding: 10px; height: 118px; display: flex; flex-direction: column; justify-content: space-between; }
+.sec .h { display: flex; justify-content: space-between; align-items: center; }
+.sec b { font: 700 17px/1 var(--mono); letter-spacing: -0.02em; }
+.sq { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; }
+.sq i { aspect-ratio: 1; border: 1.5px solid var(--ink); }
+.sq i.f { background: var(--ink); }
+.sq i.c { background: repeating-linear-gradient(45deg, #000 0 2px, #fff 2px 4px); }
+.sec.locked { box-shadow: none; border-style: dashed; color: var(--g2); border-color: var(--g2); }
+.sec.locked .lock { width: 18px; height: 18px; }
+.songs { margin-top: 14px; display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; }
+
+.nav { position: absolute; left: 0; right: 0; bottom: 0; height: 82px; border-top: 3px solid var(--ink); display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; }
+.nav span { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 12px; gap: 5px; font: 400 10px var(--px); text-transform: uppercase; border-right: 3px solid var(--ink); }
+.nav span:last-child { border-right: 0; }
+.nav span.on { background: var(--ink); color: #fff; }
+.nav svg { width: 20px; height: 20px; }
+
+/* MAP */
+.maph { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 4px; }
+.maph h1 { font: 700 46px/0.9 var(--px); }
+.maph .st { text-align: right; font-size: 12px; line-height: 1.6; }
+.board { position: relative; margin: 18px -18px 0; padding: 14px 18px; height: 590px; overflow: hidden; border-top: 3px solid var(--ink); }
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding-right: 4px; gap: 14px 14px; }
+.tile { aspect-ratio: 1; border: 3px solid var(--ink); background: #fff; position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 6px; box-shadow: 4px 4px 0 var(--ink); }
+.tile b { font: 700 24px/1 var(--px); }
+.tile .stars { display: flex; gap: 2px; }
+.tile .stars svg { width: 13px; height: 13px; }
+.tile.locked { border-style: dashed; border-color: #b5b5b5; box-shadow: none; color: #b5b5b5; background: transparent; }
+.tile.cur { background: var(--ink); color: #fff; box-shadow: 4px 4px 0 #9a9a9a; }
+.tile.cur .cur-l { font: 400 10px var(--px); }
+.tile.song { background: repeating-linear-gradient(45deg, #000 0 3px, #fff 3px 7px); }
+.tile.song .inner { background: #fff; border: 2px solid #000; position: absolute; inset: 14px; display: grid; place-items: center; font: 700 22px var(--mono); }
+.tile.hidden { border-style: dashed; border-color: #000; box-shadow: none; display: grid; place-items: center; font: 700 30px var(--px); }
+.tile.test { grid-column: span 2; aspect-ratio: auto; border-style: dashed; border-color: #b5b5b5; color: #b5b5b5; box-shadow: none; }
+.arrow { position: absolute; font: 700 14px var(--mono); color: #000; }
+.tooltip { position: absolute; padding: 8px 10px; font-size: 12px; line-height: 1.35; z-index: 5; }
+.tooltip b { font: 700 15px var(--mono); display: block; }
+
+/* LANDSCAPE */
+.land { width: 844px; height: 390px; padding: 0 47px 21px; display: flex; flex-direction: column; }
+.hud { height: 50px; display: flex; align-items: center; gap: 8px; }
+.hb { height: 34px; border: 3px solid var(--ink); display: inline-flex; align-items: center; padding: 0 10px; gap: 6px; font: 700 13px var(--mono); }
+.hb.k { background: var(--ink); color: #fff; }
+.hb svg { width: 13px; height: 13px; }
+.hb.title { flex: 1; justify-content: space-between; }
+.hb.combo { font: 700 16px var(--px); background: var(--ok); color: #fff; border-color: var(--ink); }
+.stage { position: relative; flex: 1; overflow: hidden; border: 3px solid var(--ink); border-bottom: 0; }
+.vf-strip { position: absolute; top: 0; left: 0; }
+.vf-overlay { position: absolute; inset: 0; pointer-events: none; }
+.clef-gutter { position: absolute; left: 0; top: 0; bottom: 0; width: 72px; background: #fff; border-right: 3px solid var(--ink); }
+.playhead { position: absolute; top: 0; bottom: 0; width: 4px; margin-left: -2px; background: var(--ink); z-index: 3; }
+.playhead::before { content: 'NOW'; position: absolute; top: 4px; left: 6px; font: 400 9px var(--px); background: #000; color: #fff; padding: 2px 3px; }
+.mark-miss { position: absolute; transform: translate(-50%, -150%); z-index: 2; }
+.mark-miss::before { content: 'MISS'; font: 400 8px var(--px); background: var(--bad); color: #fff; padding: 1px 3px; }
+.mark-timing { position: absolute; transform: translateX(-50%); font: 400 8px var(--px); }
+.mark-timing.t-o::before { content: 'OK'; color: var(--ok); }
+.mark-timing.t-e::before { content: 'EARLY'; color: var(--ink); }
+.mark-timing.t-l::before { content: 'LATE'; color: var(--ink); }
+.kbwrap { height: 112px; position: relative; border: 3px solid var(--ink); border-top-width: 3px; }
+.kb { position: absolute; inset: 0; }
+.key { position: absolute; top: 0; }
+.key.white { height: 100%; background: #fff; border-right: 2px solid var(--ink); }
+.key.black { height: 60%; background: var(--ink); z-index: 2; }
+.key .lbl { position: absolute; bottom: 5px; left: 0; right: 0; text-align: center; font: 400 9px var(--px); }
+.key.white.next { background-image: radial-gradient(#000 1.3px, transparent 1.5px); background-size: 6px 6px; }
+.key .finger { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); width: 24px; height: 24px; background: #000; color: #fff; display: grid; place-items: center; font: 700 14px var(--px); }
+.key.white.hit { background: var(--ok); }
+.key.white.hit::after { content: '+1'; position: absolute; bottom: 24px; left: 0; right: 0; text-align: center; font: 700 12px var(--px); color: #fff; }
+
+/* RESULTS */
+.res { flex: 1; display: grid; grid-template-columns: 300px 1fr; gap: 16px; padding-top: 4px; }
+.card { padding: 12px 14px; }
+.big { font: 700 96px/0.9 var(--px); letter-spacing: -0.04em; }
+.big small { font: 700 40px var(--mono); }
+.kv { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+.kv div { border: 2px solid #000; padding: 6px 8px; }
+.kv b { font: 700 22px/1.1 var(--mono); display: block; }
+.stars3 { display: flex; gap: 8px; margin: 10px 0 8px; }
+.stars3 svg { width: 34px; height: 34px; }
+.receipt { font-size: 12.5px; line-height: 1.75; }
+.receipt .l { display: flex; justify-content: space-between; border-bottom: 2px dotted #000; }
+.receipt .l.t { border-bottom: 0; border-top: 3px solid #000; margin-top: 4px; padding-top: 4px; font-weight: 700; font-size: 15px; }
+.tline { display: grid; grid-template-columns: repeat(26, 1fr); gap: 2px; height: 26px; margin: 6px 0 6px; }
+.tline i { background: var(--ok); }
+.tline i.e, .tline i.l { background: #000; }
+.tline i.m { background: var(--bad); }
+.legend { display: flex; gap: 14px; font: 400 10px var(--px); }
+.legend span::before { content: ''; display: inline-block; width: 10px; height: 10px; margin-right: 5px; vertical-align: -1px; background: var(--c); }
+.acts { display: flex; gap: 10px; margin-top: 12px; }
+.acts .btn { height: 44px; font-size: 13px; }
+</style>
+</head>
+<body>
+<section class="portrait dotbg" data-screen="home">
+  <div class="hdr">
+    <div class="lvbadge box" style="box-shadow:5px 5px 0 #9a9a9a"><span>LV</span><b>07</b></div>
+    <div class="xpbox box">
+      <div class="r"><span class="tag">Apprentice</span><span><b>1240</b>/1800 XP</span></div>
+      <div class="cells" id="cells"></div>
+      <div class="r"><span>Next: Lv 08</span><span>560 to go</span></div>
+    </div>
+  </div>
+  <div class="play box">
+    <div class="crumb"><span class="tag">Noob / Level 09</span><span class="tag">☆☆☆</span></div>
+    <h2>ODE TO<br>JOY_</h2>
+    <p>First real melody. Right hand, C position. Five notes: C D E F G.</p>
+    <div class="mini"><i>1</i><i>2</i><i>3</i><i>4</i><i class="n">5</i><i style="border-style:dashed;border-color:#aaa"></i></div>
+    <div class="go"><span class="btn k">▶ PLAY</span><span class="btn">♪ LISTEN</span></div>
+  </div>
+  <div class="grid4">
+    <div class="sec box"><div class="h"><b>NOOB</b><span class="tag">8/15</span></div><div class="sq" id="sq"></div><span class="tag">19★ of 45</span></div>
+    <div class="sec box locked"><div class="h"><b>BEGINNER</b><svg class="lock" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="10" height="7"/><path d="M5 7V5a3 3 0 016 0v2"/></svg></div><span class="tag">Test ≥ 85%</span></div>
+    <div class="sec box locked"><div class="h"><b>INTERMED.</b><svg class="lock" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="10" height="7"/><path d="M5 7V5a3 3 0 016 0v2"/></svg></div><span class="tag">Locked</span></div>
+    <div class="sec box locked"><div class="h"><b>ADVANCED</b><svg class="lock" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="10" height="7"/><path d="M5 7V5a3 3 0 016 0v2"/></svg></div><span class="tag">Locked</span></div>
+  </div>
+  <nav class="nav">
+    <span class="on"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 9l8-6 8 6v9H2z"/></svg>Home</span>
+    <span><svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="2" width="6" height="6"/><rect x="12" y="2" width="6" height="6"/><rect x="2" y="12" width="6" height="6"/><rect x="12" y="12" width="6" height="6" fill="none" stroke="currentColor" stroke-width="2"/></svg>Map</span>
+    <span><svg viewBox="0 0 20 20" fill="currentColor"><rect x="3" y="13" width="6" height="5"/><rect x="7" y="3" width="2" height="12"/><rect x="7" y="3" width="10" height="3"/><rect x="11" y="11" width="6" height="5"/><rect x="15" y="3" width="2" height="10"/></svg>Songs</span>
+    <span><svg viewBox="0 0 20 20" fill="currentColor"><rect x="6" y="2" width="8" height="8"/><rect x="2" y="12" width="16" height="6"/></svg>You</span>
+  </nav>
+</section>
+
+<section class="portrait" data-screen="map">
+  <div class="maph"><h1>NOOB<br>WORLD</h1><div class="st">8/15 CLEAR<br>19/45 ★<br>SONGS 1/3 + ?</div></div>
+  <div class="board dotbg" id="board"></div>
+  <nav class="nav">
+    <span><svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 9l8-6 8 6v9H2z"/></svg>Home</span>
+    <span class="on"><svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="2" width="6" height="6"/><rect x="12" y="2" width="6" height="6"/><rect x="2" y="12" width="6" height="6"/><rect x="12" y="12" width="6" height="6" fill="none" stroke="currentColor" stroke-width="2"/></svg>Map</span>
+    <span><svg viewBox="0 0 20 20" fill="currentColor"><rect x="3" y="13" width="6" height="5"/><rect x="7" y="3" width="2" height="12"/><rect x="7" y="3" width="10" height="3"/><rect x="11" y="11" width="6" height="5"/><rect x="15" y="3" width="2" height="10"/></svg>Songs</span>
+    <span><svg viewBox="0 0 20 20" fill="currentColor"><rect x="6" y="2" width="8" height="8"/><rect x="2" y="12" width="16" height="6"/></svg>You</span>
+  </nav>
+</section>
+
+<section class="land" data-screen="lesson">
+  <div class="hud">
+    <span class="hb">✕</span>
+    <span class="hb title"><span>INT-01 · ODE TO JOY</span><span style="color:#9a9a9a">3/6</span></span>
+    <span class="hb">▶ LISTEN</span>
+    <span class="hb k">♩=72 MET</span>
+    <span class="hb">96%</span>
+    <span class="hb combo">x7 COMBO</span>
+  </div>
+  <div class="stage" id="stage"></div>
+  <div class="kbwrap"><div id="kb"></div></div>
+</section>
+
+<section class="land" data-screen="results">
+  <div class="hud">
+    <span class="hb">✕</span>
+    <span class="hb title"><span>INT-01 · ODE TO JOY (HT) · CLEARED</span><span style="color:#9a9a9a">try #3</span></span>
+  </div>
+  <div class="res">
+    <div class="card box">
+      <span class="tag">Accuracy</span>
+      <div class="big">92<small>%</small></div>
+      <div class="stars3">
+        <svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path d="M4 0h2v2h2v1h2v2H8v2h1v3H7V9H3v1H1V7h1V5H0V3h2V2h2z" fill="#000"/></svg>
+        <svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path d="M4 0h2v2h2v1h2v2H8v2h1v3H7V9H3v1H1V7h1V5H0V3h2V2h2z" fill="#000"/></svg>
+        <svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path d="M4 0h2v2h2v1h2v2H8v2h1v3H7V9H3v1H1V7h1V5H0V3h2V2h2z" fill="#e6e6e6"/></svg>
+      </div>
+      <span class="tag">95% for ★★★ — 3 more</span>
+      <div class="kv"><div><b>×14</b><span class="tag">Max combo</span></div><div><b>24/26</b><span class="tag">Notes hit</span></div></div>
+    </div>
+    <div>
+      <div class="card box">
+        <span class="tag">Every note, in order</span>
+        <div class="tline" id="tline"></div>
+        <div class="legend"><span style="--c:#19a14a">On time 19</span><span style="--c:#000">Early 3 / Late 2</span><span style="--c:#e0262f">Miss 2 (E4, D4)</span></div>
+        <div class="receipt" style="margin-top:8px">
+          <div class="l"><span>Attempt</span><span>+40</span></div>
+          <div class="l"><span>Stars ★★</span><span>+60</span></div>
+          <div class="l"><span>Max combo ×14</span><span>+21</span></div>
+          <div class="l"><span>First clear</span><span>+50</span></div>
+          <div class="l t"><span>TOTAL</span><span>+171 XP</span></div>
+        </div>
+      </div>
+      <div class="acts"><span class="btn k">NEXT ▶</span><span class="btn">↺ RETRY</span><span class="btn">½ SLOW</span></div>
+    </div>
+  </div>
+</section>
+
+<script src="node_modules/vexflow/build/cjs/vexflow-bravura.js"></script>
+<script type="module">
+import { renderStrip, renderKeyboard, screen } from './common.js';
+const s = screen();
+await document.fonts.ready;
+const pstar = (c) => `<svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path d="M4 0h2v2h2v1h2v2H8v2h1v3H7V9H3v1H1V7h1V5H0V3h2V2h2z" fill="${c}"/></svg>`;
+if (s === 'home') {
+  const c = document.getElementById('cells');
+  for (let i = 0; i < 20; i++) { const e = document.createElement('i'); if (i < 14) e.className = 'f'; c.appendChild(e); }
+  const q = document.getElementById('sq');
+  for (let i = 0; i < 16; i++) { const e = document.createElement('i'); if (i < 8) e.className = 'f'; if (i === 8) e.className = 'c'; q.appendChild(e); }
+}
+if (s === 'lesson') {
+  await renderStrip(document.getElementById('stage'), { playheadFrac: 0.3 });
+  renderKeyboard(document.getElementById('kb'), { state: { C4: 'next', C3: 'next', D4: 'hit' }, fingers: { C4: 1, C3: 5 } });
+}
+if (s === 'map') {
+  const b = document.getElementById('board');
+  const g = document.createElement('div'); g.className = 'tiles'; b.appendChild(g);
+  // snake order rows: 1-4, 8-5, 9-12, 16..13 → show rows top=newest
+  const st = { 1: 3, 2: 3, 3: 2, 4: 3, 5: 1, 6: 2, 7: 3, 8: 2 };
+  const rows = [['test', 'test2', 'hidden', 15], [11, 12, 13, 14], [10, 9, 'song', 8], [4, 5, 6, 7], [3, 2, 1, 'start']];
+  rows.forEach((r) => r.forEach((n) => {
+    if (n === 'test2') return;
+    const t = document.createElement('div');
+    if (n === 'test') { t.className = 'tile test'; t.innerHTML = '<span class="tag">Boss</span><b style="font-size:20px">TEST</b><span class="tag">≥85%</span>'; }
+    else if (n === 'hidden') { t.className = 'tile hidden'; t.textContent = '?'; }
+    else if (n === 'song') { t.className = 'tile song'; t.innerHTML = '<span class="inner">♪</span>'; }
+    else if (n === 'start') { t.className = 'tile'; t.style.cssText = 'box-shadow:none;border-style:solid;background:#000;color:#fff'; t.innerHTML = '<span class="tag">Start</span><b>GO</b><span></span>'; }
+    else if (n === 9) { t.className = 'tile cur'; t.innerHTML = '<span class="cur-l">YOU ▼</span><b>09</b><span class="cur-l">Ode to Joy</span>'; }
+    else if (st[n]) { t.className = 'tile'; t.innerHTML = `<span class="tag">LV</span><b>${String(n).padStart(2, '0')}</b><span class="stars">${[0,1,2].map((j) => pstar(j < st[n] ? '#000' : '#d0d0d0')).join('')}</span>`; }
+    else { t.className = 'tile locked'; t.innerHTML = `<span class="tag">LV</span><b>${n}</b><span></span>`; }
+    g.appendChild(t);
+  }));
+  const tip = document.createElement('div'); tip.className = 'tooltip box'; tip.style.cssText = 'left:18px;right:22px;top:486px';
+  tip.innerHTML = '<b>♪ BONUS SONG FOUND</b>Hot Cross Buns — unlocked by clearing LV 07. Tap the ♪ tile to play it any time.';
+  b.appendChild(tip);
+}
+if (s === 'results') {
+  const t = document.getElementById('tline');
+  const seq = 'ooeooolomooooeoooooeolooom';
+  [...seq].forEach((c) => { const i = document.createElement('i'); i.className = c; if (c === 'e') i.style.cssText = 'background:#000;margin-top:0;height:60%'; if (c === 'l') i.style.cssText = 'background:#000;align-self:end;height:60%'; t.appendChild(i); });
+}
+document.body.dataset.ready = '1';
+</script>
+</body>
+</html>

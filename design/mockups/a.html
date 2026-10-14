@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Concept A — Engraved</title>
+<link rel="stylesheet" href="node_modules/@fontsource/instrument-serif/400.css">
+<link rel="stylesheet" href="node_modules/@fontsource/instrument-serif/400-italic.css">
+<link rel="stylesheet" href="node_modules/@fontsource/geist-sans/400.css">
+<link rel="stylesheet" href="node_modules/@fontsource/geist-sans/500.css">
+<link rel="stylesheet" href="node_modules/@fontsource/geist-sans/600.css">
+<link rel="stylesheet" href="node_modules/@fontsource/geist-mono/400.css">
+<link rel="stylesheet" href="node_modules/@fontsource/geist-mono/500.css">
+<style>
+:root {
+  --paper: #f5f5f4; --paper-2: #ebebea; --ink: #121212; --ink-2: #5c5c5c; --ink-3: #9b9b9b; --rule: #cfcfcd;
+  --ink-faded: #121212; --hit: #a3a3a3; --miss: #a3a3a3; --next: #121212;
+  --serif: 'Instrument Serif', serif; --sans: 'Geist Sans', system-ui, sans-serif; --mono: 'Geist Mono', monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--paper); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; height: 100%; overflow: hidden; }
+[hidden] { display: none !important; }
+.eyebrow { font: 500 10.5px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
+.serif { font-family: var(--serif); font-weight: 400; }
+.it { font-style: italic; }
+.staffrule { height: 17px; background: repeating-linear-gradient(to bottom, var(--rule) 0 1px, transparent 1px 4px); opacity: .9; }
+
+/* ---------- PORTRAIT ---------- */
+.portrait { height: 844px; padding: 54px 22px 0; display: flex; flex-direction: column; position: relative; }
+.topbar { display: flex; justify-content: space-between; align-items: center; height: 32px; }
+.topbar .mark { font: italic 22px/1 var(--serif); }
+.iconbtn { width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid var(--rule); border-radius: 50%; }
+.iconbtn svg { width: 16px; height: 16px; }
+
+.player { margin-top: 26px; display: flex; align-items: flex-end; justify-content: space-between; }
+.player .lv { font: 400 76px/0.85 var(--serif); letter-spacing: -0.02em; }
+.player .lv small { font: italic 30px/1 var(--serif); margin-right: 4px; }
+.player .title { text-align: right; }
+.player .title .serif { font-size: 24px; font-style: italic; display: block; margin-top: 6px; }
+.xp { margin-top: 18px; }
+.xp .bar { position: relative; height: 22px; }
+.xp .bar::before { content: ''; position: absolute; left: 0; right: 0; top: 10px; height: 1px; background: var(--ink); }
+.xp .bar .fill { position: absolute; left: 0; top: 8px; height: 5px; width: 69%; background: var(--ink); }
+.xp .bar i { position: absolute; top: 3px; width: 1px; height: 15px; background: var(--ink); }
+.xp .bar .head { position: absolute; left: 69%; top: 4px; width: 15px; height: 12px; border-radius: 50%; background: var(--ink); transform: translateX(-50%) rotate(-22deg); }
+.xp .row { display: flex; justify-content: space-between; margin-top: 7px; font: 400 11.5px/1 var(--mono); color: var(--ink-2); }
+
+.continue { margin-top: 28px; border-top: 1px solid var(--ink); padding-top: 16px; }
+.continue h2 { font: 400 50px/0.95 var(--serif); margin: 12px 0 6px; letter-spacing: -0.01em; }
+.continue p { font-size: 14px; color: var(--ink-2); line-height: 1.45; max-width: 290px; }
+.continue .preview { margin: 18px 0 18px; height: 52px; position: relative; }
+.continue .preview .staffrule { position: absolute; left: 0; right: 0; top: 18px; }
+.continue .preview .nh { position: absolute; width: 11px; height: 8px; background: var(--ink); border-radius: 50%; }
+.continue .preview .nh::after { content: ''; position: absolute; right: 0; bottom: 4px; width: 1px; height: 24px; background: var(--ink); }
+.cta { display: flex; gap: 10px; }
+.btn { height: 50px; border-radius: 25px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; font: 500 15px/1 var(--sans); padding: 0 24px; border: 1px solid var(--ink); }
+.btn.primary { background: var(--ink); color: var(--paper); flex: 1; }
+.btn svg { width: 14px; height: 14px; }
+
+.sections { margin-top: 30px; }
+.sec { display: grid; grid-template-columns: 30px 1fr auto; align-items: center; padding: 12px 0; border-top: 1px solid var(--rule); }
+.sec .num { font: italic 20px/1 var(--serif); color: var(--ink-2); }
+.sec .name { font-size: 15px; font-weight: 500; }
+.sec .dots { display: flex; gap: 3px; margin-top: 7px; }
+.sec .dots i { width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--ink); }
+.sec .dots i.f { background: var(--ink); }
+.sec .dots i.t { border-radius: 0; width: 12px; }
+.sec .meta { font: 12px var(--mono); color: var(--ink-2); text-align: right; }
+.sec.locked .name, .sec.locked .num { color: var(--ink-3); }
+.sec.locked .meta { color: var(--ink-3); }
+
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 84px; border-top: 1px solid var(--rule); display: flex; justify-content: space-around; padding-top: 12px; background: var(--paper); }
+.tab { display: flex; flex-direction: column; align-items: center; gap: 6px; font: 500 10px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.tab svg { width: 22px; height: 22px; }
+.tab.on { color: var(--ink); }
+
+/* ---------- MAP ---------- */
+.maphead { margin-top: 18px; display: flex; justify-content: space-between; align-items: flex-end; }
+.maphead h1 { font: 400 44px/0.9 var(--serif); }
+.maphead h1 em { font-size: 26px; display: block; color: var(--ink-2); margin-bottom: 4px; }
+.maphead .meta { text-align: right; font: 12px/1.6 var(--mono); color: var(--ink-2); }
+.score { position: relative; margin-top: 18px; height: 560px; overflow: hidden; -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent); }
+.score .vstaff { position: absolute; top: 0; bottom: 0; left: 50%; width: 210px; transform: translateX(-50%); background: repeating-linear-gradient(to right, var(--rule) 0 1px, transparent 1px 52px); background-size: 209px 100%; }
+.node { position: absolute; display: flex; align-items: center; gap: 10px; transform: translate(-50%, -50%); }
+.node .head { width: 34px; height: 26px; border-radius: 50%; transform: rotate(-22deg); border: 1.5px solid var(--ink); background: var(--ink); flex: none; display: grid; place-items: center; }
+.node .head b { transform: rotate(22deg); color: var(--paper); font: 500 11px var(--mono); }
+.node.locked .head { background: var(--paper); border: 1px dashed var(--ink-3); }
+.node.locked .head b { color: var(--ink-3); }
+.node.cur .head { background: var(--paper); border-width: 2px; box-shadow: 0 0 0 6px var(--paper), 0 0 0 7px var(--ink); }
+.node.cur .head b { color: var(--ink); }
+.node .lbl { font: 13px/1.25 var(--sans); white-space: nowrap; background: var(--paper); padding: 2px 4px; }
+.node .lbl small { display: block; font: 11px var(--mono); color: var(--ink-2); }
+.node.left { flex-direction: row-reverse; text-align: right; }
+.node.locked .lbl { color: var(--ink-3); }
+.stars { letter-spacing: 1px; font-size: 11px; }
+.stars .o { color: var(--ink-3); }
+.node.song .head { border-radius: 4px; transform: rotate(45deg); width: 26px; height: 26px; }
+.node.song .head b { transform: rotate(-45deg); font-size: 14px; }
+.node.cur .lbl .serif { font-size: 20px; font-style: italic; line-height: 1; }
+.dbar { position: absolute; left: 50%; transform: translateX(-50%); width: 210px; height: 8px; border-top: 1px solid var(--ink); border-bottom: 3px solid var(--ink); }
+
+/* ---------- LANDSCAPE ---------- */
+.land { width: 844px; height: 390px; padding: 0 47px 21px; display: flex; flex-direction: column; position: relative; }
+.hud { height: 46px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--rule); }
+.hud .t { flex: 1; display: flex; align-items: baseline; gap: 10px; }
+.hud .t .serif { font-size: 22px; font-style: italic; }
+.chip { height: 28px; padding: 0 11px; border: 1px solid var(--rule); border-radius: 14px; display: inline-flex; align-items: center; gap: 6px; font: 500 12px var(--mono); }
+.chip.on { border-color: var(--ink); }
+.chip svg { width: 13px; height: 13px; }
+.combo { display: flex; align-items: baseline; gap: 4px; padding-left: 6px; }
+.combo b { font: 400 30px/1 var(--serif); }
+.combo span { font: 10px var(--mono); letter-spacing: .12em; color: var(--ink-2); text-transform: uppercase; }
+.mic { display: flex; gap: 2px; align-items: flex-end; height: 16px; }
+.mic i { width: 3px; background: var(--ink); }
+.stage { position: relative; flex: 1; overflow: hidden; }
+.vf-strip { position: absolute; top: 0; left: 0; }
+.vf-overlay { position: absolute; inset: 0; pointer-events: none; }
+.clef-gutter { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(to right, var(--paper) 78%, transparent); width: 74px; }
+.stage::after { content: ''; position: absolute; left: 60px; top: 0; bottom: 0; width: 140px; background: linear-gradient(to right, var(--paper), rgba(245,245,244,0)); pointer-events: none; }
+.playhead { position: absolute; top: 6px; bottom: 6px; width: 1.5px; background: var(--ink); z-index: 3; }
+.playhead::before { content: ''; position: absolute; top: -6px; left: -5px; border: 6px solid transparent; border-top: 7px solid var(--ink); border-bottom: 0; }
+.mark-miss { position: absolute; width: 16px; height: 16px; transform: translate(-50%, -50%); z-index: 2; }
+.mark-miss::before, .mark-miss::after { content: ''; position: absolute; left: 7px; top: -2px; width: 1.5px; height: 20px; background: var(--ink); transform: rotate(45deg); }
+.mark-miss::after { transform: rotate(-45deg); }
+.mark-timing { position: absolute; transform: translateX(-50%); font: 9px var(--mono); color: var(--ink-2); }
+.mark-timing.t-o::before { content: '·'; font-size: 16px; line-height: 6px; }
+.mark-timing.t-e::before { content: '‹'; }
+.mark-timing.t-l::before { content: '›'; }
+.kbwrap { height: 116px; position: relative; }
+.kb { position: absolute; inset: 0; }
+.key { position: absolute; top: 0; }
+.key.white { height: 100%; background: #fbfbfa; border: 1px solid var(--ink); border-left-width: 0; border-radius: 0 0 4px 4px; }
+.key.white:first-child { border-left-width: 1px; }
+.key.black { height: 62%; background: var(--ink); border-radius: 0 0 3px 3px; z-index: 2; }
+.key .lbl { position: absolute; bottom: 7px; left: 0; right: 0; text-align: center; font: 9px var(--mono); color: var(--ink-2); }
+.key.middle-c .lbl { color: var(--ink); font-weight: 500; }
+.key.next::after { content: ''; position: absolute; left: 50%; bottom: 26px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--ink); }
+.key .finger { position: absolute; left: 0; right: 0; bottom: 44px; text-align: center; font: italic 17px var(--serif); }
+.key.white.hit { background: repeating-linear-gradient(135deg, #cfcfcd 0 2px, #fbfbfa 2px 5px); }
+.key.white.hit .lbl { background: #fbfbfa; }
+
+/* results */
+.res { display: grid; grid-template-columns: 1.05fr 1fr; gap: 34px; flex: 1; padding-top: 14px; }
+.res .big { font: 400 132px/0.8 var(--serif); letter-spacing: -0.03em; }
+.res .big sup { font-size: 46px; vertical-align: top; position: relative; top: 14px; }
+.starsbig { display: flex; gap: 8px; margin: 14px 0 12px; }
+.starsbig svg { width: 30px; height: 30px; }
+.res .line { font-size: 14px; color: var(--ink-2); line-height: 1.5; }
+.res .line b { color: var(--ink); font-weight: 500; }
+.res h4 { margin-bottom: 9px; }
+.dotplot { position: relative; height: 54px; border-bottom: 1px solid var(--ink); }
+.dotplot .win { position: absolute; top: 0; bottom: 0; left: 33.33%; right: 33.33%; background: var(--paper-2); }
+.dotplot .perf { position: absolute; top: 0; bottom: 0; left: 43.33%; right: 43.33%; background: #dcdcdb; }
+.dotplot .zero { position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: var(--ink); }
+.dotplot i { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); transform: translate(-50%, 50%); }
+.axis { display: flex; justify-content: space-between; font: 10px var(--mono); color: var(--ink-2); margin-top: 5px; }
+.tb { display: flex; margin-top: 12px; border-top: 1px solid var(--rule); }
+.tb div { flex: 1; padding-top: 8px; }
+.tb b { font: 400 28px/1 var(--serif); display: block; }
+.tb span { font: 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); }
+.xpline { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; border-top: 1px solid var(--ink); padding-top: 9px; }
+.xpline b { font: italic 34px/1 var(--serif); white-space: nowrap; }
+.actions { display: flex; gap: 8px; margin-top: 14px; }
+.actions .btn { height: 42px; font-size: 14px; padding: 0 18px; }
+</style>
+</head>
+<body>
+<!-- HOME -->
+<section class="portrait" data-screen="home">
+  <div class="topbar">
+    <span class="mark">Piano, <span class="it">slowly.</span></span>
+    <span class="iconbtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="8" cy="8" r="2.3"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4"/></svg></span>
+  </div>
+  <div class="player">
+    <div class="lv"><small>Lv.</small>7</div>
+    <div class="title"><span class="eyebrow">Player rank</span><span class="serif">Apprentice</span></div>
+  </div>
+  <div class="xp">
+    <div class="bar"><div class="fill"></div><i style="left:0"></i><i style="left:25%"></i><i style="left:50%"></i><i style="left:75%"></i><i style="right:0"></i><div class="head"></div></div>
+    <div class="row"><span>1,240 / 1,800 xp</span><span>560 to Lv. 8</span></div>
+  </div>
+  <div class="continue">
+    <span class="eyebrow">Continue — Noob · Level 09</span>
+    <h2>Ode to <span class="it">Joy</span></h2>
+    <p>Your first real melody. Five notes, right hand, all in C position.</p>
+    <div class="preview"><div class="staffrule"></div>
+      <span class="nh" style="left:6px;top:28px"></span><span class="nh" style="left:40px;top:28px"></span><span class="nh" style="left:74px;top:26px"></span><span class="nh" style="left:108px;top:24px"></span><span class="nh" style="left:150px;top:24px"></span><span class="nh" style="left:184px;top:26px"></span><span class="nh" style="left:218px;top:28px"></span><span class="nh" style="left:252px;top:30px"></span>
+    </div>
+    <div class="cta">
+      <span class="btn primary"><svg viewBox="0 0 14 14"><path d="M3 1.5l9 5.5-9 5.5z" fill="currentColor"/></svg>Play</span>
+      <span class="btn">Listen first</span>
+    </div>
+  </div>
+  <div class="sections">
+    <div class="sec"><span class="num">i</span><div><div class="name">Noob</div><div class="dots"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="t"></i></div></div><span class="meta">8/15<br>19★</span></div>
+    <div class="sec locked"><span class="num">ii</span><div><div class="name">Beginner</div></div><span class="meta">pass test ≥85%</span></div>
+    <div class="sec locked"><span class="num">iii</span><div><div class="name">Intermediate</div></div><span class="meta">locked</span></div>
+    <div class="sec locked"><span class="num">iv</span><div><div class="name">Advanced</div></div><span class="meta">locked</span></div>
+  </div>
+  <nav class="tabbar">
+    <span class="tab on"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 10l8-6 8 6v9H3z"/></svg>Home</span>
+    <span class="tab"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="6" cy="17" r="2"/><circle cx="16" cy="5" r="2"/><path d="M8 17c8 0 0-12 8-12" stroke-dasharray="2 2"/></svg>Map</span>
+    <span class="tab"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.3"><ellipse cx="7" cy="17" rx="3" ry="2.2"/><path d="M10 17V4l8-1.5v12"/><ellipse cx="15" cy="15" rx="3" ry="2.2"/></svg>Songs</span>
+    <span class="tab"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="11" cy="8" r="3.5"/><path d="M4 19c1-4 4-5.5 7-5.5s6 1.5 7 5.5"/></svg>You</span>
+  </nav>
+</section>
+
+<!-- MAP -->
+<section class="portrait" data-screen="map">
+  <div class="topbar">
+    <span class="iconbtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M10 3L5 8l5 5"/></svg></span>
+    <span class="eyebrow">Section i of iv</span>
+    <span class="iconbtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 5h10M3 8h10M3 11h10"/></svg></span>
+  </div>
+  <div class="maphead">
+    <h1><em class="it">The</em>Noob<br>Suite</h1>
+    <div class="meta">8 / 15 cleared<br>19 / 45 ★<br>1 song found</div>
+  </div>
+  <div class="score" id="score"><div class="vstaff"></div></div>
+  <nav class="tabbar">
+    <span class="tab"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 10l8-6 8 6v9H3z"/></svg>Home</span>
+    <span class="tab on"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="6" cy="17" r="2"/><circle cx="16" cy="5" r="2"/><path d="M8 17c8 0 0-12 8-12" stroke-dasharray="2 2"/></svg>Map</span>
+    <span class="tab"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.3"><ellipse cx="7" cy="17" rx="3" ry="2.2"/><path d="M10 17V4l8-1.5v12"/><ellipse cx="15" cy="15" rx="3" ry="2.2"/></svg>Songs</span>
+    <span class="tab"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="11" cy="8" r="3.5"/><path d="M4 19c1-4 4-5.5 7-5.5s6 1.5 7 5.5"/></svg>You</span>
+  </nav>
+</section>
+
+<!-- LESSON -->
+<section class="land" data-screen="lesson">
+  <div class="hud">
+    <span class="iconbtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 4l8 8M12 4l-8 8"/></svg></span>
+    <div class="t"><span class="eyebrow">Intermediate · 01</span><span class="serif">Ode to Joy, hands together</span></div>
+    <span class="mic"><i style="height:5px"></i><i style="height:11px"></i><i style="height:16px"></i><i style="height:8px"></i></span>
+    <span class="chip on"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4 13L6 1h2l2 12z"/><path d="M7 9l4-6"/></svg>♩ 72</span>
+    <span class="chip"><svg viewBox="0 0 14 14" fill="currentColor"><path d="M3 2l9 5-9 5z"/></svg>Listen</span>
+    <span class="combo"><b>×7</b><span>combo</span></span>
+  </div>
+  <div class="stage" id="stage"></div>
+  <div class="kbwrap"><div id="kb"></div></div>
+</section>
+
+<!-- RESULTS -->
+<section class="land" data-screen="results">
+  <div class="hud">
+    <span class="iconbtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 4l8 8M12 4l-8 8"/></svg></span>
+    <div class="t"><span class="eyebrow">Intermediate · 01 — cleared</span><span class="serif">Ode to Joy, hands together</span></div>
+    <span class="eyebrow">Attempt 3</span>
+  </div>
+  <div class="res">
+    <div>
+      <div class="big">92<sup>%</sup></div>
+      <div class="starsbig">
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6z" fill="#121212"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6z" fill="#121212"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6z" fill="none" stroke="#121212" stroke-width="1"/></svg>
+      </div>
+      <p class="line">Missed <b>E4</b> in bar 2 and <b>D4</b> in bar 6.<br>Max combo <b>14</b>. Three more percent for the third star.</p>
+      <div class="actions">
+        <span class="btn primary">Next level</span><span class="btn">Retry</span><span class="btn">Slow practice</span>
+      </div>
+    </div>
+    <div>
+      <h4 class="eyebrow">Timing, every note</h4>
+      <div class="dotplot" id="dots"><div class="win"></div><div class="perf"></div><div class="zero"></div></div>
+      <div class="axis"><span>−300ms early</span><span>window ±100 · perfect ±40</span><span>late +300ms</span></div>
+      <div class="tb"><div><b>3</b><span>Early</span></div><div><b>19</b><span>On time</span></div><div><b>2</b><span>Late</span></div><div><b>2</b><span>Missed</span></div></div>
+      <div class="xpline"><b>+171 xp</b><span class="eyebrow">attempt 40 · stars 60 · combo 21 · first clear 50</span></div>
+    </div>
+  </div>
+</section>
+
+<script src="node_modules/vexflow/build/cjs/vexflow-bravura.js"></script>
+<script type="module">
+import { renderStrip, renderKeyboard, screen } from './common.js';
+const s = screen();
+await document.fonts.ready;
+if (s === 'lesson') {
+  await renderStrip(document.getElementById('stage'), { playheadFrac: 0.34 });
+  renderKeyboard(document.getElementById('kb'), { state: { C4: 'next', C3: 'next', D4: 'hit' }, fingers: { C4: 1, C3: 5 } });
+}
+if (s === 'map') {
+  const host = document.getElementById('score');
+  // contour of Ode to Joy drives node x-offset (levels 4..12 visible)
+  const lv = [
+    { n: 4, t: 'F and G', s: 3 }, { n: 5, t: 'Quarter notes', s: 1 }, { song: 'Hot Cross Buns' }, { n: 6, t: 'Half notes', s: 2 },
+    { n: 7, t: 'Whole notes & bars', s: 3 }, { n: 8, t: 'Skipping thirds', s: 2 }, { n: 9, t: 'Ode to Joy', cur: true },
+    { n: 10, t: 'A, B and high C' }, { n: 11, t: 'Lines & spaces' }, { n: 12, t: 'Ties' },
+  ];
+  const xs = [58, 34, 70, 42, 58, 30, 50, 66, 40, 60];
+  lv.forEach((l, i) => {
+    const el = document.createElement('div');
+    const y = 545 - i * 56;
+    const x = xs[i];
+    const cls = l.song ? 'song' : l.cur ? 'cur' : l.s ? '' : 'locked';
+    const left = x > 50;
+    el.className = `node ${cls} ${left ? 'left' : ''}`;
+    el.style.left = `${x}%`; el.style.top = `${y}px`;
+    const st = l.s ? `<span class="stars">${'★'.repeat(l.s)}<span class="o">${'☆'.repeat(3 - l.s)}</span></span>` : '';
+    const lbl = l.song ? `${l.song}<small>song unlocked</small>` : l.cur ? `<small>Level 09 · next up</small><span class="serif">${l.t}</span>` : `${l.t}<small>Level ${String(l.n).padStart(2,'0')} ${st}</small>`;
+    el.innerHTML = `<span class="head"><b>${l.song ? '♪' : l.n}</b></span><span class="lbl">${lbl}</span>`;
+    host.appendChild(el);
+  });
+  const d = document.createElement('div'); d.className = 'dbar'; d.style.top = '-6px'; host.appendChild(d);
+}
+if (s === 'results') {
+  const host = document.getElementById('dots');
+  const off = [-95,-70,-55,-38,-33,-25,-20,-16,-12,-8,-5,-2,0,3,6,9,12,15,20,24,30,36,60,85];
+  const stack = {};
+  off.forEach((o) => {
+    const b = Math.round(o / 15);
+    stack[b] = (stack[b] || 0) + 1;
+    const i = document.createElement('i');
+    i.style.left = `${50 + (o / 300) * 50}%`;
+    i.style.bottom = `${(stack[b] - 1) * 9 + 4}px`;
+    host.appendChild(i);
+  });
+}
+document.body.dataset.ready = '1';
+</script>
+</body>
+</html>

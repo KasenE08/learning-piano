@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Concept B — Stage</title>
+<link rel="stylesheet" href="node_modules/@fontsource/big-shoulders-display/500.css">
+<link rel="stylesheet" href="node_modules/@fontsource/big-shoulders-display/700.css">
+<link rel="stylesheet" href="node_modules/@fontsource/big-shoulders-display/900.css">
+<link rel="stylesheet" href="node_modules/@fontsource/manrope/400.css">
+<link rel="stylesheet" href="node_modules/@fontsource/manrope/600.css">
+<link rel="stylesheet" href="node_modules/@fontsource/manrope/800.css">
+<style>
+:root {
+  --bg: #000; --ink: #f2f2f2; --g1: #0f0f0f; --g2: #1c1c1c; --g3: #3a3a3a; --g4: #7a7a7a; --g5: #b5b5b5;
+  --hit: #4a4a4a; --miss: #4a4a4a; --next: #ffffff;
+  --disp: 'Big Shoulders Display', sans-serif; --sans: 'Manrope', system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; height: 100%; overflow: hidden; }
+[hidden] { display: none !important; }
+.disp { font-family: var(--disp); text-transform: uppercase; }
+.lab { font: 800 10px/1 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: var(--g4); }
+
+.portrait { height: 844px; padding: 56px 20px 0; position: relative; display: flex; flex-direction: column;
+  background: radial-gradient(120% 60% at 50% -10%, #262626 0%, #000 60%); }
+.top { display: flex; justify-content: space-between; align-items: center; }
+.top .brand { font: 900 18px/1 var(--disp); letter-spacing: .06em; }
+.top .brand span { color: var(--g4); }
+.miclive { display: flex; align-items: center; gap: 8px; font: 600 11px var(--sans); color: var(--g4); }
+.miclive i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 10px #fff; }
+
+.lvrow { display: flex; align-items: flex-end; gap: 14px; margin-top: 24px; }
+.lvnum { font: 900 112px/0.78 var(--disp); letter-spacing: -0.02em; }
+.lvnum small { font-size: 40px; color: var(--g4); vertical-align: top; margin-right: 4px; }
+.lvmeta { padding-bottom: 6px; }
+.lvmeta b { font: 700 26px/1 var(--disp); text-transform: uppercase; display: block; letter-spacing: .02em; }
+.lvmeta span { font-size: 12.5px; color: var(--g4); }
+.vu { display: flex; gap: 3px; margin-top: 20px; height: 26px; align-items: flex-end; }
+.vu i { flex: 1; background: var(--g2); height: 100%; border-radius: 1px; }
+.vu i.on { background: var(--ink); }
+.vu i.pk { background: var(--ink); box-shadow: 0 0 12px rgba(255,255,255,.7); }
+.vurow { display: flex; justify-content: space-between; margin-top: 8px; font: 600 11.5px var(--sans); color: var(--g4); }
+.vurow b { color: var(--ink); }
+
+.hero { margin-top: 26px; background: var(--ink); color: #000; border-radius: 22px; padding: 18px 18px 18px; position: relative; overflow: hidden; }
+.hero .lab { color: #555; }
+.hero h2 { font: 900 58px/0.86 var(--disp); text-transform: uppercase; margin-top: 12px; letter-spacing: -0.005em; }
+.hero p { font-size: 13.5px; color: #333; margin-top: 10px; max-width: 220px; line-height: 1.45; }
+.hero .play { position: absolute; right: 18px; bottom: 18px; width: 76px; height: 76px; border-radius: 50%; background: #000; display: grid; place-items: center; }
+.hero .play svg { width: 26px; height: 26px; margin-left: 4px; }
+.hero .bigno { position: absolute; right: -6px; top: -26px; font: 900 150px/1 var(--disp); color: #e2e2e2; z-index: 0; }
+.hero > *:not(.bigno):not(.play) { position: relative; z-index: 1; }
+.hero .play { z-index: 2; }
+
+.setlist { margin-top: 22px; }
+.setlist .row { display: grid; grid-template-columns: 44px 1fr auto; align-items: center; height: 50px; border-bottom: 1px solid var(--g2); }
+.setlist .row .n { font: 700 24px/1 var(--disp); color: var(--g4); }
+.setlist .row .t { font: 700 22px/1 var(--disp); text-transform: uppercase; letter-spacing: .02em; }
+.setlist .row .pr { height: 3px; background: var(--g2); margin-top: 7px; width: 170px; position: relative; }
+.setlist .row .pr b { position: absolute; left: 0; top: 0; bottom: 0; width: 53%; background: var(--ink); }
+.setlist .row .m { font: 600 12px var(--sans); color: var(--g4); text-align: right; }
+.setlist .row.locked .t, .setlist .row.locked .n { color: var(--g3); }
+.setlist .row.locked .m { color: var(--g3); }
+
+.dock { position: absolute; left: 14px; right: 14px; bottom: 30px; height: 62px; border-radius: 31px; background: rgba(28,28,28,.92); display: flex; justify-content: space-around; align-items: center; border: 1px solid var(--g3); }
+.dock span { display: flex; flex-direction: column; align-items: center; gap: 4px; font: 800 9px var(--sans); letter-spacing: .14em; color: var(--g4); text-transform: uppercase; }
+.dock span svg { width: 22px; height: 22px; }
+.dock span.on { color: var(--ink); }
+
+/* MAP */
+.maptitle { margin-top: 18px; }
+.maptitle h1 { font: 900 78px/0.82 var(--disp); text-transform: uppercase; }
+.maptitle h1 span { color: var(--g3); }
+.maptitle .stats { display: flex; gap: 18px; margin-top: 14px; }
+.maptitle .stats div b { font: 700 28px/1 var(--disp); display: block; }
+.line { position: relative; margin-top: 20px; height: 560px; overflow: hidden; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 6%, #000 84%, transparent); }
+.line::before { content: ''; position: absolute; left: 36px; top: 0; bottom: 0; width: 4px; background: linear-gradient(to bottom, var(--g3) 0 30%, var(--ink) 30% 100%); }
+.stop { position: absolute; left: 0; right: 0; display: grid; grid-template-columns: 76px 1fr auto; align-items: center; height: 56px; }
+.stop .dot { width: 22px; height: 22px; margin-left: 27px; border-radius: 50%; background: var(--ink); border: 4px solid #000; box-shadow: 0 0 0 2px var(--ink); }
+.stop .t { font: 700 23px/1 var(--disp); text-transform: uppercase; letter-spacing: .02em; }
+.stop .t small { display: block; font: 600 11px/1.6 var(--sans); color: var(--g4); text-transform: none; letter-spacing: 0; }
+.stop .s { display: flex; gap: 3px; }
+.stop .s svg { width: 14px; height: 14px; }
+.stop.locked .dot { background: #000; box-shadow: 0 0 0 2px var(--g3); }
+.stop.locked .t { color: var(--g3); }
+.stop.locked .t small { color: var(--g3); }
+.stop.cur { height: 96px; }
+.stop.cur .dot { width: 36px; height: 36px; margin-left: 20px; box-shadow: 0 0 0 2px #fff, 0 0 30px 6px rgba(255,255,255,.55); }
+.stop.cur .card { background: var(--ink); color: #000; border-radius: 16px; padding: 12px 14px; grid-column: 2 / 4; display: flex; justify-content: space-between; align-items: center; margin-right: 0; }
+.stop.cur .card .t small { color: #555; }
+.stop.cur .card .go { font: 900 18px/1 var(--disp); letter-spacing: .08em; border: 2px solid #000; border-radius: 20px; padding: 8px 14px; }
+.stop.song .dot { border-radius: 4px; transform: rotate(45deg); background: #000; box-shadow: 0 0 0 2px var(--ink); }
+.stop.song .t { font-style: italic; }
+.stop.test .dot { border-radius: 3px; width: 26px; height: 26px; margin-left: 25px; }
+
+/* LANDSCAPE */
+.land { width: 844px; height: 390px; padding: 0 47px 21px; display: flex; flex-direction: column; position: relative; background: radial-gradient(90% 90% at 34% 40%, #1a1a1a 0%, #000 70%); }
+.hud { height: 50px; display: flex; align-items: center; gap: 12px; }
+.circ { width: 34px; height: 34px; border-radius: 50%; background: var(--g2); display: grid; place-items: center; }
+.circ svg { width: 14px; height: 14px; }
+.hud .t { flex: 1; }
+.hud .t b { font: 700 21px/1 var(--disp); text-transform: uppercase; letter-spacing: .03em; display: block; }
+.pill { height: 32px; border-radius: 16px; background: var(--g2); display: inline-flex; align-items: center; gap: 7px; padding: 0 13px; font: 800 12px var(--sans); }
+.pill.on { background: var(--ink); color: #000; }
+.pill svg { width: 13px; height: 13px; }
+.acc { font: 700 26px/1 var(--disp); padding: 0 4px; }
+.acc small { font-size: 14px; color: var(--g4); }
+.stage { position: relative; flex: 1; overflow: hidden; }
+.vf-strip { position: absolute; top: 0; left: 0; }
+.vf-overlay { position: absolute; inset: 0; pointer-events: none; }
+.clef-gutter { position: absolute; left: 0; top: 0; bottom: 0; width: 74px; background: linear-gradient(to right, #050505 75%, transparent); }
+.stage::after { content: ''; position: absolute; left: 60px; top: 0; bottom: 0; width: 120px; background: linear-gradient(to right, #070707, rgba(0,0,0,0)); pointer-events: none; }
+.playhead { position: absolute; top: 0; bottom: 0; width: 46px; margin-left: -23px; z-index: 3; background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,.10) 45%, rgba(255,255,255,.10) 55%, rgba(255,255,255,0)); }
+.playhead::after { content: ''; position: absolute; left: 22px; top: 0; bottom: 0; width: 2px; background: #fff; box-shadow: 0 0 12px 2px rgba(255,255,255,.75); }
+.mark-miss { position: absolute; width: 22px; height: 16px; transform: translate(-50%, -50%); border-radius: 50%; background: repeating-linear-gradient(135deg, #fff 0 1.5px, transparent 1.5px 4px); z-index: 2; }
+.mark-timing { display: none; }
+.hcombo { display: flex; align-items: baseline; gap: 5px; background: var(--ink); color: #000; border-radius: 10px; padding: 3px 10px 3px 8px; box-shadow: 0 0 22px rgba(255,255,255,.35); }
+.hcombo b { font: 900 28px/1 var(--disp); }
+.hcombo span { font: 800 9px var(--sans); letter-spacing: .16em; text-transform: uppercase; }
+.combo { position: absolute; right: 8px; top: 2px; text-align: right; z-index: 4; }
+.combo b { font: 900 64px/0.8 var(--disp); display: block; text-shadow: 0 0 24px rgba(255,255,255,.35); }
+.combo span { font: 800 9px var(--sans); letter-spacing: .2em; color: var(--g5); }
+.kbwrap { height: 112px; position: relative; }
+.kb { position: absolute; inset: 0; }
+.key { position: absolute; top: 0; }
+.key.white { height: 100%; background: linear-gradient(#cfcfcf, #e9e9e9 30%, #f4f4f4); border-right: 1.5px solid #000; border-radius: 0 0 6px 6px; }
+.key.black { height: 60%; background: linear-gradient(#2a2a2a, #0a0a0a); border: 1px solid #000; border-top: 0; border-radius: 0 0 4px 4px; z-index: 2; box-shadow: 0 3px 4px rgba(0,0,0,.6); }
+.key .lbl { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font: 800 9px var(--sans); color: #777; }
+.key.white.next { background: #fff; box-shadow: 0 0 24px 6px rgba(255,255,255,.55); z-index: 1; }
+.key.white.next::after { content: ''; position: absolute; left: 50%; bottom: 22px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; border: 3px solid #000; }
+.key .finger { position: absolute; left: 0; right: 0; bottom: 42px; text-align: center; font: 900 20px var(--disp); color: #000; }
+.key.white.hit { background: #fff; box-shadow: inset 0 -34px 0 -26px #000, 0 0 16px 2px rgba(255,255,255,.4); z-index: 1; }
+.key.white.hit::after { content: '✓'; position: absolute; left: 0; right: 0; bottom: 24px; text-align: center; font: 900 18px var(--sans); color: #000; }
+
+/* RESULTS */
+.res { flex: 1; display: grid; grid-template-columns: auto 1fr; gap: 30px; align-items: center; }
+.score { text-align: left; }
+.score .big { font: 900 170px/0.78 var(--disp); letter-spacing: -0.02em; text-shadow: 0 0 40px rgba(255,255,255,.25); }
+.score .big small { font-size: 60px; color: var(--g4); }
+.stars3 { display: flex; gap: 10px; margin-top: 14px; }
+.stars3 svg { width: 40px; height: 40px; }
+.panel { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.tile { background: var(--g1); border: 1px solid var(--g2); border-radius: 14px; padding: 12px; }
+.tile b { font: 700 36px/1 var(--disp); display: block; }
+.tile .lab { margin-top: 6px; display: block; }
+.timing { grid-column: 1 / 5; background: var(--g1); border: 1px solid var(--g2); border-radius: 14px; padding: 12px; }
+.tbar { display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 10px; gap: 2px; }
+.tbar i { display: block; }
+.tlegend { display: flex; justify-content: space-between; margin-top: 8px; font: 600 11.5px var(--sans); color: var(--g4); }
+.tlegend b { color: var(--ink); }
+.xpwide { grid-column: 1 / 5; display: flex; justify-content: space-between; align-items: center; }
+.xpwide .x { font: 900 40px/1 var(--disp); }
+.btns { display: flex; gap: 8px; }
+.btn { height: 44px; border-radius: 22px; padding: 0 18px; display: inline-flex; align-items: center; font: 800 13px var(--sans); background: var(--g2); }
+.btn.w { background: var(--ink); color: #000; }
+</style>
+</head>
+<body>
+<section class="portrait" data-screen="home">
+  <div class="top"><span class="brand">KEYS<span>/</span>STAGE</span><span class="miclive"><i></i>Mic ready</span></div>
+  <div class="lvrow">
+    <div class="lvnum"><small>LV</small>07</div>
+    <div class="lvmeta"><b>Apprentice</b><span>Next: Lv 08 · Journeyman</span></div>
+  </div>
+  <div class="vu" id="vu"></div>
+  <div class="vurow"><span><b>1,240</b> / 1,800 XP</span><span>560 to go</span></div>
+  <div class="hero">
+    <span class="bigno">09</span>
+    <span class="lab">Up next · Noob</span>
+    <h2>Ode to<br>Joy</h2>
+    <p>Your first real melody. Right hand, C position.</p>
+    <span class="play"><svg viewBox="0 0 24 24"><path d="M5 3l16 9-16 9z" fill="#fff"/></svg></span>
+  </div>
+  <div class="setlist">
+    <div class="row"><span class="n">01</span><div><div class="t">Noob</div><div class="pr"><b></b></div></div><span class="m">8/15 · 19★</span></div>
+    <div class="row locked"><span class="n">02</span><div class="t">Beginner</div><span class="m">Test ≥ 85%</span></div>
+    <div class="row locked"><span class="n">03</span><div class="t">Intermediate</div><span class="m">Locked</span></div>
+    <div class="row locked"><span class="n">04</span><div class="t">Advanced</div><span class="m">Locked</span></div>
+  </div>
+  <nav class="dock">
+    <span class="on"><svg viewBox="0 0 22 22" fill="currentColor"><path d="M3 10l8-6 8 6v9H3z"/></svg>Home</span>
+    <span><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v16"/><circle cx="5" cy="6" r="2" fill="currentColor"/><circle cx="5" cy="15" r="2" fill="currentColor"/><path d="M10 6h8M10 15h6"/></svg>Map</span>
+    <span><svg viewBox="0 0 22 22" fill="currentColor"><ellipse cx="7" cy="17" rx="3.2" ry="2.4"/><path d="M9.2 17V4l9-2v12h-1.6V4.6L10.8 6v11z"/><ellipse cx="15" cy="15" rx="3.2" ry="2.4"/></svg>Songs</span>
+    <span><svg viewBox="0 0 22 22" fill="currentColor"><circle cx="11" cy="7.5" r="4"/><path d="M3 20c1-5 4.5-6.5 8-6.5s7 1.5 8 6.5z"/></svg>You</span>
+  </nav>
+</section>
+
+<section class="portrait" data-screen="map">
+  <div class="top"><span class="circ"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg></span><span class="lab">Setlist 01 / 04</span><span class="circ"><svg viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></span></div>
+  <div class="maptitle">
+    <h1>Noob<br><span>Setlist</span></h1>
+    <div class="stats"><div><b>8/15</b><span class="lab">Cleared</span></div><div><b>19/45</b><span class="lab">Stars</span></div><div><b>1/3</b><span class="lab">Songs</span></div></div>
+  </div>
+  <div class="line" id="line"></div>
+  <nav class="dock">
+    <span><svg viewBox="0 0 22 22" fill="currentColor"><path d="M3 10l8-6 8 6v9H3z"/></svg>Home</span>
+    <span class="on"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v16"/><circle cx="5" cy="6" r="2" fill="currentColor"/><circle cx="5" cy="15" r="2" fill="currentColor"/><path d="M10 6h8M10 15h6"/></svg>Map</span>
+    <span><svg viewBox="0 0 22 22" fill="currentColor"><ellipse cx="7" cy="17" rx="3.2" ry="2.4"/><path d="M9.2 17V4l9-2v12h-1.6V4.6L10.8 6v11z"/><ellipse cx="15" cy="15" rx="3.2" ry="2.4"/></svg>Songs</span>
+    <span><svg viewBox="0 0 22 22" fill="currentColor"><circle cx="11" cy="7.5" r="4"/><path d="M3 20c1-5 4.5-6.5 8-6.5s7 1.5 8 6.5z"/></svg>You</span>
+  </nav>
+</section>
+
+<section class="land" data-screen="lesson">
+  <div class="hud">
+    <span class="circ"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l8 8M12 4l-8 8"/></svg></span>
+    <div class="t"><span class="lab">Intermediate · 01</span><b>Ode to Joy — hands together</b></div>
+    <span class="pill"><svg viewBox="0 0 14 14" fill="currentColor"><path d="M3 2l9 5-9 5z"/></svg>Listen</span>
+    <span class="pill on"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 13L6 1h2l2 12z"/><path d="M7 9l4-6"/></svg>72 BPM</span>
+    <span class="acc">96<small>%</small></span><span class="hcombo"><b>×7</b><span>combo</span></span>
+  </div>
+  <div class="stage" id="stage"></div>
+  <div class="kbwrap"><div id="kb"></div></div>
+</section>
+
+<section class="land" data-screen="results">
+  <div class="hud">
+    <span class="circ"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l8 8M12 4l-8 8"/></svg></span>
+    <div class="t"><span class="lab">Cleared · attempt 3</span><b>Ode to Joy — hands together</b></div>
+  </div>
+  <div class="res">
+    <div class="score">
+      <div class="big">92<small>%</small></div>
+      <div class="stars3">
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6z" fill="#fff"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6z" fill="#fff"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6z" fill="none" stroke="#3a3a3a" stroke-width="1.5"/></svg>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="tile"><b>14</b><span class="lab">Max combo</span></div>
+      <div class="tile"><b>24/26</b><span class="lab">Notes hit</span></div>
+      <div class="tile" style="grid-column: span 2"><b style="font-size:22px;line-height:36px">E4 · D4</b><span class="lab">Missed — bars 2, 6</span></div>
+      <div class="timing"><span class="lab">Timing</span>
+        <div class="tbar"><i style="flex:3;background:#7a7a7a"></i><i style="flex:19;background:#fff"></i><i style="flex:2;background:#7a7a7a"></i><i style="flex:2;background:repeating-linear-gradient(135deg,#fff 0 1.5px,#000 1.5px 4px)"></i></div>
+        <div class="tlegend"><span><b>3</b> early</span><span><b>19</b> on time</span><span><b>2</b> late</span><span><b>2</b> missed</span></div>
+      </div>
+      <div class="xpwide"><span class="x">+171 XP</span><span class="btns"><span class="btn">Retry</span><span class="btn">Slow</span><span class="btn w">Next →</span></span></div>
+    </div>
+  </div>
+</section>
+
+<script src="node_modules/vexflow/build/cjs/vexflow-bravura.js"></script>
+<script type="module">
+import { renderStrip, renderKeyboard, screen } from './common.js';
+const s = screen();
+await document.fonts.ready;
+if (s === 'home') {
+  const vu = document.getElementById('vu');
+  for (let i = 0; i < 36; i++) { const e = document.createElement('i'); const f = i / 36; e.style.height = `${40 + f * 60}%`; if (i < 24) e.className = 'on'; if (i === 24) e.className = 'pk'; vu.appendChild(e); }
+}
+if (s === 'lesson') {
+  await renderStrip(document.getElementById('stage'), { playheadFrac: 0.34 });
+  renderKeyboard(document.getElementById('kb'), { state: { C4: 'next', C3: 'next', D4: 'hit' }, fingers: { C4: 1, C3: 5 } });
+}
+if (s === 'map') {
+  const line = document.getElementById('line');
+  const star = (on) => `<svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6z" fill="${on ? '#fff' : '#3a3a3a'}"/></svg>`;
+  const stops = [
+    { k: 'locked', t: 'Section test', sm: 'Pass ≥ 85% to unlock Beginner', cls: 'test' },
+    { k: 'locked', t: 'A, B and high C', sm: 'Level 10' },
+    { k: 'cur', t: 'Ode to Joy', sm: 'Level 09 · right hand' },
+    { k: 'done', t: 'Skipping thirds', sm: 'Level 08', s: 2 },
+    { k: 'done', t: 'Whole notes', sm: 'Level 07', s: 3 },
+    { k: 'song', t: 'Hot Cross Buns', sm: 'Bonus song unlocked' },
+    { k: 'done', t: 'Half notes', sm: 'Level 06', s: 2 },
+    { k: 'done', t: 'Quarter notes', sm: 'Level 05', s: 1 },
+    { k: 'done', t: 'F and G', sm: 'Level 04', s: 3 },
+  ];
+  let y = 8;
+  stops.forEach((st, i) => {
+    if (i === 1) { const gap = document.createElement('div'); gap.className = 'lab'; gap.style.cssText = `position:absolute;left:76px;top:${y + 6}px;color:#3a3a3a`; gap.textContent = '· · · levels 11–15'; line.appendChild(gap); y += 30; }
+    const el = document.createElement('div');
+    el.className = `stop ${st.k === 'done' ? '' : st.k} ${st.cls || ''}`;
+    el.style.top = `${y}px`;
+    const stars = st.s ? `<span class="s">${[0,1,2].map((j) => star(j < st.s)).join('')}</span>` : '<span></span>';
+    if (st.k === 'cur') el.innerHTML = `<span class="dot"></span><div class="card"><span class="t">${st.t}<small>${st.sm}</small></span><span class="go">PLAY</span></div>`;
+    else el.innerHTML = `<span class="dot"></span><span class="t">${st.t}<small>${st.sm}</small></span>${stars}`;
+    line.appendChild(el);
+    y += st.k === 'cur' ? 100 : 58;
+  });
+}
+document.body.dataset.ready = '1';
+</script>
+</body>
+</html>

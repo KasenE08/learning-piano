@@ -136,7 +136,12 @@ export function createNoteDetector(sampleRate, opts = {}) {
         // Same pitch as a note that's ringing (or just was, e.g. a held bass note heard
         // again when a higher key is released): a new strike only if the level dipped and rose.
         const wasRinging = m === sounding || (seen.get(m) ?? -Infinity) > p.time - 1.5;
-        if (wasRinging && p.swing < o.reattackDb) { lastOnset = -Infinity; return; }
+        if (wasRinging && p.swing < o.reattackDb) {
+          // Still reported (marked) so a melody check can look at this attack.
+          if (o.reportDropped) sink.push({ midi: m, time: p.time, how: 'attack', dropped: true });
+          lastOnset = -Infinity;
+          return;
+        }
         emit(m, p.time, 'attack', sink);
         if (run && run.midi !== m && run.n >= 2) seen.set(run.midi, run.last);
         run = { midi: m, start: p.time, n: o.stableFrames + 1, last: p.time };

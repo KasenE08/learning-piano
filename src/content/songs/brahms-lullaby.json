@@ -1,0 +1,23 @@
+{
+  "hands": "both",
+  "key": "C",
+  "time": "3/4",
+  "pickup": true,
+  "tempo": {
+    "default": 84,
+    "min": 56,
+    "max": 120
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Brahms' Lullaby",
+      "text": "Brahms, 1868. Two verses: the second is an octave higher. The left hand plays a waltz pattern: bass note, then two soft chords."
+    }
+  ],
+  "parts": {
+    "rh": "E4/8 E4/8 | G4/qd E4/8 E4/q | G4/h E4/8 G4/8 | C5/q B4/qd A4/8 | A4/q G4/q D4/8 E4/8 | F4/q D4/q D4/8 E4/8 | F4/q r/q D4/8 F4/8 | B4/8 A4/8 G4/q B4/q | C5/q r/q C4/8 C4/8 | C5/h A4/8 F4/8 | G4/h E4/8 C4/8 | F4/q G4/q A4/q | G4/h C4/8 C4/8 | C5/h A4/8 F4/8 | G4/h E4/8 C4/8 | F4/q E4/q D4/q | C4/h E5/8 E5/8 | G5/qd E5/8 E5/q | G5/h E5/8 G5/8 | C6/q B5/qd A5/8 | A5/q G5/q D5/8 E5/8 | F5/q D5/q D5/8 E5/8 | F5/q r/q D5/8 F5/8 | B5/8 A5/8 G5/q B5/q | C6/q r/q C5/8 C5/8 | C6/h A5/8 F5/8 | G5/h E5/8 C5/8 | F5/q G5/q A5/q | G5/h C5/8 C5/8 | C6/h A5/8 F5/8 | G5/h E5/8 C5/8 | F5/q E5/q D5/q | C5/hd",
+    "lh": "r/q | C3/q [E3 G3]/q [E3 G3]/q | C3/q [E3 G3]/q [E3 G3]/q | C3/q [E3 G3]/q [E3 G3]/q | D3/q [F3 A3]/q G2/q | D3/q [F3 A3]/q G2/q | D3/q [F3 A3]/q G2/q | G2/q [F3 B3]/q [F3 B3]/q | C3/q [E3 G3]/q [E3 Bb3]/q | F2/q [F3 A3]/q [F3 A3]/q | C3/q [E3 G3]/q [E3 G3]/q | D3/q [F3 A3]/q G2/q | C3/q [E3 G3]/q [E3 Bb3]/q | F2/q [F3 A3]/q [F3 A3]/q | C3/q [E3 G3]/q [E3 G3]/q | D3/q [F3 A3]/q G2/q | C3/q G2/q r/q | C3/q [E3 G3]/q [E3 G3]/q | C3/q [E3 G3]/q [E3 G3]/q | C3/q [E3 G3]/q [E3 G3]/q | D3/q [F3 A3]/q G2/q | D3/q [F3 A3]/q G2/q | D3/q [F3 A3]/q G2/q | G2/q [F3 B3]/q [F3 B3]/q | C3/q [E3 G3]/q [E3 Bb3]/q | F2/q [F3 A3]/q [F3 A3]/q | C3/q [E3 G3]/q [E3 G3]/q | D3/q [F3 A3]/q G2/q | C3/q [E3 G3]/q [E3 Bb3]/q | F2/q [F3 A3]/q [F3 A3]/q | C3/q [E3 G3]/q [E3 G3]/q | D3/q [F3 A3]/q G2/q | [C2 C3]/hd"
+  },
+  "credit": "Melody from the Mutopia Project edition (Brahms, Op. 49 No. 4, arr. Diego F. Guillen, public domain). Left hand arranged for this app."
+}

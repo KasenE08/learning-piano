@@ -7,7 +7,8 @@ import { createDrill, drillPrompts } from '../../engine/drill.js';
 import { sections, songs, getSettings, saveSettings, getProgress, saveProgress, getCalibration } from '../../core/store.js';
 import { mapState, recordAttempt, recordTest, recordSong, attemptXp, addXp, evaluateUnlocks, comboMultiplier, rankFor } from '../../core/progress.js';
 import { nameOf, midiOf } from '../../core/music.js';
-import { parseLevel, expectedNotes, noteRange, keyboardWindow, measureBeats } from '../../engine/notation.js';
+import { parseLevel, expectedNotes, noteRange, keyboardWindow, measureBeats, pulseBeats, micMelody, hasChords } from '../../engine/notation.js';
+import { generatePassage } from '../../engine/generate.js';
 import { createRun } from '../../engine/run.js';
 import { loadLevel } from '../../content/levels.js';
 import { TIMING_WINDOWS_MS, SECTION_TEST_PASS } from '../../config/scoring.js';
@@ -63,7 +64,7 @@ export function render(root, params) {
     </div>
   </main>`);
   root.append(screen);
-  if (import.meta.env.DEV) window.__lesson = { get run() { return run; }, get notes() { return notes; }, get drill() { return drill; } };
+  if (import.meta.env.DEV) window.__lesson = { get run() { return run; }, get notes() { return notes; }, get drill() { return drill; }, get score() { return score; } };
 
   const $ = (s) => screen.querySelector(s);
   const scoreHost = $('.score');
@@ -83,6 +84,8 @@ export function render(root, params) {
   let run = null;
   let tempo = 80;
   let practice = false;
+  // Practice options: a bar range, looping, and one hand at a time.
+  const pr = { from: 1, to: 1, loop: false, hand: 'both' };
   let heardDemo = false;
   let alive = true;
   let state = 'loading';
@@ -129,6 +132,7 @@ export function render(root, params) {
   }
   const updateTempoBtn = () => {
     tempoBtn.querySelector('.tempo-val').textContent = `${tempo} BPM`;
+    tempoBtn.title = pulse() === 1.5 ? 'Beats per minute, one beat = a dotted quarter' : '';
     tempoBtn.classList.toggle('pill--on', !!getSettings().metronome);
   };
 
@@ -169,6 +173,42 @@ export function render(root, params) {
     score.setBeat(-0.5);
   }
 
+  // ---------- timing helpers ----------
+  const time = () => level.time || '4/4';
+  // Clicks per beat unit: 1.5 quarter notes in 6/8 (tempo is in those beats).
+  const pulse = () => pulseBeats(time());
+  const quarterTempo = () => tempo * pulse();
+  const barsOf = () => (parsed.display || parsed.parts)[Object.keys(parsed.parts)[0]];
+  const hasBothHands = () => !!(level.parts?.rh && level.parts?.lh);
+
+  /** The notes and length to play now: the whole piece, or the practice bars/hand. */
+  function playSet({ forListen = false } = {}) {
+    let list = notes;
+    let total = parsed.totalBeats;
+    let offset = 0;
+    if (practice) {
+      const bars = barsOf();
+      if (!(pr.from === 1 && pr.to === bars.length)) {
+        offset = bars[pr.from - 1].start;
+        const end = bars[pr.to - 1].start + bars[pr.to - 1].beats;
+        list = notes.filter((n) => !n.event.orig && n.beat >= offset - 1e-6 && n.beat < end - 1e-6).map((n) => ({ ...n, beat: n.beat - offset }));
+        total = end - offset;
+      }
+      if (!forListen && pr.hand !== 'both') list = list.filter((n) => n.part === pr.hand);
+    }
+    return { list, total, offset };
+  }
+
+  /** In mic mode, notes that start together can't all be heard yet: score the melody. */
+  function micSplit(list) {
+    if (!hasChords(list)) return { scored: list, ghosts: [], partial: false };
+    const { scored, ghosts } = micMelody(list);
+    return { scored, ghosts, partial: true };
+  }
+  const micNote = () => (micMode() && notes.length && hasChords(notes)
+    ? 'Keyboard mode scores the melody (top notes) until chord detection lands.'
+    : '');
+
   // ---------- flow ----------
   function ready(note = '') {
     if (isDrill()) return drillReady(note);
@@ -176,33 +216,55 @@ export function render(root, params) {
     run = null;
     countEl.textContent = '';
     countEl.classList.remove('is-on');
-    score?.setBeat(-0.5);
-    markNext(notes.filter((n) => n.beat === notes[0].beat));
+    score?.setBeat((practice ? barsOf()[pr.from - 1].start : 0) - 0.5);
+    const first = playSet().list;
+    markNext(first.filter((n) => n.beat === first[0]?.beat));
     listenBtn.disabled = false;
     tempoBtn.disabled = false;
     updateTempoBtn();
     const rec = info.isTest ? getProgress().tests[info.section.id] : info.isSong ? getProgress().songs[info.songId] : getProgress().levels[params.id];
     const loaded = audio.isLoaded();
     hidePanel();
-    const p = showPanel(html`<div class="card ready">
+    const nBars = practice ? barsOf().length : 0;
+    const mn = micNote();
+    const p = showPanel(html`<div class="card ready ${practice ? 'ready--practice' : ''}">
       <span class="label">${practice ? 'Practice · not scored for stars' : info.isTest ? `Pass with ${SECTION_TEST_PASS}%` : `Timing window ±${windowMs} ms`}</span>
-      <h2 class="display">${info.title}</h2>
+      ${practice ? '' : html`<h2 class="display">${info.title}</h2>`}
+      ${level.generate ? html`<p class="ready__gen">Passage ${String(level.seed % 10000).padStart(4, '0')} · ${level.key.replace('b', '♭')} major · ${time()} <button class="link" data-act="newpassage">New passage</button></p>` : ''}
       ${note ? html`<p class="ready__note">${note}</p>` : ''}
-      <div class="seg" role="radiogroup" aria-label="Input">
-        <button class="seg__b ${micMode() ? 'is-on' : ''}" data-input="mic" role="radio" aria-checked="${micMode()}">${icons.mic} Keyboard</button>
-        <button class="seg__b ${micMode() ? '' : 'is-on'}" data-input="tap" role="radio" aria-checked="${!micMode()}">Taps</button>
+      ${mn && !note ? html`<p class="ready__mic">${mn}</p>` : ''}
+      <div class="ready__foot">
+        <div class="seg" role="radiogroup" aria-label="Input">
+          <button class="seg__b ${micMode() ? 'is-on' : ''}" data-input="mic" role="radio" aria-checked="${micMode()}">${icons.mic} Keyboard</button>
+          <button class="seg__b ${micMode() ? '' : 'is-on'}" data-input="tap" role="radio" aria-checked="${!micMode()}">Taps</button>
+        </div>
+        <div class="ready__btns">
+          <button class="btn btn--primary" data-act="go" ${loaded ? '' : 'disabled'}>${icons.play} ${loaded ? (practice ? 'Start' : info.isTest ? 'Start test' : 'Play') : 'Loading piano…'}</button>
+          ${info.isTest ? '' : html`<button class="btn btn--ghost" data-act="mode">${practice ? 'Scored play' : 'Practice'}</button>`}
+        </div>
       </div>
       ${micMode() && !getCalibration() ? html`<p class="ready__note">First, a 1-minute mic calibration. <a class="link" href="#/calibrate/lesson/${params.id}">Calibrate now →</a></p>` : ''}
-      ${practice ? html`<div class="tempo-row">
+      ${practice ? html`<div class="prac">
+        <div class="tempo-row">
           <span class="label">Tempo</span>
           <input type="range" min="${level.tempo.min}" max="${level.tempo.max}" step="2" value="${tempo}" aria-label="Tempo">
           <b class="display tempo-out">${tempo}</b>
         </div>
-        <div class="metro-row"><span class="label">Metronome while playing</span><button class="switch ${getSettings().metronome ? 'is-on' : ''}" data-act="metro" role="switch" aria-checked="${!!getSettings().metronome}"><i></i></button></div>` : ''}
-      <div class="ready__btns">
-        <button class="btn btn--primary" data-act="go" ${loaded ? '' : 'disabled'}>${icons.play} ${loaded ? (practice ? 'Start practice' : info.isTest ? 'Start test' : 'Play') : 'Loading piano…'}</button>
-        ${info.isTest ? '' : html`<button class="btn btn--ghost" data-act="mode">${practice ? 'Scored play' : 'Practice'}</button>`}
-      </div>
+        <div class="bars-row">
+          <span class="label">Bars</span>
+          <span class="stepper"><button data-bar="from" data-d="-1" aria-label="Start one bar earlier">−</button><b class="display" data-out="from">${pr.from}</b><button data-bar="from" data-d="1" aria-label="Start one bar later">+</button></span>
+          <span class="label">to</span>
+          <span class="stepper"><button data-bar="to" data-d="-1" aria-label="End one bar earlier">−</button><b class="display" data-out="to">${pr.to}</b><button data-bar="to" data-d="1" aria-label="End one bar later">+</button></span>
+          <small class="label">of ${nBars}</small>
+        </div>
+        <div class="toggles">
+          <span class="tog"><span class="label">Click</span><button class="switch ${getSettings().metronome ? 'is-on' : ''}" data-act="metro" role="switch" aria-label="Metronome" aria-checked="${!!getSettings().metronome}"><i></i></button></span>
+          <span class="tog"><span class="label">Loop</span><button class="switch ${pr.loop ? 'is-on' : ''}" data-act="loop" role="switch" aria-label="Loop the bars" aria-checked="${pr.loop}"><i></i></button></span>
+        </div>
+        ${hasBothHands() ? html`<div class="hands-row"><span class="label">Hands</span><div class="seg seg--sm" role="radiogroup" aria-label="Hands">
+          ${[['both', 'Both'], ['rh', 'Right'], ['lh', 'Left']].map(([v, t]) => html`<button class="seg__b ${pr.hand === v ? 'is-on' : ''}" data-hand="${v}" role="radio" aria-checked="${pr.hand === v}">${t}</button>`)}
+        </div></div>` : ''}
+      </div>` : ''}
       ${rec?.best != null ? html`<p class="ready__best">Best ${fmtPct(rec.best)}% ${info.isTest ? '' : stars(rec.stars)}</p>` : ''}
     </div>`);
     p.querySelector('[data-act="go"]').addEventListener('click', onGo);
@@ -214,6 +276,7 @@ export function render(root, params) {
     p.querySelector('[data-act="mode"]')?.addEventListener('click', () => {
       practice = !practice;
       if (!practice) tempo = level.tempo.default;
+      score.setBeat(-0.5);
       ready();
     });
     const range = p.querySelector('input[type="range"]');
@@ -222,6 +285,23 @@ export function render(root, params) {
       p.querySelector('.tempo-out').textContent = tempo;
       updateTempoBtn();
     });
+    p.querySelectorAll('[data-bar]').forEach((b) => b.addEventListener('click', () => {
+      const k = b.dataset.bar;
+      pr[k] = Math.max(1, Math.min(nBars, pr[k] + Number(b.dataset.d)));
+      if (pr.from > pr.to) { if (k === 'from') pr.to = pr.from; else pr.from = pr.to; }
+      p.querySelector('[data-out="from"]').textContent = pr.from;
+      p.querySelector('[data-out="to"]').textContent = pr.to;
+      const first = playSet().list;
+      markNext(first.filter((n) => n.beat === first[0]?.beat));
+      score.setBeat(barsOf()[pr.from - 1].start - 0.5);
+    }));
+    p.querySelector('[data-act="loop"]')?.addEventListener('click', (e) => {
+      pr.loop = !pr.loop;
+      e.currentTarget.classList.toggle('is-on', pr.loop);
+      e.currentTarget.setAttribute('aria-checked', pr.loop);
+    });
+    p.querySelectorAll('[data-hand]').forEach((b) => b.addEventListener('click', () => { pr.hand = b.dataset.hand; ready(note); }));
+    p.querySelector('[data-act="newpassage"]')?.addEventListener('click', () => newPassage());
     p.querySelector('[data-act="metro"]')?.addEventListener('click', (e) => {
       const on = !getSettings().metronome;
       saveSettings({ metronome: on });
@@ -266,11 +346,12 @@ export function render(root, params) {
       .querySelector('[data-act="skip"]').addEventListener('click', () => { stopRun(); if (thenPlay) startPlay(); else ready(); });
     panel.classList.add('panel--corner');
     let lastKey = '';
+    const { list, total, offset } = playSet({ forListen: true });
     run = createRun({
-      notes, totalBeats: parsed.totalBeats, tempo, beatsPerBar: measureBeats(level.time || '4/4'), mode: 'listen', windowMs,
+      notes: list, totalBeats: total, tempo: quarterTempo(), beatsPerBar: measureBeats(time()), pulse: pulse(), mode: 'listen', windowMs,
       onFrame: (beat) => {
-        score.setBeat(beat);
-        const sounding = notes.filter((n) => beat >= n.beat && beat < n.beat + n.beats);
+        score.setBeat(beat + offset);
+        const sounding = list.filter((n) => beat >= n.beat && beat < n.beat + n.beats);
         const key = sounding.map((n) => n.id).join();
         if (key !== lastKey) { lastKey = key; markNext(sounding); }
       },
@@ -286,6 +367,7 @@ export function render(root, params) {
   function startPlay() {
     stopRun();
     hidePanel();
+    if (!(practice && pr.loop)) loopAcc = null;
     state = 'running';
     listenBtn.disabled = true;
     tempoBtn.disabled = true;
@@ -296,23 +378,36 @@ export function render(root, params) {
     let hits = 0;
     let nextIds = '';
     const useMic = micMode() && mic.getState() === 'on';
+    const { list, total, offset } = playSet();
+    const split = useMic ? micSplit(list) : { scored: list, ghosts: [], partial: false };
+    const verify = useMic && (split.partial || hasBothHands());
+    const byId = new Map(list.map((n) => [n.id, n]));
     const refreshNext = (scorer) => {
       const up = scorer.upcoming();
       const ids = up.map((n) => n.id).join();
       if (ids === nextIds) return;
       nextIds = ids;
-      markNext(up.map((n) => notes[n.id]));
+      // Show every key that starts with the next scored note (both hands), even if only the melody is scored.
+      const at = up.length ? byId.get(up[0].id).beat : null;
+      markNext(at == null ? [] : list.filter((n) => Math.abs(n.beat - at) < 1e-6));
       up.forEach((n) => score.mark(notes[n.id], 'next'));
     };
+    const looping = practice && pr.loop;
+    if (looping) {
+      showPanel(html`<div class="card card--mini loopcard"><span class="label">Looping bars ${pr.from}–${pr.to}${loopAcc == null ? '' : ` · last ${fmtPct(loopAcc)}%`}</span><button class="btn btn--ghost" data-act="stoploop">Stop</button></div>`)
+        .querySelector('[data-act="stoploop"]').addEventListener('click', () => { loopAcc = null; stopRun(); ready(); });
+      panel.classList.add('panel--corner');
+    }
     run = createRun({
-      notes, totalBeats: parsed.totalBeats, tempo, beatsPerBar: measureBeats(level.time || '4/4'), mode: 'play', windowMs,
+      notes: split.scored, ghosts: split.ghosts, totalBeats: total, tempo: quarterTempo(), beatsPerBar: measureBeats(time()), pulse: pulse(), mode: 'play', windowMs,
       metronome: !!getSettings().metronome,
       latencyMs: useMic ? (getCalibration()?.micLatencyMs ?? 80) : getSettings().tapLatencyMs || 0,
-      judgeDelayMs: useMic ? MIC_JUDGE_DELAY_MS : 0,
+      // Score-following checks run ATTACK_MS after a note's window closes, so misses wait a bit longer.
+      judgeDelayMs: useMic ? (verify ? mic.ATTACK_MS + 90 : MIC_JUDGE_DELAY_MS) : 0,
       onFrame: (beat, scorer) => {
-        score.setBeat(beat);
+        score.setBeat(beat + offset);
         const counting = beat < 0;
-        countEl.textContent = counting ? String(Math.ceil(-beat)) : '';
+        countEl.textContent = counting ? String(Math.ceil(-beat / pulse() - 1e-6)) : '';
         countEl.classList.toggle('is-on', counting);
         refreshNext(scorer);
       },
@@ -323,7 +418,7 @@ export function render(root, params) {
           score.mark(notes[res.note.id], 'hit');
           kb.flash(res.note.midi, 'hit');
           playheadFlash();
-        } else {
+        } else if (res.type === 'extra') {
           kb.flash(res.midi, 'miss');
         }
         setHud({ acc: judged ? (hits / judged) * 100 : null, combo: scorer.combo, bump: res.type === 'hit' });
@@ -338,18 +433,54 @@ export function render(root, params) {
         stopMicNotes();
         countEl.textContent = '';
         countEl.classList.remove('is-on');
-        if (alive && completed) results(summary);
+        if (!alive || !completed) return;
+        if (looping) {
+          loopAcc = summary.accuracy;
+          setTimeout(() => { if (alive && state === 'running' && run?.finished) startPlay(); }, 300);
+          return;
+        }
+        loopAcc = null;
+        results({ ...summary, melodyOnly: split.partial ? { scored: split.scored.length, all: list.length } : null });
       },
     });
     run.start();
     if (useMic) {
       const thisRun = run;
+      const latency = getCalibration()?.micLatencyMs ?? 80;
       mic.setDetecting(true);
-      micNotesOff = mic.onNote((e) => { if (run === thisRun) run.input(e.midi, e.perf); });
+      if (!verify) {
+        micNotesOff = mic.onNote((e) => { if (run === thisRun) run.input(e.midi, e.perf); });
+      } else {
+        // Both hands sound together, so the one-pitch detector often names the
+        // left hand (or the hands' shared root). Follow the score instead: as each
+        // scored note's window closes, check the audio for that note starting near
+        // its time. Detector notes still count right away when they match, and as
+        // wrong notes only if nothing in the music explains them.
+        const sounding = (t) => list.some((n) => {
+          const a = n.beat * run.msPerBeat;
+          return t >= a - windowMs && t <= a + n.beats * run.msPerBeat + windowMs;
+        });
+        const offNote = mic.onOnset((e) => {
+          if (run !== thisRun || run.finished || e.dropped) return;
+          const t = e.perf - run.perfBeat0 - latency;
+          const due = run.scorer.notes.some((n) => !n.result && n.midi === e.midi && Math.abs(n.time - t) <= windowMs);
+          if (due) run.input(e.midi, e.perf);
+          else if (e.how === 'attack' && !list.some((n) => n.midi === e.midi && sounding(t))) run.input(e.midi, e.perf);
+        });
+        const timers = split.scored.map((n) => setTimeout(() => {
+          if (run !== thisRun || run.finished) return;
+          const sn = run.scorer.notes.find((x) => x.id === n.id);
+          if (!sn || sn.result) return;
+          const at = mic.noteStartedNear(n.midi, run.perfBeat0 + sn.time + latency, windowMs);
+          if (at != null) run.input(n.midi, at);
+        }, Math.max(0, run.perfBeat0 + n.beat * run.msPerBeat + latency + windowMs + mic.ATTACK_MS + 10 - performance.now())));
+        micNotesOff = () => { offNote(); timers.forEach(clearTimeout); };
+      }
     }
   }
 
   let micNotesOff = null;
+  let loopAcc = null;
   function stopMicNotes() {
     micNotesOff?.();
     micNotesOff = null;
@@ -415,6 +546,7 @@ export function render(root, params) {
         <div class="tile"><b class="display">${sum.maxCombo}</b><span class="label">Max combo</span></div>
         <div class="tile"><b class="display">${sum.hits}/${sum.total}</b><span class="label">Notes hit</span></div>
         <div class="tile tile--wide"><b class="display missed">${missedNames.length ? missedNames.slice(0, 5).join(' · ') : 'None'}</b><span class="label">Missed notes</span></div>
+        ${sum.melodyOnly ? html`<p class="results__mic">Melody scored: ${sum.melodyOnly.scored} of ${sum.melodyOnly.all} notes. The mic hears one note at a time for now; both hands get scored once chord detection lands.</p>` : ''}
         ${sum.untimed ? html`<div class="timing"><span class="label">Untimed drill · your first answer to each note counts</span></div>` : html`<div class="timing">
           <div class="tbar">
             <i style="flex:${sum.early}" class="t-early"></i><i style="flex:${sum.ontime}" class="t-on"></i><i style="flex:${sum.late}" class="t-late"></i><i style="flex:${sum.missed.length}" class="t-miss"></i>
@@ -652,6 +784,23 @@ export function render(root, params) {
   });
 
   // ---------- boot ----------
+  function prepare() {
+    parsed = parseLevel(level);
+    notes = expectedNotes(parsed);
+    pr.from = 1;
+    pr.to = barsOf().length;
+  }
+  const freshSeed = () => (Date.now() ^ Math.floor(Math.random() * 1e9)) >>> 0;
+  // Sight-reading: swap in another unseen passage.
+  async function newPassage() {
+    if (state === 'running') return;
+    level = { ...level, ...generatePassage(level.generate, freshSeed()) };
+    prepare();
+    buildKeyboard(noteRange(notes));
+    await buildScore();
+    ready();
+  }
+
   (async () => {
     showPanel(html`<div class="card card--mini"><span class="label">Loading…</span></div>`);
     audio.load();
@@ -675,8 +824,8 @@ export function render(root, params) {
       tempoBtn.hidden = true;
       drillStage();
     } else {
-      parsed = parseLevel(level);
-      notes = expectedNotes(parsed);
+      if (level.generate) level = { ...level, ...generatePassage(level.generate, freshSeed()) };
+      prepare();
       tempo = level.tempo.default;
       buildKeyboard(noteRange(notes));
       await buildScore();

@@ -1,0 +1,26 @@
+{
+  "hands": "both",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 72,
+    "min": 45,
+    "max": 110
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Accompaniment patterns",
+      "text": "Instead of block chords, the left hand can spread a chord out. The Alberti bass plays bottom-top-middle-top in steady eighths: C G E G."
+    },
+    {
+      "kind": "text",
+      "title": "Mozart",
+      "text": "Bars 1–4 are the opening of Mozart's Sonata in C, K. 545 (1788). Keep the left hand soft and even under the tune."
+    }
+  ],
+  "parts": {
+    "rh": "C5/h:1 E5/q:3 G5/q:5 | B4/qd:1 C5/16:2 D5/16:3 C5/h:2 | A5/h:5 G5/q:4 C6/q:5 | G5/q:3 F5/8:2 E5/8:1 F5/h:2 | E5/q:3 D5/q:2 C5/q:1 E5/q:3 | D5/q:2 C5/q:1 B4/q:1 D5/q:3 | C5/q:2 B4/q:1 A4/q:1 G4/q:1 | C5/w:4",
+    "lh": "C4/8:5 G4/8:1 E4/8:3 G4/8:1 C4/8:5 G4/8:1 E4/8:3 G4/8:1 | D4/8:5 G4/8:1 F4/8:2 G4/8:1 C4/8:5 G4/8:1 E4/8:3 G4/8:1 | C4/8:5 A4/8:1 F4/8:3 A4/8:1 C4/8:5 G4/8:1 E4/8:3 G4/8:1 | B3/8:5 G4/8:1 D4/8:3 G4/8:1 C4/8:5 G4/8:1 E4/8:3 G4/8:1 | A3/8 E4/8 C4/8 E4/8 A3/8 E4/8 C4/8 E4/8 | G3/8 D4/8 B3/8 D4/8 G3/8 D4/8 B3/8 D4/8 | F3/8 C4/8 A3/8 C4/8 G3/8 D4/8 B3/8 D4/8 | C4/8 G4/8 E4/8 G4/8 C4/h"
+  }
+}

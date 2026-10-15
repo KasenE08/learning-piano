@@ -3,12 +3,12 @@
 // Uses the Vite dev server; ?demo loads sample mid-course progress.
 import { createServer } from 'vite';
 import { chromium } from 'playwright';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readdirSync } from 'node:fs';
 
 const [outDir = 'screenshots', ...only] = process.argv.slice(2);
 const P = { width: 390, height: 844 };
 const L = { width: 844, height: 390 };
-const SEEN = [...['noob', 'beginner'].flatMap((s) => Array.from({ length: 15 }, (_, i) => `${s}-${String(i + 1).padStart(2, '0')}`)), 'intermediate-01', 'song-hot-cross-buns'];
+const SEEN = [...['noob', 'beginner', 'intermediate', 'advanced'].flatMap((s) => [...Array.from({ length: 15 }, (_, i) => `${s}-${String(i + 1).padStart(2, '0')}`), `${s}-test`]), ...readdirSync('src/content/songs').map((f) => `song-${f.replace('.json', '')}`)];
 
 // Taps every expected note on time, except the ones listed in `skip` (by index).
 const playAlong = (skip = [], wrongAt = []) => {
@@ -71,6 +71,26 @@ const SHOTS = [
   { name: 'p5-b15-grace', path: '#/lesson/beginner-15', vp: L },
   { name: 'p5-btest', path: '#/lesson/beginner-test', vp: L },
   { name: 'p5-song-jingle', path: '#/lesson/song-jingle-bells', vp: L },
+  // Phase 6 — intermediate, advanced, songs
+  { name: 'p6-i01-mic-ready', path: '#/lesson/intermediate-01', vp: L, mic: true },
+  { name: 'p6-i04-drill', path: '#/lesson/intermediate-04', vp: L, steps: [['click', '[data-act="go"]'], ['wait', 500]] },
+  { name: 'p6-i05-accidentals', path: '#/lesson/intermediate-05', vp: L, steps: [['beat', 3.5]] },
+  { name: 'p6-i12-chords', path: '#/lesson/intermediate-12', vp: L, steps: [['beat', 1.5]] },
+  { name: 'p6-i13-dynamics', path: '#/lesson/intermediate-13', vp: L, steps: [['beat', 15.5]] },
+  { name: 'p6-i15-fur-elise', path: '#/lesson/intermediate-15', vp: L, steps: [['beat', 24]] },
+  { name: 'p6-a07-triplets', path: '#/lesson/advanced-07', vp: L, steps: [['beat', 3.5]] },
+  { name: 'p6-a09-six-eight', path: '#/lesson/advanced-09', vp: L, steps: [['beat', 2.5]] },
+  { name: 'p6-a10-sightread', path: '#/lesson/advanced-10', vp: L },
+  { name: 'p6-a11-8va', path: '#/lesson/advanced-11', vp: L, steps: [['click', '[data-act="listen"]'], ['wait', 3300 + 12.6 * 790]] },
+  { name: 'p6-a13-prelude', path: '#/lesson/advanced-13', vp: L, steps: [['beat', 3.5]] },
+  { name: 'p6-a15-capstone', path: '#/lesson/advanced-15', vp: L, seen: false, steps: [['click', '[data-act="next"]'], ['click', '[data-act="next"]'], ['wait', 300]] },
+  { name: 'p6-practice', path: '#/lesson/intermediate-14', vp: L, steps: [['click', '[data-act="mode"]'], ['click', '[data-bar="from"][data-d="1"]'], ['click', '[data-bar="from"][data-d="1"]'], ['click', '[data-bar="from"][data-d="1"]'], ['click', '[data-bar="to"][data-d="-1"]'], ['click', '[data-act="loop"]'], ['wait', 300]] },
+  { name: 'p6-loop', path: '#/lesson/intermediate-14', vp: L, steps: [['click', '[data-act="mode"]'], ['click', '[data-act="loop"]'], ['click', '[data-hand="rh"]'], ['click', '[data-act="go"]'], ['play', [], []], ['wait', 3000]] },
+  { name: 'p6-clair-clef', path: '#/lesson/song-clair-de-lune', vp: L, steps: [['beat', 34]] },
+  { name: 'p6-song-canon', path: '#/lesson/song-canon-in-d', vp: L, steps: [['beat', 50]] },
+  { name: 'p6-song-entertainer', path: '#/lesson/song-the-entertainer', vp: L, steps: [['beat', 9]] },
+  { name: 'p6-map-advanced', path: '#/map/advanced', vp: P, demo: true },
+  { name: 'p6-songs', path: '#/songs', vp: P, demo: true, steps: [['scroll', '.songlist li:nth-child(10)'], ['wait', 300]] },
 ];
 
 mkdirSync(outDir, { recursive: true });
@@ -96,14 +116,15 @@ for (const s of SHOTS.filter((x) => !only.length || only.includes(x.name))) {
     });
   }
   if (s.seen !== false) {
-    await page.addInitScript((seen) => {
+    await page.addInitScript(([seen, mic]) => {
       const req = indexedDB.open('learning-piano', 1);
       req.onupgradeneeded = () => req.result.createObjectStore('kv');
       req.onsuccess = () => {
         const tx = req.result.transaction('kv', 'readwrite');
-        tx.objectStore('kv').put({ metronome: true, sfx: true, inputMode: 'tap', introsSeen: seen }, 'settings');
+        tx.objectStore('kv').put({ metronome: true, sfx: true, inputMode: mic ? 'mic' : 'tap', introsSeen: seen }, 'settings');
+        if (mic) tx.objectStore('kv').put({ noiseDb: -60, low: 36, high: 96, micLatencyMs: 120, spreadMs: 10, at: 1 }, 'calibration');
       };
-    }, SEEN);
+    }, [SEEN, !!s.mic]);
   }
   await page.goto(`http://localhost:5179/learning-piano/${s.demo ? '?demo' : ''}${s.path}`);
   await page.waitForSelector('#app > *');
@@ -135,6 +156,7 @@ for (const s of SHOTS.filter((x) => !only.length || only.includes(x.name))) {
       await page.mouse.down();
       await page.mouse.up();
     }
+    if (act === 'beat') { await page.evaluate((b) => window.__lesson.score.setBeat(b), a); await page.waitForTimeout(150); }
     if (act === 'scroll') await page.evaluate((sel) => document.querySelector(sel).scrollIntoView({ block: 'center' }), a);
     if (act === 'upload') {
       const backup = { app: 'learning-piano', version: 1, exportedAt: '2026-10-01T10:00:00Z', progress: { version: 1, xp: 2600, levels: Object.fromEntries(Array.from({ length: 15 }, (_, i) => [`noob-${String(i + 1).padStart(2, '0')}`, { stars: 3, best: 97, attempts: 2 }])), tests: { noob: { passed: true, best: 92, attempts: 1 } }, songs: {} }, settings: { metronome: true }, calibration: null };

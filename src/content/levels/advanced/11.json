@@ -1,0 +1,46 @@
+{
+  "hands": "both",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 76,
+    "min": 45,
+    "max": 110
+  },
+  "ottava": [
+    {
+      "part": "rh",
+      "from": 3,
+      "to": 4,
+      "type": "8va"
+    },
+    {
+      "part": "rh",
+      "from": 7,
+      "to": 8,
+      "type": "8va"
+    },
+    {
+      "part": "lh",
+      "from": 7,
+      "to": 8,
+      "type": "8vb"
+    }
+  ],
+  "intro": [
+    {
+      "kind": "text",
+      "title": "8va",
+      "text": "“8va” with a dashed line means: play these notes an octave (8 notes) higher than written. It saves a stack of ledger lines. Bars 3–4 look like bars 1–2 but sound an octave up."
+    },
+    {
+      "kind": "text",
+      "title": "8vb",
+      "text": "“8vb” under the staff means an octave lower. In bars 7–8 the left hand plays down near the bottom of your keyboard."
+    }
+  ],
+  "parts": {
+    "rh": "C5/q:1 D5/q:2 E5/q:3 F5/q:4 | G5/h:5 E5/h:3 | C6/q:1 D6/q:2 E6/q:3 F6/q:4 | G6/h:5 E6/h:3 | F5/q:4 E5/q:3 D5/q:2 E5/q:3 | C5/w:1 | F6/q:4 E6/q:3 D6/q:2 E6/q:3 | C6/w:1",
+    "lh": "C3/w | C3/h G2/h | C3/w | C3/h G2/h | G2/w | C3/w | G2/w | C2/w"
+  }
+}

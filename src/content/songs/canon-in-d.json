@@ -1,0 +1,22 @@
+{
+  "hands": "both",
+  "key": "D",
+  "time": "4/4",
+  "tempo": {
+    "default": 72,
+    "min": 48,
+    "max": 100
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Canon in D",
+      "text": "Pachelbel, around 1700. The left hand repeats one 4-bar bass line the whole way through (a ground bass) while the right hand's tune keeps changing over it."
+    }
+  ],
+  "parts": {
+    "rh": "D5/h C#5/h | B4/h A4/h | G4/h F#4/h | G4/h B4/h | F#4/h A4/h | D4/h F#4/h | B4/h D5/h | B4/h C#5/h | F#5/h E5/h | D5/h C#5/h | B4/h A4/h | B4/h C#5/q C#5/q | D5/8 C#5/8 D5/8 D4/8 C#4/8 A4/8 E4/8 F#4/8 | D4/8 D5/8 C#5/8 B4/8 C#5/8 F#4/8 A4/8 B4/8 | G4/8 F#4/8 E4/8 G4/8 F#4/8 E4/8 D4/8 C#5/8 | B4/8 A4/8 G4/8 F#4/8 E4/8 G4/8 F#4/8 E4/8 | D4/q r/hd | r/w | C#5/h B4/h | A4/h G4/h | F#4/h G4/h | F#4/h A4/h | E5/q E5/q D5/q D5/q | C#5/q C#5/q B4/q B4/q | A4/q A4/q G4/q G4/q | A4/q A4/q B4/q B4/q | E5/h D5/h | C#5/h B4/h | A4/h G4/h | A4/h F#4/h | G4/qd G4/8 G4/8 A4/8 G4/8 F#4/8 | E4/qd E4/8 E4/8 F#4/8 E4/8 D4/8 | [D4 F#4 D5]/w",
+    "lh": "D3/h A2/h | B2/h F#2/h | G2/h D2/h | G2/h A2/h | D3/h A2/h | B2/h F#2/h | G2/h D2/h | G2/h A2/h | D3/h A2/h | B2/h F#2/h | G2/h D2/h | G2/h A2/h | D3/h A2/h | B2/h F#2/h | G2/h D2/h | G2/h A2/h | D3/h A2/h | B2/h F#2/h | G2/h D2/h | G2/h A2/h | D3/h A2/h | B2/h F#2/h | G2/h D2/h | G2/h A2/h | D3/h A2/h | B2/h F#2/h | G2/h D2/h | G2/h A2/h | D3/h A2/h | B2/h F#2/h | G2/h D2/h | G2/h A2/h | [D2 D3]/w"
+  },
+  "credit": "Melody adapted from Jim Paterson's arrangement (mfiles.co.uk) via the Mutopia Project, CC BY 3.0. Ground bass and piano layout arranged for this app."
+}

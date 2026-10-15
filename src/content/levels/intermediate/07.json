@@ -1,0 +1,33 @@
+{
+  "hands": "both",
+  "key": "Am",
+  "time": "4/4",
+  "tempo": {
+    "default": 76,
+    "min": 45,
+    "max": 110
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Minor keys",
+      "text": "A minor uses the same key signature as C major (no sharps or flats) but centres on A. It sounds darker."
+    },
+    {
+      "kind": "text",
+      "title": "Harmonic minor",
+      "text": "Raising the 7th note gives the harmonic minor: in A minor, G becomes G♯. E minor works the same way: one sharp (F♯), with D♯ raised."
+    },
+    {
+      "kind": "note",
+      "note": "G#4",
+      "title": "G sharp",
+      "text": "The black key just right of G. Here your thumb slides down onto it.",
+      "finger": 1
+    }
+  ],
+  "parts": {
+    "rh": "A4/q:1 B4/q:2 C5/q:3 D5/q:4 | E5/h:5 C5/h:3 | D5/q:4 C5/q:3 B4/q:2 A4/q:1 | B4/w:2 | C5/q:3 B4/q:2 A4/q:1 G#4/q:1 | A4/q:2 B4/q:3 C5/h:4 | B4/q:3 A4/q:2 G#4/q:1 B4/q:3 | A4/w:2",
+    "lh": "A2/w:5 | A2/h:5 C3/h:3 | D3/h:2 B2/h:4 | E3/w:1 | A2/h:5 C3/h:3 | D3/h:2 C3/h:3 | E3/h:1 E2/h | A2/w:5"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "hands": "both",
+  "key": "Bm",
+  "time": "4/4",
+  "tempo": {
+    "default": 84,
+    "min": 56,
+    "max": 132
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "In the Hall of the Mountain King",
+      "text": "Grieg, Peer Gynt, 1875. One tune, again and again, getting louder each time: start very soft (pp) and build to very loud (ff). B minor: F♯ and C♯ in the key signature, plus a few naturals."
+    }
+  ],
+  "parts": {
+    "rh": "B3/8!pp C#4/8 D4/8 E4/8 F#4/8 D4/8 F#4/q | F4/8 C#4/8 F4/q E4/8 C4/8 E4/q | B3/8 C#4/8 D4/8 E4/8 F#4/8 D4/8 F#4/8 B4/8 | A4/8 F#4/8 D4/8 F#4/8 A4/h | B4/8 C#5/8 D5/8 E5/8 F#5/8 D5/8 F#5/q | F5/8 C#5/8 F5/q E5/8 C5/8 E5/q | B4/8 C#5/8 D5/8 E5/8 F#5/8 D5/8 F#5/8 B5/8 | A5/8 F#5/8 D5/8 F#5/8 A5/h | F#4/8!p G#4/8 A#4/8 B4/8 C#5/8 A#4/8 C#5/q | D5/8 A#4/8 D5/q C#5/8 A#4/8 C#5/q | F#4/8 G#4/8 A#4/8 B4/8 C#5/8 A#4/8 C#5/q | D5/8 A#4/8 D5/q C#5/h | F#5/8 G#5/8 A#5/8 B5/8 C#6/8 A#5/8 C#6/q | D6/8 A#5/8 D6/q C#6/8 A#5/8 C#6/q | F#5/8 G#5/8 A#5/8 B5/8 C#6/8 A#5/8 C#6/q | D6/8 A#5/8 D6/q C#6/h | B3/8!mf C#4/8 D4/8 E4/8 F#4/8 D4/8 F#4/q | F4/8 C#4/8 F4/q E4/8 C4/8 E4/q | B3/8 C#4/8 D4/8 E4/8 F#4/8 D4/8 F#4/8 B4/8 | A4/8 F#4/8 D4/8 F#4/8 A4/h | B4/8 C#5/8 D5/8 E5/8 F#5/8 D5/8 F#5/q | F5/8 C#5/8 F5/q E5/8 C5/8 E5/q | B4/8 C#5/8 D5/8 E5/8 F#5/8 D5/8 F#5/8 B5/8 | A5/8 F#5/8 D5/8 F#5/8 A5/h | F#4/8!cresc G#4/8 A#4/8 B4/8 C#5/8 A#4/8 C#5/q | D5/8 A#4/8 D5/q C#5/8 A#4/8 C#5/q | F#4/8 G#4/8 A#4/8 B4/8 C#5/8 A#4/8 C#5/q | D5/8 A#4/8 D5/q C#5/h | F#5/8 G#5/8 A#5/8 B5/8 C#6/8 A#5/8 C#6/q | D6/8 A#5/8 D6/q C#6/8 A#5/8 C#6/q | F#5/8 G#5/8 A#5/8 B5/8 C#6/8 A#5/8 C#6/q | D6/8 A#5/8 D6/q C#6/h | B4/q!ff F#4/q B3/q r/q | [D4 F#4 B4]/w",
+    "lh": "B2/q F#2/q B2/q F#2/q | B2/q F#2/q B2/q F#2/q | B2/q F#2/q B2/q F#2/q | D2/q A2/q D2/q A2/q | B2/q F#2/q B2/q F#2/q | B2/q F#2/q B2/q F#2/q | B2/q F#2/q B2/q F#2/q | D2/q A2/q D2/q A2/q | F#2/q C#2/q F#2/q C#2/q | D2/q A#2/q F#2/q C#2/q | F#2/q C#2/q F#2/q C#2/q | D2/q A#2/q F#2/q C#2/q | F#2/q C#2/q F#2/q C#2/q | D2/q A#2/q F#2/q C#2/q | F#2/q C#2/q F#2/q C#2/q | D2/q A#2/q F#2/q C#2/q | B2/q F#2/q B2/q F#2/q | B2/q F#2/q B2/q F#2/q | B2/q F#2/q B2/q F#2/q | D2/q A2/q D2/q A2/q | B2/q F#2/q B2/q F#2/q | B2/q F#2/q B2/q F#2/q | B2/q F#2/q B2/q F#2/q | D2/q A2/q D2/q A2/q | F#2/q C#2/q F#2/q C#2/q | D2/q A#2/q F#2/q C#2/q | F#2/q C#2/q F#2/q C#2/q | D2/q A#2/q F#2/q C#2/q | F#2/q C#2/q F#2/q C#2/q | D2/q A#2/q F#2/q C#2/q | F#2/q C#2/q F#2/q C#2/q | D2/q A#2/q F#2/q C#2/q | B2/q F#2/q B2/q r/q | [B2 F#3]/w"
+  },
+  "credit": "Melody and bass checked against the Mutopia Project edition (Grieg, Op. 46 No. 4, University Society 1918). Arranged for this app."
+}

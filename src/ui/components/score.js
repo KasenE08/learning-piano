@@ -2,6 +2,7 @@
 // A fixed playhead sits at PLAYHEAD_FRAC of the stage; setBeat() slides the music
 // under it. Notes can be marked hit / miss / next. A sticky gutter keeps the
 // clefs and key signature visible once the first bar has scrolled away.
+import { tripletGroups } from '../../engine/notation.js';
 
 export const PLAYHEAD_FRAC = 0.3;
 const STAVE_GAP = 100; // distance between the treble and bass staves (unscaled)
@@ -12,6 +13,8 @@ const vfKey = (name) => {
   return `${m[1].toLowerCase()}${m[2]}/${m[3]}`;
 };
 const vfDur = (e) => e.dur + 'd'.repeat(e.dots) + (e.rest ? 'r' : '');
+const BEAMLESS = new Set(['w', 'h', 'q']);
+const DYN_TEXT = { cresc: 'cresc.', dim: 'dim.' };
 
 let VFp = null;
 async function vexflow() {
@@ -36,9 +39,19 @@ export async function createScore(host, { level, parsed, fingers = true }) {
   const ink = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#f2f2f2';
   const layout = staffLayout(level);
   const staffCount = layout.length;
+  // Clef changes: level.clefChanges = { lh: [[bar, 'treble'], [bar, 'bass']] } (bars 1-based).
+  const changes = level.clefChanges || {};
+  const clefAt = (part, i) => {
+    let c = layout.find((l) => l.part === part).clef;
+    for (const [bar, clef] of changes[part] || []) if (bar - 1 <= i) c = clef;
+    return c;
+  };
+  const clefChangesAt = (i) => i > 0 && layout.some(({ part }) => clefAt(part, i) !== clefAt(part, i - 1));
   // Vertical span: fingerings/ledger lines above, the staves, fingerings/ledger lines below.
-  const above = TOP_PAD;
-  const below = layout.some((l) => l.part === 'lh') ? 48 : 30;
+  // Extra room for 8va brackets above (and 8vb below), clear of the fingerings.
+  const ott = level.ottava || [];
+  const above = TOP_PAD + (ott.some((o) => o.type !== '8vb') ? 36 : 0);
+  const below = (layout.some((l) => l.part === 'lh') ? 48 : 30) + (ott.some((o) => o.type === '8vb') ? 22 : 0);
   const span = above + (staffCount - 1) * STAVE_GAP + 40 + below;
   const H = host.clientHeight;
   const W = host.clientWidth;
@@ -54,11 +67,12 @@ export async function createScore(host, { level, parsed, fingers = true }) {
   for (let i = 0; i < nBars; i++) {
     const voices = [];
     const all = [];
-    for (const { part, clef } of layout) {
+    for (const { part } of layout) {
+      const clef = clefAt(part, i);
       const m = parts[part][i];
       const notes = m.events.map((e) => {
         const n = new VF.StaveNote({
-          keys: e.rest ? [clef === 'bass' ? 'd/3' : 'b/4'] : e.names.map(vfKey),
+          keys: e.rest ? [clef === 'bass' ? 'd/3' : 'b/4'] : (e.shown || e.names).map(vfKey),
           duration: vfDur(e),
           clef,
           autoStem: !e.rest,
@@ -70,20 +84,34 @@ export async function createScore(host, { level, parsed, fingers = true }) {
           a.setVerticalJustification(part === 'lh' ? VF.AnnotationVerticalJustify.BOTTOM : VF.AnnotationVerticalJustify.TOP);
           n.addModifier(a, 0);
         }
+        // Shared dynamics are written once, between the staves (the right hand's copy).
+        const dupDyn = part === 'lh' && e.dyn && parts.rh?.[i]?.events.some((r) => r.dyn === e.dyn && Math.abs(r.beat - e.beat) < 1e-6);
+        if (e.dyn && !dupDyn) {
+          // Dynamics sit between the staves: under the right hand, over the left.
+          const d = new VF.Annotation(DYN_TEXT[e.dyn] || e.dyn).setFont('Times New Roman', DYN_TEXT[e.dyn] ? 13 : 16, 'bold', 'italic');
+          d.setVerticalJustification(part === 'lh' ? VF.AnnotationVerticalJustify.TOP : VF.AnnotationVerticalJustify.BOTTOM);
+          d.setStyle({ fillStyle: ink, strokeStyle: ink });
+          n.addModifier(d, 0);
+        }
         e._vf = n;
         return n;
       });
+      // Triplets: 3 in the time of 2. Must exist before the voice counts ticks.
+      const tuplets = tripletGroups(m.events).map((g) => new VF.Tuplet(g.events.map((e) => e._vf), {
+        numNotes: 3, notesOccupied: 2, bracketed: g.events.some((e) => e.rest || BEAMLESS.has(e.dur)),
+        location: part === 'lh' ? 1 : -1, // opposite the fingerings, so the 3 isn't read as a finger
+      }));
       const [num, den] = time.split('/').map(Number);
       const v = new VF.Voice({ numBeats: (m.beats * den) / 4, beatValue: den }).setMode(VF.Voice.Mode.SOFT).addTickables(notes);
       VF.Accidental.applyAccidentals([v], key);
-      voices.push({ part, clef, voice: v, notes, events: m.events, num });
+      voices.push({ part, clef, voice: v, notes, events: m.events, num, tuplets, ottava: m.ottava });
       all.push(v);
     }
     const fmt = new VF.Formatter();
     voices.forEach(({ voice }) => fmt.joinVoices([voice]));
     const minW = fmt.preCalculateMinTotalWidth(all);
     const beats = parts[layout[0].part][i].beats;
-    const width = Math.max(minW * 1.5 + 36, beats * 46, 120);
+    const width = Math.max(minW * 1.5 + 36, beats * 46, 120) + (clefChangesAt(i) ? 28 : 0);
     bars.push({ voices, fmt, width, all });
   }
 
@@ -110,10 +138,12 @@ export async function createScore(host, { level, parsed, fingers = true }) {
   let x = 20;
   const ties = [];
   bars.forEach((bar, i) => {
-    const staves = layout.map(({ clef }, s) => {
+    const staves = layout.map(({ part }, s) => {
+      const clef = clefAt(part, i);
       const w = bar.width + (i === 0 ? firstExtra : 0);
       const st = new VF.Stave(x, top + s * STAVE_GAP, w);
       if (i === 0) st.addClef(clef).addKeySignature(key).addTimeSignature(time);
+      else if (clef !== clefAt(part, i - 1)) st.addClef(clef, 'small');
       if (i === 0 && parsed.repeatBeats) st.setBegBarType(VF.Barline.type.REPEAT_BEGIN);
       if (i === bars.length - 1) st.setEndBarType(parsed.repeatBeats ? VF.Barline.type.REPEAT_END : VF.Barline.type.END);
       st.setStyle({ strokeStyle: ink, fillStyle: ink });
@@ -132,7 +162,23 @@ export async function createScore(host, { level, parsed, fingers = true }) {
     bar.fmt.format(bar.all, avail);
     bar.voices.forEach((v, s) => {
       v.voice.draw(ctx, staves[s]);
-      VF.Beam.generateBeams(v.notes.filter((n) => !n.isRest())).forEach((b) => b.setContext(ctx).draw());
+      // Beam plain notes by beat (by dotted quarter in 6/8); each triplet group beams on its own.
+      const inTuplet = new Set(v.tuplets.flatMap((t) => t.getNotes()));
+      const groups = time.endsWith('/8') ? [new VF.Fraction(3, 8)] : undefined;
+      let run = [];
+      const flush = () => {
+        const plain = run.filter((n) => !n.isRest());
+        if (plain.length > 1) VF.Beam.generateBeams(plain, groups ? { groups } : {}).forEach((b) => b.setContext(ctx).draw());
+        run = [];
+      };
+      v.notes.forEach((n) => { if (inTuplet.has(n)) flush(); else run.push(n); });
+      flush();
+      v.tuplets.forEach((t) => {
+        const tn = t.getNotes();
+        if (!tn.some((n) => n.isRest()) && tn.every((n) => !BEAMLESS.has(n.getDuration()))) new VF.Beam(tn).setContext(ctx).draw();
+        t.setStyle({ fillStyle: ink, strokeStyle: ink });
+        t.setContext(ctx).draw();
+      });
     });
     const mStart = parts[layout[0].part][i].start;
     anchors.push([mStart, startX - 4]);
@@ -151,6 +197,27 @@ export async function createScore(host, { level, parsed, fingers = true }) {
       const nx = flat[i + 1];
       if (e.tie && nx && !e.rest) {
         new VF.StaveTie({ firstNote: e._vf, lastNote: nx._vf, firstIndexes: e.keys.map((_, k) => k), lastIndexes: nx.keys.map((_, k) => k) }).setContext(ctx).draw();
+      }
+    });
+  }
+
+  // 8va / 8vb brackets over runs of marked bars.
+  for (const { part } of layout) {
+    let runStart = null;
+    const ms = parts[part];
+    ms.forEach((m, i) => {
+      const nx = ms[i + 1];
+      if (m.ottava && !runStart) runStart = m;
+      if (runStart && (!nx || nx.ottava !== m.ottava)) {
+        const evs = ms.slice(runStart.index, i + 1).flatMap((x) => x.events);
+        const tb = new VF.TextBracket({
+          start: evs[0]._vf, stop: evs.at(-1)._vf, text: '8', superscript: m.ottava === '8vb' ? 'vb' : 'va',
+          position: m.ottava === '8vb' ? VF.TextBracket.Position.BOTTOM : VF.TextBracket.Position.TOP,
+        });
+        tb.renderOptions.color = ink;
+        tb.setStyle({ fillStyle: ink, strokeStyle: ink });
+        tb.setLine(3).setContext(ctx).draw();
+        runStart = null;
       }
     });
   }
@@ -181,24 +248,36 @@ export async function createScore(host, { level, parsed, fingers = true }) {
   const gutter = document.createElement('div');
   gutter.className = 'score__gutter';
   host.appendChild(gutter);
-  const gr = new VF.Renderer(gutter, VF.Renderer.Backends.SVG);
   const gw = probe(false) + 22;
-  gr.resize(Math.ceil(gw * scale), H);
-  const gctx = gr.getContext();
-  gctx.scale(scale, scale);
-  gctx.setFillStyle(ink);
-  gctx.setStrokeStyle(ink);
-  const gst = layout.map(({ clef }, s) => {
-    const st = new VF.Stave(10, top + s * STAVE_GAP, gw - 10).addClef(clef).addKeySignature(key);
-    st.setStyle({ strokeStyle: ink, fillStyle: ink });
-    st.setContext(gctx).draw();
-    return st;
-  });
-  if (gst.length === 2) {
-    new VF.StaveConnector(gst[0], gst[1]).setType('brace').setContext(gctx).draw();
-    new VF.StaveConnector(gst[0], gst[1]).setType('singleLeft').setContext(gctx).draw();
-  }
+  let gutterClefs = '';
+  // Redrawn when a clef change scrolls past, so the gutter always shows the clefs in force.
+  const drawGutter = (i) => {
+    const clefs = layout.map(({ part }) => clefAt(part, i));
+    if (clefs.join() === gutterClefs) return;
+    gutterClefs = clefs.join();
+    gutter.replaceChildren();
+    const gr = new VF.Renderer(gutter, VF.Renderer.Backends.SVG);
+    gr.resize(Math.ceil(gw * scale), H);
+    const gctx = gr.getContext();
+    gctx.scale(scale, scale);
+    gctx.setFillStyle(ink);
+    gctx.setStrokeStyle(ink);
+    const gst = clefs.map((clef, s) => {
+      const st = new VF.Stave(10, top + s * STAVE_GAP, gw - 10).addClef(clef).addKeySignature(key);
+      st.setStyle({ strokeStyle: ink, fillStyle: ink });
+      st.setContext(gctx).draw();
+      return st;
+    });
+    if (gst.length === 2) {
+      new VF.StaveConnector(gst[0], gst[1]).setType('brace').setContext(gctx).draw();
+      new VF.StaveConnector(gst[0], gst[1]).setType('singleLeft').setContext(gctx).draw();
+    }
+  };
+  drawGutter(0);
   gutter.style.width = `${Math.ceil(gw * scale) + 24}px`;
+  const barStarts = parts[layout[0].part].map((m) => m.start);
+  const barAt = (b) => { let i = 0; while (i + 1 < barStarts.length && barStarts[i + 1] <= b) i++; return i; };
+  const hasChanges = Object.keys(changes).length > 0;
 
   const playX = Math.round(W * PLAYHEAD_FRAC);
   const svgOf = (e) => e._vf.getSVGElement?.() || null;
@@ -214,7 +293,10 @@ export async function createScore(host, { level, parsed, fingers = true }) {
       const rb = parsed.repeatBeats;
       const pass = rb && beat >= rb ? 1 : 0;
       if (rb && pass !== api.pass) { api.pass = pass; api.clearMarks(); }
-      const tx = playX - beatToX(pass ? beat - rb : beat) * scale;
+      const local = pass ? beat - rb : beat;
+      const tx = playX - beatToX(local) * scale;
+      // The gutter covers about one bar left of the playhead: show the clef of the bar under it.
+      if (hasChanges) drawGutter(barAt(Math.max(0, local - 1)));
       strip.style.transform = `translate3d(${tx.toFixed(1)}px,0,0)`;
       // Gutter appears once the first bar's own clefs have slid under it.
       gutter.classList.toggle('is-on', tx < -10);

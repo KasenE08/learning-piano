@@ -1,11 +1,11 @@
 // Plays every level of the given sections in Chromium with perfectly timed taps
 // (and correct answers for drills) and checks each scores 100%.
-// Usage: node scripts/e2e-levels.mjs [section|songs ...]   (default: noob beginner songs)
+// Usage: node scripts/e2e-levels.mjs [section|songs ...]   (default: every section and songs)
 import { createServer } from 'vite';
 import { chromium } from 'playwright';
 import { readdirSync } from 'node:fs';
 
-const sections = process.argv.slice(2).length ? process.argv.slice(2) : ['noob', 'beginner', 'songs'];
+const sections = process.argv.slice(2).length ? process.argv.slice(2) : ['noob', 'beginner', 'intermediate', 'advanced', 'songs'];
 const only = process.env.ONLY ? process.env.ONLY.split(',') : null;
 const ids = sections.flatMap((s) => (s === 'songs' ? readdirSync('src/content/songs').map((f) => `song-${f.replace('.json', '')}`) : readdirSync(`src/content/levels/${s}`).map((f) => `${s}-${f.replace('.json', '')}`))).filter((id) => !only || only.includes(id)).sort();
 const server = await createServer({ server: { port: 5185, strictPort: true }, logLevel: 'error' });
@@ -54,7 +54,7 @@ async function playLevel(id) {
     };
     go();
   }, isDrill);
-  await page.waitForSelector('.results', { timeout: 120000 });
+  await page.waitForSelector('.results', { timeout: 300000 });
   const acc = Number((await page.textContent('.results__big')).replace(/\D/g, ''));
   await ctx.close();
   return { id, acc, errors };

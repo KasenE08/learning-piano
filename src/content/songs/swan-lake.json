@@ -1,0 +1,22 @@
+{
+  "hands": "both",
+  "key": "Eb",
+  "time": "2/4",
+  "tempo": {
+    "default": 72,
+    "min": 48,
+    "max": 104
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Swan Lake: Neapolitan Dance",
+      "text": "Tchaikovsky, 1876, from Act 3 of the ballet. A cornet solo over a strumming accompaniment: the left hand plays a bass note, then quick repeated chords. E♭ major: three flats."
+    }
+  ],
+  "parts": {
+    "rh": "r/h | r/8 Bb4/16 C5/16 Eb5/16 D5/16 C5/16 Bb4/16 | D5/8 r/8 D5/q | D5/8 C5/16 D5/16 Eb5/16 D5/16 C5/16 D5/16 | C5/8 r/8 Bb4/q | Bb4/8 Bb4/16 Bb4/16 C5/16 Bb4/16 Ab4/16 G4/16 | Bb4/8 r/8 Ab4/q | Ab4/8 Ab4/16 Ab4/16 Bb4/16 Ab4/16 G4/16 F4/16 | G4/8 r/8 Eb4/q | Eb4/h | Eb4/8 r/q r/8 | r/8 Bb4/16 C5/16 Eb5/16 D5/16 C5/16 Bb4/16 | D5/8 r/8 D5/q | D5/8 C5/16 D5/16 Eb5/16 D5/16 C5/16 D5/16 | C5/8 r/8 Bb4/q | Bb4/8 Bb4/16 Bb4/16 C5/16 Bb4/16 Ab4/16 G4/16 | Bb4/8 r/8 Ab4/q | Ab4/8 Ab4/16 Ab4/16 Bb4/16 Ab4/16 G4/16 F4/16 | Eb4/h | Eb4/q Eb4/8d Eb4/16 | C5/8 r/8 C5/q | C5/8 D5/16 Eb5/16 F5/16 Eb5/16 D5/16 C5/16 | C5/8 r/8 Bb4/q | Bb4/8 A4/16 Bb4/16 A4/16 Bb4/16 D5/16 C5/16 | Bb4/8 r/8 Ab4/q | Ab4/8 G4/16 Ab4/16 G4/16 Ab4/16 C5/16 Bb4/16 | Eb4/h | Eb4/q Eb4/8d Eb4/16 | C5/8 r/8 C5/q | C5/8 D5/16 Eb5/16 F5/16 Eb5/16 D5/16 C5/16 | C5/8 r/8 Bb4/q | Bb4/8 A4/16 Bb4/16 A4/16 Bb4/16 D5/16 C5/16 | Bb4/8 r/8 Ab4/q | Ab4/8 G4/16 Ab4/16 G4/16 Ab4/16 C5/16 Bb4/16 | Eb4/h | Eb5/q r/q",
+    "lh": "Eb3/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | Bb2/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | F3/8 [Ab3 Bb3]/16 [Ab3 Bb3]/16 [Ab3 Bb3]/8 [Ab3 Bb3]/8 | Bb2/8 [Ab3 Bb3]/16 [Ab3 Bb3]/16 [Ab3 Bb3]/8 [Ab3 Bb3]/8 | Eb3/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | Bb2/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | F3/8 [Ab3 Bb3]/16 [Ab3 Bb3]/16 [Ab3 Bb3]/8 [Ab3 Bb3]/8 | Bb2/8 [Ab3 Bb3]/16 [Ab3 Bb3]/16 [Ab3 Bb3]/8 [Ab3 Bb3]/8 | Eb3/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | Bb2/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | Eb3/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | Bb2/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | F3/8 [Ab3 Bb3]/16 [Ab3 Bb3]/16 [Ab3 Bb3]/8 [Ab3 Bb3]/8 | Bb2/8 [Ab3 Bb3]/16 [Ab3 Bb3]/16 [Ab3 Bb3]/8 [Ab3 Bb3]/8 | Eb3/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | Bb2/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | F3/8 [Ab3 Bb3]/16 [Ab3 Bb3]/16 [Ab3 Bb3]/8 [Ab3 Bb3]/8 | Bb2/8 [Ab3 Bb3]/16 [Ab3 Bb3]/16 [Ab3 Bb3]/8 [Ab3 Bb3]/8 | Eb3/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | [G3 Bb3]/q r/q | Ab3/8 [C4 Eb4]/16 [C4 Eb4]/16 [C4 Eb4]/8 [C4 Eb4]/8 | Ab3/8 [C4 Eb4]/16 [C4 Eb4]/16 [C4 Eb4]/8 [C4 Eb4]/8 | Eb3/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | Eb3/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | Bb2/8 [F3 Bb3]/16 [F3 Bb3]/16 [F3 Bb3]/8 [F3 Bb3]/8 | Bb2/8 [F3 Bb3]/16 [F3 Bb3]/16 [F3 Bb3]/8 [F3 Bb3]/8 | Eb3/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | Eb3/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | Ab3/8 [C4 Eb4]/16 [C4 Eb4]/16 [C4 Eb4]/8 [C4 Eb4]/8 | Ab3/8 [C4 Eb4]/16 [C4 Eb4]/16 [C4 Eb4]/8 [C4 Eb4]/8 | Eb3/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | Eb3/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | Bb2/8 [F3 Bb3]/16 [F3 Bb3]/16 [F3 Bb3]/8 [F3 Bb3]/8 | Bb2/8 [F3 Bb3]/16 [F3 Bb3]/16 [F3 Bb3]/8 [F3 Bb3]/8 | Eb3/8 [G3 Bb3]/16 [G3 Bb3]/16 [G3 Bb3]/8 [G3 Bb3]/8 | [Eb2 Eb3]/q r/q"
+  },
+  "credit": "Notes from the Mutopia Project arrangement by Laurence Sardain (public domain), melody at concert pitch."
+}

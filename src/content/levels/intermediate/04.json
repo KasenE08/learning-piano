@@ -1,0 +1,64 @@
+{
+  "type": "find",
+  "show": "both",
+  "clef": "treble",
+  "prompts": [
+    "F#4",
+    "Bb4",
+    "C#4",
+    "Eb4",
+    "G#4",
+    "Db5",
+    "A#4",
+    "Gb4",
+    "D#5",
+    "Ab4",
+    "C#5",
+    "Bb3",
+    "F#5",
+    "Eb5"
+  ],
+  "hints": {
+    "A#4": "same key as B♭4",
+    "Gb4": "same key as F♯4",
+    "D#5": "same key as E♭5",
+    "Db5": "same key as C♯5",
+    "Ab4": "same key as G♯4",
+    "Bb3": "below middle C"
+  },
+  "intro": [
+    {
+      "kind": "keys",
+      "title": "Sharps",
+      "text": "A sharp (♯) raises a note to the very next key on the right. F♯ is the black key just right of F.",
+      "highlight": [
+        "F#4",
+        "C#4",
+        "G#4"
+      ]
+    },
+    {
+      "kind": "keys",
+      "title": "Flats",
+      "text": "A flat (♭) lowers a note to the very next key on the left. B♭ is the black key just left of B.",
+      "highlight": [
+        "Bb4",
+        "Eb4",
+        "Ab4"
+      ]
+    },
+    {
+      "kind": "keys",
+      "title": "Two names, one key",
+      "text": "C♯ and D♭ are the same black key. Notes like this are “enharmonic”. White keys can do it too: E♯ is F, and C♭ is B.",
+      "highlight": [
+        "C#4"
+      ]
+    },
+    {
+      "kind": "text",
+      "title": "How this drill works",
+      "text": "A note appears on the staff with its name. Find the key and play it. Only your first answer counts."
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "hands": "both",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 66,
+    "min": 40,
+    "max": 100
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Sixteenth notes",
+      "text": "A sixteenth is a quarter of a beat: four per click, with two beams. Count “1 e & a, 2 e & a”. Start at 50 BPM in Practice and loop bar 3."
+    }
+  ],
+  "parts": {
+    "rh": "C4/16:1 D4/16:2 E4/16:3 F4/16:4 G4/q:5 G4/16:5 F4/16:4 E4/16:3 D4/16:2 C4/q:1 | E4/8:3 E4/16 F4/16:4 G4/8:5 G4/8 F4/16:4 E4/16:3 D4/16:2 C4/16:1 D4/q:2 | C4/16:1 E4/16:3 G4/16:5 E4/16:3 C4/16:1 E4/16:3 G4/16:5 E4/16:3 D4/16:2 F4/16:4 G4/16:5 F4/16:4 D4/16:2 F4/16:4 G4/16:5 F4/16:4 | G4/16:5 F4/16:4 E4/16:3 D4/16:2 C4/8:1 E4/8:3 G4/h:5 | F4/16:4 E4/16:3 D4/16:2 E4/16:3 F4/8:4 D4/8:2 E4/16:3 D4/16:2 C4/16:1 D4/16:2 E4/8:3 C4/8:1 | D4/8:2 D4/16 E4/16:3 F4/8:4 F4/16 G4/16:5 E4/q:3 C4/q:1 | G4/16:5 E4/16:3 F4/16:4 D4/16:2 E4/16:3 C4/16:1 D4/16:2 E4/16:3 F4/8:4 E4/8:3 D4/q:2 | C4/w:1",
+    "lh": "C3/h G2/h | C3/h G2/h | C3/h G2/h | G2/h C3/h | F2/h C3/h | G2/h C3/h | C3/h G2/h | C3/w"
+  }
+}

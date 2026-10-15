@@ -1,0 +1,44 @@
+{
+  "hands": "both",
+  "key": "Gm",
+  "time": "2/4",
+  "pickup": true,
+  "noListen": true,
+  "tempo": {
+    "default": 66,
+    "min": 36,
+    "max": 92
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Capstone",
+      "text": "Tchaikovsky's Old French Song (1878), which you haven't heard here. No Listen button: learn it the way you'll learn any piece from now on."
+    },
+    {
+      "kind": "text",
+      "title": "1. Scan",
+      "text": "Key: G minor (two flats; F♯ is the raised 7th). Time: 2/4 with a one-note pickup. Find the highest and lowest notes and any repeated bars: bars 9–15 repeat bars 1–7."
+    },
+    {
+      "kind": "text",
+      "title": "2. Rhythm, then hands alone",
+      "text": "Practice at a slow tempo with the metronome. Pick 2–4 bars, turn on Loop, and play the right hand alone (Practice → Hands), then the left."
+    },
+    {
+      "kind": "text",
+      "title": "3. Together, then faster",
+      "text": "Hands together on the same bars, slowly. When a loop is clean twice in a row, add 4 BPM. Move on to the next bars and join them up."
+    },
+    {
+      "kind": "text",
+      "title": "4. Perform",
+      "text": "Play the whole piece in Scored play. That's the workflow for any sheet music: scan, slow, small chunks, hands alone, together, then speed."
+    }
+  ],
+  "parts": {
+    "rh": "D4/8 | G4/8 A4/8 Bb4/8 C5/8 | D5/qd D5/8 | C5/8 D5/8 Eb5/8 C5/8 | D5/qd D5/8 | C5/8 D5/8 Eb5/8 C5/8 | D5/8 Eb5/16 D5/16 C5/8 Bb4/8 | A4/qdd G4/16 | G4/qd D4/8 | G4/8 A4/8 Bb4/8 C5/8 | D5/qd D5/8 | C5/8 D5/8 Eb5/8 C5/8 | D5/qd D5/8 | C5/8 D5/8 Eb5/8 C5/8 | D5/8 Eb5/16 D5/16 C5/8 Bb4/8 | A4/qdd G4/16 | G4/h | G4/q G4/8 A4/8 | Bb4/qd Bb4/8 | C5/q C5/q | A4/qd A4/8 | D5/qd D5/8 | Eb5/8 F5/16 Eb5/16 D5/8 C5/8 | Bb4/q A4/8 G4/8 | [F#4 A4]/qd D4/8 | G4/8 A4/8 Bb4/8 C5/8 | D5/qd D5/8 | C5/8 D5/8 Eb5/8 C5/8 | D5/qd D5/8 | C5/8 D5/8 Eb5/8 C5/8 | D5/8 Eb5/16 D5/16 C5/8 Bb4/8 | [Eb4 A4]/q D4/8d G4/16 | [Bb3 G4]/h",
+    "lh": "r/8 | [G3 Bb3]/8 C4/8 D4/8 C4/8 | Bb3/q G3/q | Eb4/q C4/q | Bb3/q G3/q | Eb4/q C4/q | Bb3/q G3/q | [F#3 C4]/q D3/q | [G3 Bb3]/q G2/q | [G3 Bb3]/8 C4/8 D4/8 C4/8 | Bb3/q G3/q | Eb4/q C4/q | Bb3/q G3/q | Eb4/q C4/q | Bb3/q G3/q | [F#3 C4]/q D3/q | [G3 Bb3]/h | C3/8 G3/8 C4/8 Eb4/8 | G2/8 G3/8 C4/8 Eb4/8 | C3/8 G3/8 C4/8 Eb4/8 | D3/8 A3/8 C4/8 F#4/8 | [G3 Bb3]/8 D4/8 G4/8 r/8 | [C4 G4]/h | [D4 G4]/q r/q | D4/q D3/q | [G3 Bb3]/8 C4/8 D4/8 C4/8 | Bb3/q G3/q | Eb4/q C4/q | Bb3/q G3/q | Eb4/q C4/q | Bb3/q G3/q | [C3 G3]/q [D3 F#3]/q | [G2 D3]/h"
+  },
+  "credit": "Notes from the Mutopia Project edition (Tchaikovsky, Op. 39 No. 16, Schirmer 1904, public domain)."
+}

@@ -1,0 +1,26 @@
+{
+  "hands": "both",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 84,
+    "min": 50,
+    "max": 120
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Syncopation",
+      "text": "Syncopation puts notes between the clicks and holds them across the beat. “1 & (2) & 3”: the quarter note in bar 1 starts on the “&” of 1 and covers beat 2."
+    },
+    {
+      "kind": "text",
+      "title": "Feel it",
+      "text": "The left hand keeps the beat in quarters: lock onto it, and let the right hand push against it."
+    }
+  ],
+  "parts": {
+    "rh": "C4/8:1 E4/q:3 E4/8 G4/h:5 | F4/8:4 E4/q:3 D4/8:2 C4/h:1 | E4/q:3 G4/8:5 G4/q G4/8 r/q | A4/8 G4/8 E4/8 G4/8~ G4/h | r/8 C4/q:1 E4/q:3 G4/q:5 E4/8:3 | F4/8:4 D4/q:2 F4/8:4 E4/h:3 | D4/8:2 E4/8:3 F4/8:4 G4/8:5~ G4/8 F4/8:4 E4/8:3 D4/8:2 | C4/w:1",
+    "lh": "C3/q G2/q C3/q G2/q | G2/q B2/q C3/q G2/q | C3/q G2/q C3/q G2/q | A2/q E3/q C3/q G2/q | C3/q G2/q C3/q G2/q | G2/q B2/q C3/q G2/q | G2/q B2/q D3/q B2/q | C3/w"
+  }
+}

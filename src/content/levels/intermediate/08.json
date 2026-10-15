@@ -1,0 +1,25 @@
+{
+  "hands": "right",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 80,
+    "min": 45,
+    "max": 120
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Thumb under",
+      "text": "A scale has 8 notes but you have 5 fingers. In C major the right thumb tucks under finger 3 to land on F, then the hand carries on: 1 2 3 1 2 3 4 5."
+    },
+    {
+      "kind": "text",
+      "title": "Three scales",
+      "text": "C major (bars 1–4), G major with F♯ (5–8), F major with B♭ (9–12). In F major the thumb goes under finger 4: 1 2 3 4 1 2 3 4."
+    }
+  ],
+  "parts": {
+    "rh": "C4/q:1 D4/q:2 E4/q:3 F4/q:1 | G4/q:2 A4/q:3 B4/q:4 C5/q:5 | C5/q:5 B4/q:4 A4/q:3 G4/q:2 | F4/q:1 E4/q:3 D4/q:2 C4/q:1 | G4/q:1 A4/q:2 B4/q:3 C5/q:1 | D5/q:2 E5/q:3 F#5/q:4 G5/q:5 | G5/q:5 F#5/q:4 E5/q:3 D5/q:2 | C5/q:1 B4/q:3 A4/q:2 G4/q:1 | F4/q:1 G4/q:2 A4/q:3 Bb4/q:4 | C5/q:1 D5/q:2 E5/q:3 F5/q:4 | F5/q:4 E5/q:3 D5/q:2 C5/q:1 | Bb4/q:4 A4/q:3 G4/q:2 F4/q:1"
+  }
+}

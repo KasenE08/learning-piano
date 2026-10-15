@@ -1,0 +1,21 @@
+{
+  "hands": "both",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 72,
+    "min": 45,
+    "max": 110
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Contrary motion",
+      "text": "Now the hands mirror each other: when the right hand steps up, the left steps down. Both thumbs start on a C, and the same finger numbers play at the same time."
+    }
+  ],
+  "parts": {
+    "rh": "C4/q:1 D4/q:2 E4/q:3 F4/q:4 | G4/w:5 | G4/q:5 F4/q:4 E4/q:3 D4/q:2 | C4/w:1 | C4/q:1 E4/q:3 D4/q:2 F4/q:4 | E4/q:3 G4/q:5 E4/h:3 | D4/q:2 E4/q:3 D4/q:2 C4/q:1 | C4/w:1",
+    "lh": "C3/q:1 B2/q:2 A2/q:3 G2/q:4 | F2/w:5 | F2/q:5 G2/q:4 A2/q:3 B2/q:2 | C3/w:1 | C3/q:1 A2/q:3 B2/q:2 G2/q:4 | A2/q:3 F2/q:5 A2/h:3 | B2/q:2 A2/q:3 B2/q:2 C3/q:1 | C3/w:1"
+  }
+}

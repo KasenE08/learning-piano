@@ -1,0 +1,26 @@
+{
+  "hands": "both",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 76,
+    "min": 45,
+    "max": 110
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Dynamics",
+      "text": "Dynamics say how loud: p (piano) soft, mp medium soft, mf medium loud, f (forte) loud. “cresc.” means get gradually louder, “dim.” gradually softer."
+    },
+    {
+      "kind": "text",
+      "title": "Not scored",
+      "text": "The app can't judge loudness yet, so dynamics don't change your score. Tap Listen to hear the shape, then copy it."
+    }
+  ],
+  "parts": {
+    "rh": "C4/q:1!p E4/q:3 G4/h:5 | F4/q:4 E4/q:3 D4/h:2 | E4/q:3!mf G4/q:5 F4/q:4 D4/q:2 | E4/w:3 | C4/q:1!cresc D4/q:2 E4/q:3 F4/q:4 | G4/q:5!f G4/q G4/h | F4/q:4!dim E4/q:3 D4/q:2 E4/q:3 | C4/w:1!p",
+    "lh": "C3/w:5!p | G2/w | C3/w:5!mf | C3/w:5 | C3/h:5!cresc F3/h:2 | E3/h:3!f C3/h:5 | G2/w!dim | C3/w:5!p"
+  }
+}

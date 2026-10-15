@@ -1,0 +1,14 @@
+{
+  "hands": "both",
+  "key": "Bb",
+  "time": "4/4",
+  "tempo": {
+    "default": 84,
+    "min": 84,
+    "max": 84
+  },
+  "parts": {
+    "rh": "Bb4/q D5/q F5/h | Eb5/q C5/q A4/h | Bb4/q C5/q D5/q Eb5/q | F5/w | G5/q F5/q Eb5/q D5/q | C5/q D5/q Eb5/h | D5/q C5/q B4/q D5/q | C5/w | F5/q!f Eb5/q D5/q C5/q | Bb4/q A4/q G4/q A4/q | Bb4/q!dim D5/q C5/q A4/q | Bb4/w!p",
+    "lh": "Bb2/w | F2/w | Bb2/h G2/h | F2/w | Eb3/h C3/h | F2/w | G2/w | C3/w | F2/w | G2/h F2/h | F2/h F2/h | Bb2/w"
+  }
+}

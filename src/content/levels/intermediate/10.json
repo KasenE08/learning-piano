@@ -1,0 +1,25 @@
+{
+  "hands": "right",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 72,
+    "min": 45,
+    "max": 110
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Intervals",
+      "text": "An interval is the distance between two notes. Count the letter names, including both ends: C to E is C-D-E, a 3rd. C to C is an octave (8th)."
+    },
+    {
+      "kind": "text",
+      "title": "On the staff",
+      "text": "2nds go line to space, 3rds line to line, 5ths skip two lines. Bars 1–7 go up from C: 2nd, 3rd, 4th, 5th, 6th, 7th, octave. Then mixed."
+    }
+  ],
+  "parts": {
+    "rh": "C4/h:1 D4/h:2 | C4/h:1 E4/h:3 | C4/h:1 F4/h:4 | C4/h:1 G4/h:5 | C4/h:1 A4/h:5 | C4/h:1 B4/h:5 | C4/h:1 C5/h:5 | G4/q:5 E4/q:3 C4/q:1 G4/q:5 | F4/q:4 D4/q:2 F4/q:4 C4/q:1 | E4/q:3 G4/q:5 D4/q:2 F4/q:4 | C4/q:1 G4/q:5 C4/q:1 E4/q:3 | C4/w:1"
+  }
+}

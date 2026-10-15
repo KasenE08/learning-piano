@@ -1,0 +1,27 @@
+{
+  "hands": "both",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 60,
+    "min": 36,
+    "max": 84
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Prelude in C",
+      "text": "Bach, The Well-Tempered Clavier, 1722. Every bar is one chord, broken into the same pattern: two notes in the left hand, then the right hand's three notes twice. Learn the pattern once and read only the chord."
+    },
+    {
+      "kind": "text",
+      "title": "Fitting 61 keys",
+      "text": "The whole prelude fits your keyboard: the lowest note is the C2 at your far left in the last bars. The hands never play at the same time, so the mic scores every note."
+    }
+  ],
+  "parts": {
+    "rh": "r/8 G4/16 C5/16 E5/16 G4/16 C5/16 E5/16 r/8 G4/16 C5/16 E5/16 G4/16 C5/16 E5/16 | r/8 A4/16 D5/16 F5/16 A4/16 D5/16 F5/16 r/8 A4/16 D5/16 F5/16 A4/16 D5/16 F5/16 | r/8 G4/16 D5/16 F5/16 G4/16 D5/16 F5/16 r/8 G4/16 D5/16 F5/16 G4/16 D5/16 F5/16 | r/8 G4/16 C5/16 E5/16 G4/16 C5/16 E5/16 r/8 G4/16 C5/16 E5/16 G4/16 C5/16 E5/16 | r/8 A4/16 E5/16 A5/16 A4/16 E5/16 A5/16 r/8 A4/16 E5/16 A5/16 A4/16 E5/16 A5/16 | r/8 F#4/16 A4/16 D5/16 F#4/16 A4/16 D5/16 r/8 F#4/16 A4/16 D5/16 F#4/16 A4/16 D5/16 | r/8 G4/16 D5/16 G5/16 G4/16 D5/16 G5/16 r/8 G4/16 D5/16 G5/16 G4/16 D5/16 G5/16 | r/8 E4/16 G4/16 C5/16 E4/16 G4/16 C5/16 r/8 E4/16 G4/16 C5/16 E4/16 G4/16 C5/16 | r/8 E4/16 G4/16 C5/16 E4/16 G4/16 C5/16 r/8 E4/16 G4/16 C5/16 E4/16 G4/16 C5/16 | r/8 D4/16 F#4/16 C5/16 D4/16 F#4/16 C5/16 r/8 D4/16 F#4/16 C5/16 D4/16 F#4/16 C5/16 | r/8 D4/16 G4/16 B4/16 D4/16 G4/16 B4/16 r/8 D4/16 G4/16 B4/16 D4/16 G4/16 B4/16 | r/8 E4/16 G4/16 C#5/16 E4/16 G4/16 C#5/16 r/8 E4/16 G4/16 C#5/16 E4/16 G4/16 C#5/16 | r/8 D4/16 A4/16 D5/16 D4/16 A4/16 D5/16 r/8 D4/16 A4/16 D5/16 D4/16 A4/16 D5/16 | r/8 D4/16 F4/16 B4/16 D4/16 F4/16 B4/16 r/8 D4/16 F4/16 B4/16 D4/16 F4/16 B4/16 | r/8 C4/16 G4/16 C5/16 C4/16 G4/16 C5/16 r/8 C4/16 G4/16 C5/16 C4/16 G4/16 C5/16 | r/8 A3/16 C4/16 F4/16 A3/16 C4/16 F4/16 r/8 A3/16 C4/16 F4/16 A3/16 C4/16 F4/16 | r/8 A3/16 C4/16 F4/16 A3/16 C4/16 F4/16 r/8 A3/16 C4/16 F4/16 A3/16 C4/16 F4/16 | r/8 G3/16 B3/16 F4/16 G3/16 B3/16 F4/16 r/8 G3/16 B3/16 F4/16 G3/16 B3/16 F4/16 | r/8 G3/16 C4/16 E4/16 G3/16 C4/16 E4/16 r/8 G3/16 C4/16 E4/16 G3/16 C4/16 E4/16 | r/8 Bb3/16 C4/16 E4/16 Bb3/16 C4/16 E4/16 r/8 Bb3/16 C4/16 E4/16 Bb3/16 C4/16 E4/16 | r/8 A3/16 C4/16 E4/16 A3/16 C4/16 E4/16 r/8 A3/16 C4/16 E4/16 A3/16 C4/16 E4/16 | r/8 A3/16 C4/16 Eb4/16 A3/16 C4/16 Eb4/16 r/8 A3/16 C4/16 Eb4/16 A3/16 C4/16 Eb4/16 | r/8 B3/16 C4/16 D4/16 B3/16 C4/16 D4/16 r/8 B3/16 C4/16 D4/16 B3/16 C4/16 D4/16 | r/8 G3/16 B3/16 D4/16 G3/16 B3/16 D4/16 r/8 G3/16 B3/16 D4/16 G3/16 B3/16 D4/16 | r/8 G3/16 C4/16 E4/16 G3/16 C4/16 E4/16 r/8 G3/16 C4/16 E4/16 G3/16 C4/16 E4/16 | r/8 G3/16 C4/16 F4/16 G3/16 C4/16 F4/16 r/8 G3/16 C4/16 F4/16 G3/16 C4/16 F4/16 | r/8 G3/16 B3/16 F4/16 G3/16 B3/16 F4/16 r/8 G3/16 B3/16 F4/16 G3/16 B3/16 F4/16 | r/8 A3/16 C4/16 F#4/16 A3/16 C4/16 F#4/16 r/8 A3/16 C4/16 F#4/16 A3/16 C4/16 F#4/16 | r/8 G3/16 C4/16 G4/16 G3/16 C4/16 G4/16 r/8 G3/16 C4/16 G4/16 G3/16 C4/16 G4/16 | r/8 G3/16 C4/16 F4/16 G3/16 C4/16 F4/16 r/8 G3/16 C4/16 F4/16 G3/16 C4/16 F4/16 | r/8 G3/16 B3/16 F4/16 G3/16 B3/16 F4/16 r/8 G3/16 B3/16 F4/16 G3/16 B3/16 F4/16 | r/8 G3/16 Bb3/16 E4/16 G3/16 Bb3/16 E4/16 r/8 G3/16 Bb3/16 E4/16 G3/16 Bb3/16 E4/16 | r/8 F3/16 A3/16 C4/16 F4/16 C4/16 A3/16 C4/16 A3/16 F3/16 A3/16 F3/16 D3/16 F3/16 D3/16 | r/8 G4/16 B4/16 D5/16 F5/16 D5/16 B4/16 D5/16 B4/16 G4/16 B4/16 D4/16 F4/16 E4/16 D4/16 | [E4 G4 C5]/w",
+    "lh": "C4/16 E4/8d~ E4/q C4/16 E4/8d~ E4/q | C4/16 D4/8d~ D4/q C4/16 D4/8d~ D4/q | B3/16 D4/8d~ D4/q B3/16 D4/8d~ D4/q | C4/16 E4/8d~ E4/q C4/16 E4/8d~ E4/q | C4/16 E4/8d~ E4/q C4/16 E4/8d~ E4/q | C4/16 D4/8d~ D4/q C4/16 D4/8d~ D4/q | B3/16 D4/8d~ D4/q B3/16 D4/8d~ D4/q | B3/16 C4/8d~ C4/q B3/16 C4/8d~ C4/q | A3/16 C4/8d~ C4/q A3/16 C4/8d~ C4/q | D3/16 A3/8d~ A3/q D3/16 A3/8d~ A3/q | G3/16 B3/8d~ B3/q G3/16 B3/8d~ B3/q | G3/16 Bb3/8d~ Bb3/q G3/16 Bb3/8d~ Bb3/q | F3/16 A3/8d~ A3/q F3/16 A3/8d~ A3/q | F3/16 Ab3/8d~ Ab3/q F3/16 Ab3/8d~ Ab3/q | E3/16 G3/8d~ G3/q E3/16 G3/8d~ G3/q | E3/16 F3/8d~ F3/q E3/16 F3/8d~ F3/q | D3/16 F3/8d~ F3/q D3/16 F3/8d~ F3/q | G2/16 D3/8d~ D3/q G2/16 D3/8d~ D3/q | C3/16 E3/8d~ E3/q C3/16 E3/8d~ E3/q | C3/16 G3/8d~ G3/q C3/16 G3/8d~ G3/q | F2/16 F3/8d~ F3/q F2/16 F3/8d~ F3/q | F#2/16 C3/8d~ C3/q F#2/16 C3/8d~ C3/q | Ab2/16 F3/8d~ F3/q Ab2/16 F3/8d~ F3/q | G2/16 F3/8d~ F3/q G2/16 F3/8d~ F3/q | G2/16 E3/8d~ E3/q G2/16 E3/8d~ E3/q | G2/16 D3/8d~ D3/q G2/16 D3/8d~ D3/q | G2/16 D3/8d~ D3/q G2/16 D3/8d~ D3/q | G2/16 Eb3/8d~ Eb3/q G2/16 Eb3/8d~ Eb3/q | G2/16 E3/8d~ E3/q G2/16 E3/8d~ E3/q | G2/16 D3/8d~ D3/q G2/16 D3/8d~ D3/q | G2/16 D3/8d~ D3/q G2/16 D3/8d~ D3/q | C2/16 C3/8d~ C3/q C2/16 C3/8d~ C3/q | C2/16 C3/8d~ C3/hd | C2/16 B2/8d~ B2/hd | [C2 C3]/w"
+  },
+  "credit": "Notes from the Mutopia Project edition (Bach, BWV 846, typeset by Tobias Erbsland)."
+}

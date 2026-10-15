@@ -4,6 +4,8 @@
 //  - The inner ON_TIME_FRACTION of the window is "on time"; the rest early/late.
 //  - A note never hit by the end of its window is a miss (breaks the combo).
 //  - Wrong or extra notes break the combo but do not change accuracy.
+//  - "Ghost" notes are in the music but not scored (e.g. the left hand while the
+//    mic scores only the melody). Playing one is neither a hit nor an extra.
 import { ON_TIME_FRACTION, STAR_THRESHOLDS, XP, comboMultiplier } from '../config/scoring.js';
 
 export function judgeTiming(offsetMs, windowMs, onTimeFraction = ON_TIME_FRACTION) {
@@ -15,9 +17,9 @@ export function judgeTiming(offsetMs, windowMs, onTimeFraction = ON_TIME_FRACTIO
 
 /**
  * @param {Array<{id:number, midi:number, time:number}>} expected  time in ms from start
- * @param {{windowMs:number, onTimeFraction?:number}} opts
+ * @param {{windowMs:number, onTimeFraction?:number, ghosts?:Array<{midi:number, time:number}>}} opts
  */
-export function createScorer(expected, { windowMs, onTimeFraction = ON_TIME_FRACTION }) {
+export function createScorer(expected, { windowMs, onTimeFraction = ON_TIME_FRACTION, ghosts = [] }) {
   const notes = expected.map((n) => ({ ...n, result: null, offset: null }));
   let combo = 0;
   let maxCombo = 0;
@@ -50,6 +52,11 @@ export function createScorer(expected, { windowMs, onTimeFraction = ON_TIME_FRAC
         break;
       }
       if (!best) {
+        // A note from the unscored part, played at about the right time: ignore it.
+        // Its tail can be heard a little late, so allow twice the window after.
+        if (ghosts.some((g) => g.midi === midi && time - g.time >= -windowMs && time - g.time <= windowMs * 2)) {
+          return { type: 'ghost', midi, time, combo };
+        }
         extras++;
         combo = 0;
         return { type: 'extra', midi, time, combo };

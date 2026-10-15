@@ -1,0 +1,27 @@
+{
+  "hands": "both",
+  "key": "D",
+  "time": "3/4",
+  "tempo": {
+    "default": 66,
+    "min": 44,
+    "max": 90
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Gymnopédie No. 1",
+      "text": "Satie, 1888: “slow and sorrowful”. The left hand swings between a low bass note on beat 1 and a chord on beat 2. The melody floats over it, mostly in long notes."
+    },
+    {
+      "kind": "text",
+      "title": "The bass leap",
+      "text": "The left hand jumps an octave or more every bar. Look at the next bass note, not your hand, and let the chord on beat 2 be quiet."
+    }
+  ],
+  "parts": {
+    "rh": "r/q [D4 F#4]/h | r/q [C#4 F#4]/h | r/q [D4 F#4]/h | r/q [C#4 F#4]/h | r/q [F#4 F#5]/q A5/q | G5/q [F#4 F#5]/q C#5/q | B4/q [F#4 C#5]/q D5/q | A4/q [C#4 F#4]/h | F#4/q [D4 F#4]/h~ | [D4 F#4]/q [C#4 F#4]/h~ | [C#4 F#4]/q [D4 F#4]/h~ | [D4 F#4]/q [C#4 F#4]/h | r/q [F#4 F#5]/q A5/q | G5/q [F#4 F#5]/q C#5/q | B4/q [F#4 C#5]/q D5/q | A4/q [C#4 F#4]/h | C#5/q [C#4 F#4]/h | F#5/q [D4 F#4]/h | E4/hd~ | E4/hd~ | E4/hd | A4/q B4/q C5/q | E5/q D5/q B4/q | D5/q C5/q B4/q | D5/hd~ | D5/h D5/q | E5/q F5/q G5/q | A5/q C5/q D5/q | E5/q D5/q B4/q | D5/hd~ | D5/h D5/q | G5/q [E4 G4]/h | F#5/q [C#4 F#4]/h | B4/q [F#4 A4]/q B4/q | C#5/q [A4 D5]/q E5/q | C#5/q [A4 D5]/q E5/q | F#4/q [A3 D4]/q [D4 G4]/q | [A4 C5]/hd | [A4 D5]/hd",
+    "lh": "G2/hd | D2/hd | G2/hd | D2/hd | G2/hd | D2/hd | G2/hd | D2/hd | G2/hd | D2/hd | G2/hd | D2/hd | G2/hd | D2/hd | G2/hd | D2/hd | F#2/hd | B2/hd | E2/q [G3 B3]/h | E2/q [B3 D4 G4]/h | D2/q [F3 A3 D4]/h | A2/q [A3 C4 E4]/h | D2/q [G3 B3 E4]/h | D2/q [D3 B3 E4]/h | D2/q [C3 A3 D4]/h | D2/q [C3 A3 D4]/h | D2/q [A3 C4 F4]/h | D2/q [A3 C4 E4]/h | D2/q [D3 B3 E4]/h | D2/q [C3 A3 D4]/h | D2/q [C3 A3 D4]/h | E2/hd | F#2/hd | B2/hd | E2/hd | E2/hd | E2/q B2/q E3/q | [A2 G3]/hd | [D2 A2 D3]/hd"
+  },
+  "credit": "Notes from the Mutopia Project edition (Satie, Gymnopédie No. 1, public domain)."
+}

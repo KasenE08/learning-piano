@@ -1,0 +1,26 @@
+{
+  "hands": "both",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 72,
+    "min": 45,
+    "max": 110
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Triplets",
+      "text": "A triplet fits three notes into the time of two, marked with a 3. Three triplet eighths fill one click: count “1-trip-let, 2-trip-let”."
+    },
+    {
+      "kind": "text",
+      "title": "Straight vs triplet",
+      "text": "Bar 1 is straight eighths (two per click), bar 2 is triplets (three per click). Bar 5 has quarter-note triplets: three across two clicks."
+    }
+  ],
+  "parts": {
+    "rh": "C4/8:1 D4/8:2 E4/8:3 F4/8:4 G4/h:5 | C4/8t:1 D4/8t:2 E4/8t:3 F4/8t:4 G4/8t:5 E4/8t:3 C4/h:1 | E4/q:3 G4/8t:5 F4/8t:4 E4/8t:3 D4/h:2 | C4/8t:1 E4/8t:3 G4/8t:5 E4/8t:3 C4/8t:1 E4/8t:3 D4/8:2 E4/8:3 C4/q:1 | G4/qt:5 F4/qt:4 E4/qt:3 D4/h:2 | E4/8:3 F4/8:4 G4/8t:5 F4/8t:4 E4/8t:3 D4/q:2 r/q | C4/8t:1 D4/8t:2 E4/8t:3 F4/8t:4 E4/8t:3 D4/8t:2 E4/8:3 D4/8:2 G4/q:5 | C4/w:1",
+    "lh": "C3/w | C3/h G2/h | C3/h G2/h | C3/w | G2/w | C3/h G2/h | C3/h G2/h | C3/w"
+  }
+}

@@ -15,15 +15,16 @@ npm run build            # production build into dist/
 npm run verify:offline   # build, then prove every screen loads with the network off
 npm run shots -- <dir>   # iPhone screenshots (390×844 portrait, 844×390 landscape)
 npm run e2e:mic -- <dir> # fake-microphone browser tests: calibration, mic test, a scored lesson
-npm run e2e:levels       # plays every Noob/Beginner level and song with perfect taps; expects 100%
+npm run e2e:levels -- noob beginner intermediate advanced songs
+                         # plays every level and song with perfect taps; expects 100%
 ```
 
 ## Layout
 
 - `src/config/scoring.js`: every scoring number (timing windows, stars, XP, combo)
 - `src/content/`: curriculum, songs and level files (`levels/<section>/<NN>.json`; notation is documented in `src/engine/notation.js`)
-- `src/engine/`: notation parser, scorer, and the listen/play run loop
-- `src/audio/`: Tone.js piano (self-hosted Salamander samples in `public/samples/piano/`), metronome, mic capture (AudioWorklet), analysis (McLeod pitch + band spectral flux) and the note detector
+- `src/engine/`: notation parser (triplets, dynamics, 8va/8vb, compound time), scorer, the listen/play run loop, drills and the sight-reading passage generator
+- `src/audio/`: Tone.js piano (self-hosted Salamander samples in `public/samples/piano/`), metronome, mic capture (AudioWorklet), analysis (McLeod pitch + band spectral flux), the note detector, and the "did this note just start?" check (`salience.js`) used to score a melody under the left hand
 - `src/core/`: storage, progress and unlock rules, music helpers, orientation, service worker
 - `src/ui/`: design tokens, components (keyboard, staff, dock, sheet), screens
 - `PLAN.md`: the overall plan and curriculum
@@ -37,3 +38,9 @@ GitHub Pages. One-time setup: repo **Settings → Pages → Source: GitHub Actio
 
 Piano samples: Salamander Grand Piano by Alexander Holm (CC-BY 3.0). Notation: VexFlow.
 All music is public domain or original.
+
+Many of the Intermediate/Advanced pieces were converted from public-domain editions
+in the [Mutopia Project](https://www.mutopiaproject.org) (LilyPond → MIDI → this app's
+notation, then simplified to fit 61 keys); each file's `credit` field names its edition.
+Canon in D's melody is adapted from Jim Paterson's arrangement (mfiles.co.uk) via Mutopia,
+licensed CC BY 3.0.

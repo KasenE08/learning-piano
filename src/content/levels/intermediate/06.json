@@ -1,0 +1,33 @@
+{
+  "hands": "both",
+  "key": "D",
+  "time": "4/4",
+  "tempo": {
+    "default": 80,
+    "min": 50,
+    "max": 120
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "D major",
+      "text": "Two sharps: every F and every C is sharp. Put your right thumb on D4: D E F♯ G A. Finger 3 sits on the black key F♯."
+    },
+    {
+      "kind": "note",
+      "note": "F#4",
+      "title": "F sharp",
+      "text": "The black key just right of F.",
+      "finger": 3
+    },
+    {
+      "kind": "text",
+      "title": "B♭ major",
+      "text": "B♭ major has two flats, B♭ and E♭. You'll meet it in the section test."
+    }
+  ],
+  "parts": {
+    "rh": "D4/q:1 E4/q:2 F#4/q:3 G4/q:4 | A4/h:5 F#4/h:3 | G4/q:4 E4/q:2 A4/q:5 G4/q:4 | F#4/w:3 | A4/q:5 G4/q:4 F#4/q:3 E4/q:2 | D4/q:1 F#4/q:3 E4/h:2 | F#4/q:3 E4/q:2 D4/q:1 E4/q:2 | D4/w:1",
+    "lh": "D3/w:5 | D3/h:5 F#3/h:3 | E3/h:4 G3/h:2 | A3/w:1 | F#3/h:3 G3/h:2 | A3/h:1 G3/h:2 | A3/h:1 A3/h | D3/w:5"
+  }
+}

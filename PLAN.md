@@ -76,6 +76,8 @@ Content lives in `src/content` and loads through `import.meta.glob`, so the prec
 
 Notation: `pitch/duration[:finger]`, with `|` as the bar line and `r/q` for a rest. Chords are written as `[C4 E4 G4]/h`. A validator runs in the tests, so a typo in a level fails CI before it reaches you.
 
+Added in Phase 6: triplets `C4/8t` (validated in complete groups), dynamics `C4/q!mf` (`pp p mp mf f ff cresc dim`, used for playback loudness, not scored), 6/8 and 9/8 (clicks on the dotted quarter; tempo counts those beats), `ottava: [{part, from, to, type: "8va"|"8vb"}]` (notes are written at sounding pitch and engraved an octave away), `clefChanges: { lh: [[bar, "treble"], ...] }`, and `generate: {...}` for unseen sight-reading passages.
+
 ### iOS audio plan
 
 - One `AudioContext` is created and unlocked on the first tap. It resumes on `visibilitychange`/`pageshow`, and the mic stream is re-acquired if iOS killed it while the app was in the background.
@@ -159,7 +161,7 @@ Every level fits inside **C2–C7**, the 61-key range of the CTK-2400; early sec
 | 7 | Triplets *(added)* | 15 | Capstone: learn an unseen piece with the self-study workflow |
 | 8 | Hand independence: melody + accompaniment | ⚑ | **Advanced Test** |
 
-**Unlockable song library** (all arrangements are mine; every melody is public domain): Hot Cross Buns, Lightly Row, Jingle Bells (1857), Oh! Susanna (1848), When the Saints, Greensleeves, Scarborough Fair, Morning Mood (Grieg), Eine kleine Nachtmusik theme, Swan Lake theme, Canon in D (Pachelbel), Turkish March theme, Maple Leaf Rag (A section), The Entertainer (A section), Clair de Lune (opening). The hidden ones unlock by earning ★★★ on certain levels, or by clearing a section with every level at ★★ or better.
+**Unlockable song library** (every piece is public domain): Hot Cross Buns, Lightly Row, Jingle Bells (1857), Oh! Susanna (1848), When the Saints, Greensleeves, In the Hall of the Mountain King (Grieg), Brahms' Lullaby, Eine kleine Nachtmusik, Swan Lake: Neapolitan Dance, Canon in D (Pachelbel), Turkish March, Maple Leaf Rag (A and B strains), The Entertainer (intro and A strain), Clair de Lune (opening page). Intermediate/Advanced songs are long versions (32+ bars or about a minute). Scarborough Fair, Morning Mood and the Swan Lake oboe theme were swapped out in Phase 6 because no checkable source was reachable (pending your OK). The hidden ones unlock by earning ★★★ on certain levels, or by clearing a section with every level at ★★ or better.
 
 ## 4. Design concepts
 
@@ -182,6 +184,9 @@ The lesson layout is the same in all three: a fixed playhead about a third of th
 - Practice earns no XP. Levels stay 4–8 bars (songs ~16).
 - "Find the key" drills (untimed, first answer counts) for keyboard geography and staff reading.
 - Noob and Beginner content is strictly one note at a time so the mic can score it (checked by tests).
+- Hands-together levels: Keyboard (mic) mode scores the melody (the top right-hand note wherever notes start together); Taps mode scores every note. Both hands get scored once Phase 7 lands. Left-hand notes the mic hears near their time never break the combo.
+- Songs in the later sections are longer versions (32+ bars).
+- Phase 6 sources: Mutopia Project editions converted via LilyPond → MIDI, simplified to ≤2 notes per hand at once and fitted to C2–C7.
 
 ## 6. Later (after Phase 8)
 

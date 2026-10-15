@@ -1,0 +1,26 @@
+{
+  "hands": "both",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 72,
+    "min": 40,
+    "max": 110
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Left-hand scale",
+      "text": "The left hand goes up 5 4 3 2 1, then finger 3 crosses over the thumb: 3 2 1. Coming down, the thumb passes under finger 3."
+    },
+    {
+      "kind": "text",
+      "title": "Both hands",
+      "text": "Bars 5–8 play the scale in both hands, an octave apart. The thumbs cross at different moments, so go slowly: try 50 BPM in Practice."
+    }
+  ],
+  "parts": {
+    "rh": "r/w | r/w | r/w | r/w | C4/q:1 D4/q:2 E4/q:3 F4/q:1 | G4/q:2 A4/q:3 B4/q:4 C5/q:5 | C5/q:5 B4/q:4 A4/q:3 G4/q:2 | F4/q:1 E4/q:3 D4/q:2 C4/q:1 | C4/w:1",
+    "lh": "C3/q:5 D3/q:4 E3/q:3 F3/q:2 | G3/q:1 A3/q:3 B3/q:2 C4/q:1 | C4/q:1 B3/q:2 A3/q:3 G3/q:1 | F3/q:2 E3/q:3 D3/q:4 C3/q:5 | C3/q:5 D3/q:4 E3/q:3 F3/q:2 | G3/q:1 A3/q:3 B3/q:2 C4/q:1 | C4/q:1 B3/q:2 A3/q:3 G3/q:1 | F3/q:2 E3/q:3 D3/q:4 C3/q:5 | C3/w:5"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "hands": "both",
+  "noListen": true,
+  "showFingers": false,
+  "tempo": {
+    "default": 72,
+    "min": 45,
+    "max": 100
+  },
+  "generate": {
+    "keys": [
+      "C",
+      "G",
+      "F",
+      "D",
+      "Bb",
+      "A",
+      "Eb"
+    ],
+    "times": [
+      "4/4",
+      "3/4"
+    ],
+    "bars": 8,
+    "hands": "both",
+    "rhythm": "medium"
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Unseen passages",
+      "text": "Every visit makes a new passage you've never seen, in a random key and time. No Listen: read it cold."
+    },
+    {
+      "kind": "text",
+      "title": "Before you play",
+      "text": "Check the key signature, the time signature, the highest and lowest notes, and any rhythm you need to count. Then keep going, even after a mistake. “New passage” makes another one."
+    }
+  ]
+}

@@ -59,18 +59,18 @@
       "section": "beginner"
     },
     {
-      "id": "scarborough-fair",
-      "title": "Scarborough Fair",
-      "by": "Traditional",
+      "id": "mountain-king",
+      "title": "In the Hall of the Mountain King",
+      "by": "Grieg, 1875",
       "unlock": {
         "level": "intermediate-07"
       },
       "section": "intermediate"
     },
     {
-      "id": "morning-mood",
-      "title": "Morning Mood",
-      "by": "Grieg, 1875",
+      "id": "brahms-lullaby",
+      "title": "Brahms' Lullaby",
+      "by": "Brahms, 1868",
       "unlock": {
         "level": "intermediate-10"
       },
@@ -89,7 +89,7 @@
     },
     {
       "id": "swan-lake",
-      "title": "Swan Lake theme",
+      "title": "Swan Lake: Neapolitan Dance",
       "by": "Tchaikovsky, 1876",
       "unlock": {
         "level": "advanced-03"

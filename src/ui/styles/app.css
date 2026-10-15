@@ -216,6 +216,27 @@
 .tempo-row b { font-size: 24px; font-weight: 700; text-align: right; }
 .tempo-row input { width: 100%; accent-color: var(--ink); }
 .metro-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+/* Ready card: input switch and buttons share one row. */
+.ready { width: min(440px, 56%); }
+.ready__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; margin-top: 10px; }
+.ready__foot .seg, .ready__foot .ready__btns { margin-top: 0; }
+.ready__foot .ready__btns .btn { height: 38px; padding: 0 14px; }
+/* Practice: two columns of controls in a wider card. */
+.ready--practice { width: min(560px, 68%); }
+.prac { display: grid; grid-template-columns: 1fr 1fr; column-gap: 18px; align-items: center; }
+.toggles { display: flex; gap: 14px; align-items: center; margin-top: 8px; }
+.tog { display: inline-flex; align-items: center; gap: 8px; }
+.bars-row { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+.bars-row small { margin-left: auto; }
+.stepper { display: inline-flex; align-items: center; background: var(--surface-2); border-radius: var(--pill); }
+.stepper button { width: 28px; height: 28px; border-radius: 50%; font: 800 16px var(--font-body); color: var(--ink); }
+.stepper b { min-width: 20px; text-align: center; font-size: 18px; font-weight: 700; }
+.hands-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.hands-row .seg { margin-top: 0; }
+.ready__gen { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-weight: 700; color: var(--ink) !important; }
+.ready__gen .link { font: 700 12px var(--font-body); text-decoration: underline; color: var(--ink-2); }
+.ready__mic { font-size: 12px !important; color: var(--ink-3) !important; }
+.loopcard .label { white-space: nowrap; }
 .intro__head { display: flex; align-items: center; gap: 14px; margin-top: 4px; }
 .intro__head h2 { margin-top: 0; }
 .intro__note { display: flex; flex-direction: column; align-items: flex-start; }
@@ -243,6 +264,7 @@
 .tbar .t-miss { background: var(--miss); }
 .tlegend { display: flex; justify-content: space-between; margin-top: 6px; font: 600 11px var(--font-body); color: var(--ink-3); }
 .tlegend b { color: var(--ink); }
+.results__mic { grid-column: 1 / 5; font: 600 11px/1.4 var(--font-body); color: var(--ink-3); }
 .results__btns { grid-column: 1 / 5; display: flex; gap: 6px; justify-content: flex-end; }
 .results__btns .btn { height: 40px; }
 

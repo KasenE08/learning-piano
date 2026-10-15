@@ -1,0 +1,58 @@
+{
+  "hands": "both",
+  "key": "Db",
+  "time": "9/8",
+  "tempo": {
+    "default": 40,
+    "min": 28,
+    "max": 56
+  },
+  "clefChanges": {
+    "lh": [
+      [
+        1,
+        "treble"
+      ],
+      [
+        7,
+        "bass"
+      ],
+      [
+        16,
+        "treble"
+      ],
+      [
+        17,
+        "bass"
+      ],
+      [
+        18,
+        "treble"
+      ],
+      [
+        19,
+        "bass"
+      ],
+      [
+        25,
+        "treble"
+      ],
+      [
+        27,
+        "bass"
+      ]
+    ]
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Clair de Lune",
+      "text": "Debussy, 1905: the opening page. 9/8 has three slow beats per bar, each a dotted quarter. The left hand starts in the treble clef: watch for the clef changes. D♭ major has five flats."
+    }
+  ],
+  "parts": {
+    "rh": "r/q [F5 Ab5]/qdd~ [F5 Ab5]/16 [Db5 F5]/qd~ | [Db5 F5]/8 [C5 Eb5]/8 [Db5 F5]/8 [C5 Eb5]/hd~ | [C5 Eb5]/8 [Bb4 Db5]/8 [C5 Eb5]/8 [Bb4 Db5]/8d F5/8d~ F5/8d Db5/8d~ | Db5/8 [Ab4 C5]/8 [Bb4 Db5]/8 [Ab4 C5]/hd | Gb4/8 Bb4/8 C5/8 Bb4/8 Eb5/8 Bb4/8 [Gb4 Ab4]/8 Bb4/8 Ab4/8 | Eb4/8 Gb4/8 Ab4/8 Gb4/qd [Eb4 F4]/qd | Db4/8 F4/8 Gb4/8 F4/8 Bb4/8 F4/8 Eb4/8 F4/8 Eb4/8 | Bb3/8 Db4/8 Eb4/8 Db4/qd [Ab3 C4]/qd | r/8 [F3 Ab3]/q [F5 Ab5]/qd [Db5 F5]/qd~ | [Db5 F5]/8 [Bb4 Eb5]/8 F5/8 Eb5/hd~ | Eb5/8 [Ab4 Db5]/8 Eb5/8 [Db5 Ab5]/qd [Db5 F5]/qd~ | [Db5 F5]/8 [Bb4 Eb5]/8 F5/8 Eb5/qd Db5/qd~ | Db5/8 [Ab4 Db5]/8 Eb5/8 [F5 Bb5]/8d Ab5/8d~ Ab5/8d F5/8d | F5/8 [Bb4 Eb5]/8 F5/8 Eb5/8d Db5/8d~ Db5/8d Bb4/8d | r/8d [Bb5 F6]/8d~ [Bb5 F6]/8 [Bb5 Eb6]/8 [Bb5 Eb6]/8 [Bb5 Eb6]/8 [Bb5 Db6]/8 [Bb5 Db6]/8 | [Bb5 Db6]/8 [Bb5 C6]/8 [Bb5 C6]/8 [Bb5 C6]/8d [Bb5 Db6]/8d [Gb5 Bb5]/qd | r/8d [Bb5 F6]/8d~ [Bb5 F6]/8 [Bb5 Gb6]/8 [Bb5 F6]/8 [Bb5 Eb6]/8 [Bb5 F6]/8 [Bb5 Eb6]/8 | [Bb5 Db6]/8 [Bb5 Eb6]/8 [Bb5 Db6]/8 [Bb5 C6]/8d [Bb5 Db6]/8d [Gb5 Bb5]/qd~ | [Gb5 Bb5]/8d Gb5/8d [Eb5 Ab5]/8d C6/8d [Gb5 Bb5]/8d Gb5/8d | r/8 [Eb5 Gb5]/8 [Eb5 Gb5]/8 [Eb5 Gb5]/8 [Eb5 Gb5]/8 [Eb5 Ab5]/8 [Eb5 Gb5]/qd | r/8d [Db5 Gb5]/8d Ab5/8d Db6/8d [Gb5 Bb5]/8d Gb5/8d | r/8 [Eb5 Gb5]/8 [Eb5 Gb5]/8 [Eb5 Gb5]/8 [Eb5 Gb5]/8 [F5 Ab5]/8 [Eb5 Gb5]/qd | r/8d [Db5 Gb5]/8d Ab5/8d Eb6/8d [Bb5 Db6]/8d Bb5/8d | r/8 [Gb5 Bb5]/8 [Gb5 Bb5]/8 [Gb5 Bb5]/8 [Gb5 Bb5]/8 [Ab5 C6]/8 [Gb5 Bb5]/8 [Bb5 Db6]/8 [Bb5 Eb6]/8 | [Db6 Ab6]/hd [Db6 Ab6]/qd | [Db6 Ab6]/hd [Eb5 Ab5]/qd | [Db5 F5]/hd~ [Db5 F5]/qd",
+    "lh": "r/8 [F4 Ab4]/q~ [F4 Ab4]/hd | [Gb4 A4]/w~ [Gb4 A4]/8 | [F4 Ab4]/w~ [F4 Ab4]/8 | [Eb4 Gb4]/w~ [Eb4 Gb4]/8 | [Db4 Eb4]/hd [C4 Eb4]/qd | [Bb3 Db4]/hd [A3 C4]/qd | [Ab3 Bb3]/hd Gb3/qd | [F3 Ab3]/hd [Eb3 Gb3]/8d Ab2/8d | Db2/8 r/8 [F4 Ab4]/qdd~ [F4 Ab4]/16~ [F4 Ab4]/qd | [Gb2 Db3]/8 [Gb3 Db4]/q~ [Gb3 Db4]/hd | [F2 Db3]/8 [F3 Ab3]/q [Db4 F4]/qd [Ab3 Db4]/qd | [Gb2 Db3]/8 [Gb3 Db4]/q~ [Gb3 Db4]/hd | Ab2/8 [F3 B3]/q [B3 F4]/h r/q | Bb2/8 [F3 Eb4]/q~ [F3 Eb4]/8d Db4/8d~ Db4/qd | Eb2/8d [F4 Bb4]/8d~ [F4 Bb4]/8 [Eb4 Bb4]/8 [Eb4 Bb4]/8 [Eb4 Bb4]/8 [Db4 Bb4]/8 [Db4 Bb4]/8 | [Db4 Bb4]/8 [C4 Bb4]/8 [C4 Bb4]/8 [C4 Bb4]/8d [Db4 Bb4]/8d [Bb3 Gb4]/qd | [Eb2 Bb2]/8d [F4 Bb4]/8d~ [F4 Bb4]/8 [Gb4 Eb5]/8 [F4 Bb4]/8 [Eb4 Bb4]/8 [F4 Bb4]/8 [Eb4 Bb4]/8 | [Db4 Bb4]/8 [Eb4 Bb4]/8 [Db4 Bb4]/8 [C4 Bb4]/8d [Db4 Bb4]/8d [Bb3 Gb4]/qd | Ab2/8d Gb3/8d [Ab3 Eb4]/8d C4/8d [Bb3 Gb4]/8d Gb3/8d | A2/8 [Gb3 Eb4]/8 [Gb3 Eb4]/8 [Gb3 Eb4]/8 [Gb3 Eb4]/8 [Ab3 Eb4]/8 [Gb3 Eb4]/qd | Bb2/8d [Gb3 Db4]/8d Ab3/8d Db4/8d [Bb3 Gb4]/8d Gb3/8d | C3/8 [Gb3 Eb4]/8 [Gb3 Eb4]/8 [Gb3 Eb4]/8 [Gb3 Eb4]/8 [Ab3 F4]/8 [Gb3 Eb4]/qd | Db3/8d [Gb3 Db4]/8d Ab3/8d Eb4/8d [Db4 Bb4]/8d Bb3/8d | Eb3/8 [Bb3 Gb4]/8 [Bb3 Gb4]/8 [Bb3 Gb4]/8 [Bb3 Gb4]/8 [C4 Ab4]/8 [Bb3 Gb4]/8 [Db4 Bb4]/8 [Eb4 Bb4]/8 | [Ab4 F5]/hd [Ab4 E5]/qd | [Gb4 Eb5]/hd [Ab3 C5]/qd | [Db2 Ab2]/hd~ [Db2 Ab2]/qd"
+  },
+  "credit": "Notes from the Mutopia Project edition (Debussy, Suite bergamasque III, typeset by Keith OHara)."
+}

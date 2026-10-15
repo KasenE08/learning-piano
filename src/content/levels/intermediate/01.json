@@ -2,12 +2,25 @@
   "hands": "both",
   "key": "C",
   "time": "4/4",
-  "tempo": { "default": 72, "min": 45, "max": 110 },
+  "tempo": {
+    "default": 72,
+    "min": 45,
+    "max": 110
+  },
   "intro": [
-    { "kind": "text", "title": "Hands together", "text": "Your left hand holds one long note per bar while the right hand plays the melody. Start slow in practice mode." }
+    {
+      "kind": "text",
+      "title": "Hands together",
+      "text": "Your left hand holds one long note per bar while the right hand plays the melody you know: Ode to Joy. Start slow in Practice: you can pick the bars and loop them."
+    },
+    {
+      "kind": "text",
+      "title": "How the mic scores this",
+      "text": "Where both hands start notes together, Keyboard mode scores your right hand (the top note). Both hands get scored once chord detection lands. Taps mode scores every note."
+    }
   ],
   "parts": {
-    "rh": "E4/q:3 E4/q F4/q:4 G4/q:5 | G4/q F4/q:4 E4/q:3 D4/q:2 | C4/q:1 C4/q D4/q:2 E4/q:3 | E4/qd:3 D4/8:2 D4/h",
-    "lh": "C3/w:5 | G3/w:1 | C3/w:5 | G3/h:1 G3/h"
+    "rh": "E4/q:3 E4/q F4/q:4 G4/q:5 | G4/q F4/q:4 E4/q:3 D4/q:2 | C4/q:1 C4/q D4/q:2 E4/q:3 | E4/qd:3 D4/8:2 D4/h | E4/q:3 E4/q F4/q:4 G4/q:5 | G4/q F4/q:4 E4/q:3 D4/q:2 | C4/q:1 C4/q D4/q:2 E4/q:3 | D4/qd:2 C4/8:1 C4/h",
+    "lh": "C3/w:5 | G3/w:1 | C3/w:5 | G3/w:1 | C3/w:5 | G3/w:1 | C3/w:5 | G3/h:1 C3/h:5"
   }
 }

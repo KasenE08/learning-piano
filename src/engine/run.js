@@ -5,27 +5,31 @@ import * as audio from '../audio/engine.js';
 import { createScorer } from './scorer.js';
 
 export function createRun({
-  notes, totalBeats, tempo, beatsPerBar, mode, windowMs, metronome = true, countInBeats = beatsPerBar,
+  notes, ghosts = [], totalBeats, tempo, beatsPerBar, pulse = 1, mode, windowMs, metronome = true, countInBeats = beatsPerBar,
   latencyMs = 0, judgeDelayMs = 0, onFrame = () => {}, onJudge = () => {}, onMiss = () => {}, onEnd = () => {},
 }) {
   const spb = 60 / tempo;
   const msPerBeat = spb * 1000;
   const play = mode === 'play';
   const countIn = play ? countInBeats : 0;
-  const scorer = play ? createScorer(notes.map((n) => ({ id: n.id, midi: n.midi, time: n.beat * msPerBeat })), { windowMs }) : null;
+  const scorer = play ? createScorer(notes.map((n) => ({ id: n.id, midi: n.midi, time: n.beat * msPerBeat })), {
+    windowMs, ghosts: ghosts.map((n) => ({ midi: n.midi, time: n.beat * msPerBeat })),
+  }) : null;
 
+  // Clicks fall every `pulse` beats (a dotted quarter in 6/8); bar starts are accented.
   const events = [];
-  for (let i = 0; i < countIn; i++) {
-    events.push({ at: i * spb, fn: (t) => audio.playClick(t, i % beatsPerBar === 0) });
+  const downbeat = (b) => Math.abs(b / beatsPerBar - Math.round(b / beatsPerBar)) < 1e-6;
+  for (let b = 0; b < countIn - 1e-6; b += pulse) {
+    events.push({ at: b * spb, fn: (t) => audio.playClick(t, downbeat(b)) });
   }
   if (play && metronome) {
-    for (let b = 0; b < Math.ceil(totalBeats); b++) {
-      events.push({ at: (countIn + b) * spb, fn: (t) => audio.playClick(t, b % beatsPerBar === 0) });
+    for (let b = 0; b < totalBeats - 1e-6; b += pulse) {
+      events.push({ at: (countIn + b) * spb, fn: (t) => audio.playClick(t, downbeat(b)) });
     }
   }
   if (!play) {
     for (const n of notes) {
-      events.push({ at: (countIn + n.beat) * spb, fn: (t) => audio.playNote(n.midi, Math.max(0.25, n.beats * spb * 0.95), t, 0.75) });
+      events.push({ at: (countIn + n.beat) * spb, fn: (t) => audio.playNote(n.midi, Math.max(0.25, n.beats * spb * 0.95), t, n.vel ?? 0.75) });
     }
   }
 
@@ -60,6 +64,7 @@ export function createRun({
   return {
     mode,
     scorer,
+    pulse,
     msPerBeat,
     start() {
       const startAt = audio.startTransport(events, 0.2);

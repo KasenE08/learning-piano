@@ -1,0 +1,26 @@
+{
+  "hands": "both",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 80,
+    "min": 50,
+    "max": 120
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Triads",
+      "text": "A triad is three notes a 3rd apart: root, 3rd, 5th. Here you play them one note at a time (broken), up and down."
+    },
+    {
+      "kind": "text",
+      "title": "Major and minor",
+      "text": "C, F and G are major (bright). D, E and A are minor (darker): their middle note is one key lower. The left hand plays each root."
+    }
+  ],
+  "parts": {
+    "rh": "C4/q:1 E4/q:3 G4/q:5 E4/q:3 | D4/q:1 F4/q:3 A4/q:5 F4/q:3 | E4/q:1 G4/q:3 B4/q:5 G4/q:3 | F4/q:1 A4/q:3 C5/q:5 A4/q:3 | G4/q:1 B4/q:3 D5/q:5 B4/q:3 | A4/q:1 C5/q:3 E5/q:5 C5/q:3 | G4/q:1 B4/q:3 D5/q:5 B4/q:3 | C4/q:1 E4/q:3 G4/h:5",
+    "lh": "C3/w | D3/w | E3/w | F3/w | G3/w | A3/w | G3/w | C3/w"
+  }
+}

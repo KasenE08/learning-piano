@@ -1,0 +1,26 @@
+{
+  "hands": "both",
+  "key": "G",
+  "time": "6/8",
+  "tempo": {
+    "default": 56,
+    "min": 36,
+    "max": 80
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Six-eight time",
+      "text": "6/8 has six eighth notes per bar, grouped in two sets of three. It's felt as two big beats, each a dotted quarter: “1-2-3, 4-5-6”."
+    },
+    {
+      "kind": "text",
+      "title": "Two clicks a bar",
+      "text": "The metronome clicks on the two big beats, and the tempo counts them. The long-short pattern (quarter, eighth) gives 6/8 its lilt."
+    }
+  ],
+  "parts": {
+    "rh": "G4/q:1 A4/8:2 B4/q:3 G4/8:1 | D5/qd:5 B4/qd:3 | C5/q:4 B4/8:3 A4/q:2 G4/8:1 | B4/8:3 A4/8:2 G4/8:1 A4/qd:2 | G4/q:1 A4/8:2 B4/q:3 C5/8:4 | D5/8:5 C5/8:4 B4/8:3 A4/qd:2 | C5/q:4 A4/8:2 B4/q:3 A4/8:2 | G4/qd:1 r/qd",
+    "lh": "G2/qd D3/qd | G2/qd B2/qd | C3/qd D3/qd | D3/hd | G2/qd D3/qd | G2/qd D3/qd | C3/qd D3/qd | G2/hd"
+  }
+}

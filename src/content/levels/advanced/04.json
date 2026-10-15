@@ -1,0 +1,31 @@
+{
+  "hands": "both",
+  "key": "A",
+  "time": "4/4",
+  "tempo": {
+    "default": 84,
+    "min": 50,
+    "max": 120
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "More keys",
+      "text": "Sharp keys add one sharp each time: G (F♯), D (+C♯), A (+G♯), E (+D♯). Flat keys add flats: F (B♭), B♭ (+E♭), E♭ (+A♭), A♭ (+D♭)."
+    },
+    {
+      "kind": "text",
+      "title": "Relative minors",
+      "text": "Every major key shares its signature with a minor key three notes below: D minor goes with F major, G minor with B♭ major."
+    },
+    {
+      "kind": "text",
+      "title": "A major",
+      "text": "Three sharps: F♯, C♯ and G♯. Right thumb on A4."
+    }
+  ],
+  "parts": {
+    "rh": "A4/q:1 B4/q:2 C#5/q:3 A4/q:1 | E5/h:5 C#5/h:3 | D5/q:4 C#5/q:3 B4/q:2 D5/q:4 | C#5/w:3 | E5/q:5 D5/q:4 C#5/q:3 B4/q:2 | A4/q:1 C#5/q:3 B4/h:2 | C#5/q:3 B4/q:2 A4/q:1 G#4/q:1 | A4/w:2",
+    "lh": "A2/h E3/h | A2/h C#3/h | D3/h E3/h | A2/w | A2/h C#3/h | D3/h E3/h | E3/h E2/h | A2/w"
+  }
+}

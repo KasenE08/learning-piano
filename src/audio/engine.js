@@ -90,6 +90,14 @@ export function playClick(time, accent = false) {
 export const context = () => Tone.getContext();
 
 /** Audio-clock time (s) → performance.now() (ms), for input events (no output latency). */
+/** Inverse of contextToPerf: a performance.now() time on the audio clock. */
+export function perfToContext(ms) {
+  const ctx = Tone.getContext().rawContext;
+  const ts = ctx.getOutputTimestamp?.();
+  if (ts && ts.performanceTime) return ts.contextTime + (ms - ts.performanceTime) / 1000;
+  return ctx.currentTime + (ms - performance.now()) / 1000;
+}
+
 export function contextToPerf(t) {
   const ctx = Tone.getContext().rawContext;
   const ts = ctx.getOutputTimestamp?.();

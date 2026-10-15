@@ -8,6 +8,8 @@ const routes = [
   { re: /^\/lesson\/([\w-]+)$/, name: 'lesson', keys: ['id'] },
   { re: /^\/songs$/, name: 'songs' },
   { re: /^\/you$/, name: 'you' },
+  { re: /^\/calibrate(?:\/(.+))?$/, name: 'calibrate', keys: ['back'] },
+  { re: /^\/mictest$/, name: 'mictest' },
 ];
 
 export function parse(hash) {

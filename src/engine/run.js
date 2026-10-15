@@ -6,7 +6,7 @@ import { createScorer } from './scorer.js';
 
 export function createRun({
   notes, totalBeats, tempo, beatsPerBar, mode, windowMs, metronome = true, countInBeats = beatsPerBar,
-  latencyMs = 0, onFrame = () => {}, onJudge = () => {}, onMiss = () => {}, onEnd = () => {},
+  latencyMs = 0, judgeDelayMs = 0, onFrame = () => {}, onJudge = () => {}, onMiss = () => {}, onEnd = () => {},
 }) {
   const spb = 60 / tempo;
   const msPerBeat = spb * 1000;
@@ -32,7 +32,8 @@ export function createRun({
   let raf = 0;
   let perfBeat0 = 0;
   let finished = false;
-  const endBeat = totalBeats + (play ? windowMs / msPerBeat : 0) + 0.4;
+  // Mic notes arrive a little after they are played, so misses are called later.
+  const endBeat = totalBeats + (play ? (windowMs + judgeDelayMs) / msPerBeat : 0) + 0.4;
 
   const finish = (completed) => {
     if (finished) return;
@@ -48,7 +49,7 @@ export function createRun({
     const t = performance.now();
     const beat = (t - perfBeat0) / msPerBeat;
     if (scorer) {
-      const missed = scorer.tick(t - perfBeat0 - latencyMs);
+      const missed = scorer.tick(t - perfBeat0 - latencyMs - judgeDelayMs);
       missed.forEach((n) => onMiss(n, scorer));
     }
     onFrame(beat, scorer);

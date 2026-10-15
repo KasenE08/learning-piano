@@ -18,8 +18,10 @@ import * as map from './ui/screens/map.js';
 import * as lesson from './ui/screens/lesson.js';
 import * as songs from './ui/screens/songs.js';
 import * as you from './ui/screens/you.js';
+import * as calibrate from './ui/screens/calibrate.js';
+import * as mictest from './ui/screens/mictest.js';
 
-const screens = { home, map, lesson, songs, you };
+const screens = { home, map, lesson, songs, you, calibrate, mictest };
 
 async function boot() {
   await store.load();

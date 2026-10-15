@@ -28,11 +28,14 @@ export function load() {
       baseUrl: `${import.meta.env.BASE_URL}samples/piano/`,
       release: 1.2,
     }).toDestination();
-    click = new Tone.Synth({
-      oscillator: { type: 'triangle' },
-      envelope: { attack: 0.001, decay: 0.045, sustain: 0, release: 0.02 },
-      volume: -6,
-    }).toDestination();
+    // Metronome click: a short burst of high-passed noise. It is clearly audible
+    // but has almost no energy in the piano band, so the mic ignores it.
+    const hp = new Tone.Filter(4500, 'highpass').toDestination();
+    click = new Tone.NoiseSynth({
+      noise: { type: 'white' },
+      envelope: { attack: 0.0005, decay: 0.03, sustain: 0, release: 0.01 },
+      volume: -4,
+    }).connect(hp);
     await Tone.loaded();
   })();
   return loading;
@@ -40,14 +43,17 @@ export function load() {
 
 export const isLoaded = () => !!piano?.loaded;
 
-function setSession(type) {
+let sessionType = 'playback';
+/** 'playback' (ignores the silent switch) or 'play-and-record' (while the mic is open). */
+export function setSession(type) {
+  sessionType = type;
   try { if (navigator.audioSession) navigator.audioSession.type = type; } catch { /* unsupported */ }
 }
 
 /** Must run inside a tap/click handler. */
 export async function unlock() {
   await load();
-  setSession('playback');
+  setSession(sessionType);
   await Tone.start();
 }
 
@@ -78,7 +84,17 @@ export function playNote(midi, durSec = 0.6, time, velocity = 0.8) {
 }
 
 export function playClick(time, accent = false) {
-  click?.triggerAttackRelease(accent ? 'A6' : 'E6', 0.03, time, accent ? 1 : 0.6);
+  click?.triggerAttackRelease(0.03, time, accent ? 1 : 0.55);
+}
+
+export const context = () => Tone.getContext();
+
+/** Audio-clock time (s) → performance.now() (ms), for input events (no output latency). */
+export function contextToPerf(t) {
+  const ctx = Tone.getContext().rawContext;
+  const ts = ctx.getOutputTimestamp?.();
+  if (ts && ts.performanceTime) return ts.performanceTime + (t - ts.contextTime) * 1000;
+  return performance.now() + (t - ctx.currentTime) * 1000;
 }
 
 /** Schedules callbacks on the transport; returns the audio time at which beat 0 sounds. */

@@ -12,7 +12,7 @@ const isPhone = () => Math.min(window.innerWidth, window.innerHeight) < 540;
 function update() {
   const el = overlay();
   const portrait = isPortrait();
-  const wrong = want === 'landscape' ? portrait : !portrait && isPhone();
+  const wrong = want === 'any' ? false : want === 'landscape' ? portrait : !portrait && isPhone();
   document.documentElement.dataset.orientation = portrait ? 'portrait' : 'landscape';
   el.hidden = !wrong;
   if (!wrong) return;

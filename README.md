@@ -14,6 +14,7 @@ npm test                 # unit tests (Vitest)
 npm run build            # production build into dist/
 npm run verify:offline   # build, then prove every screen loads with the network off
 npm run shots -- <dir>   # iPhone screenshots (390×844 portrait, 844×390 landscape)
+npm run e2e:mic -- <dir> # fake-microphone browser tests: calibration, mic test, a scored lesson
 ```
 
 ## Layout
@@ -21,7 +22,7 @@ npm run shots -- <dir>   # iPhone screenshots (390×844 portrait, 844×390 lands
 - `src/config/scoring.js`: every scoring number (timing windows, stars, XP, combo)
 - `src/content/`: curriculum, songs and level files (`levels/<section>/<NN>.json`; notation is documented in `src/engine/notation.js`)
 - `src/engine/`: notation parser, scorer, and the listen/play run loop
-- `src/audio/`: Tone.js piano (self-hosted Salamander samples in `public/samples/piano/`) and metronome
+- `src/audio/`: Tone.js piano (self-hosted Salamander samples in `public/samples/piano/`), metronome, mic capture (AudioWorklet), analysis (McLeod pitch + band spectral flux) and the note detector
 - `src/core/`: storage, progress and unlock rules, music helpers, orientation, service worker
 - `src/ui/`: design tokens, components (keyboard, staff, dock, sheet), screens
 - `PLAN.md`: the overall plan and curriculum

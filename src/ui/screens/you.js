@@ -1,7 +1,8 @@
 import { html, el, pad2 } from '../dom.js';
 import { icons } from '../icons.js';
 import { dock } from '../components/dock.js';
-import { getProgress, getSettings, saveSettings } from '../../core/store.js';
+import { getProgress, getSettings, saveSettings, getCalibration } from '../../core/store.js';
+import { nameOf } from '../../core/music.js';
 import { playerLevel, rankFor } from '../../core/progress.js';
 
 export const orientation = 'portrait';
@@ -11,6 +12,7 @@ const standalone = () => window.matchMedia('(display-mode: standalone)').matches
 export function render(root) {
   const p = getProgress();
   const s = getSettings();
+  const cal = getCalibration();
   const { level } = playerLevel(p.xp);
   const screen = el(html`<main class="screen screen--portrait you">
     <header class="topbar"><span class="label">You</span></header>
@@ -21,7 +23,10 @@ export function render(root) {
 
     <h2 class="group-title label">Practice</h2>
     <ul class="rows">
-      <li class="row is-soon"><span>${icons.mic}</span><span class="row__t">Calibrate mic & keyboard<small>Range, latency, room noise · Phase 3</small></span>${icons.chevron}</li>
+      <li class="row"><span>${icons.mic}</span><span class="row__t">Play with<small>${s.inputMode === 'mic' ? 'Your keyboard, heard through the mic' : 'On-screen keys'}</small></span>
+        <span class="seg seg--sm" role="radiogroup" aria-label="Input"><button class="seg__b ${s.inputMode === 'mic' ? 'is-on' : ''}" data-input="mic">Keyboard</button><button class="seg__b ${s.inputMode === 'mic' ? '' : 'is-on'}" data-input="tap">Taps</button></span></li>
+      <li class="row"><a class="row__link" href="#/calibrate"><span>◎</span><span class="row__t">Calibrate mic & keyboard<small>${cal ? `${nameOf(cal.low)}–${nameOf(cal.high)} · delay ${cal.micLatencyMs} ms · room ${Math.round(cal.noiseDb)} dB` : 'Not done yet · about a minute'}</small></span>${icons.chevron}</a></li>
+      <li class="row"><a class="row__link" href="#/mictest"><span>♪</span><span class="row__t">Mic test<small>See which notes the app hears</small></span>${icons.chevron}</a></li>
       <li class="row"><span>${icons.metronome}</span><span class="row__t">Metronome during play<small>Count-in always plays</small></span><button class="switch ${s.metronome ? 'is-on' : ''}" data-set="metronome" role="switch" aria-checked="${s.metronome}"><i></i></button></li>
       <li class="row"><span>${icons.songs}</span><span class="row__t">Sound effects<small>Muted while the mic listens</small></span><button class="switch ${s.sfx ? 'is-on' : ''}" data-set="sfx" role="switch" aria-checked="${s.sfx}"><i></i></button></li>
     </ul>
@@ -43,6 +48,11 @@ export function render(root) {
     saveSettings({ [key]: on });
     b.classList.toggle('is-on', on);
     b.setAttribute('aria-checked', on);
+  }));
+  screen.querySelectorAll('[data-input]').forEach((b) => b.addEventListener('click', async () => {
+    await saveSettings({ inputMode: b.dataset.input });
+    screen.querySelectorAll('[data-input]').forEach((x) => x.classList.toggle('is-on', x === b));
+    b.closest('.row').querySelector('small').textContent = b.dataset.input === 'mic' ? 'Your keyboard, heard through the mic' : 'On-screen keys';
   }));
   root.append(screen, dock('you'));
 }

@@ -7,7 +7,12 @@ const BASE = '/learning-piano/';
 export default defineConfig({
   base: BASE,
   // VexFlow (~720 kB) is lazy-loaded by the lesson screen and precached for offline use.
-  build: { target: 'es2020', chunkSizeWarningLimit: 800 },
+  build: {
+    target: 'es2020',
+    chunkSizeWarningLimit: 800,
+    // The mic AudioWorklet must be a real file: Safari won't load worklets from data: URLs.
+    assetsInlineLimit: (file) => (file.endsWith('-worklet.js') ? false : undefined),
+  },
   define: { __APP_VERSION__: JSON.stringify(pkg.version) },
   plugins: [
     VitePWA({

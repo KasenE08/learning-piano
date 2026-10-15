@@ -3,7 +3,7 @@ import { html, el, raw, pad2 } from '../dom.js';
 import { icons, stars } from '../icons.js';
 import { createKeyboard, createKeyMap } from '../components/keyboard.js';
 import { createScore } from '../components/score.js';
-import { sections, getSettings, saveSettings, getProgress, saveProgress } from '../../core/store.js';
+import { sections, getSettings, saveSettings, getProgress, saveProgress, getCalibration } from '../../core/store.js';
 import { mapState, recordAttempt, recordTest } from '../../core/progress.js';
 import { nameOf, midiOf } from '../../core/music.js';
 import { parseLevel, expectedNotes, noteRange, keyboardWindow, measureBeats } from '../../engine/notation.js';
@@ -11,6 +11,7 @@ import { createRun } from '../../engine/run.js';
 import { loadLevel } from '../../content/levels.js';
 import { TIMING_WINDOWS_MS, SECTION_TEST_PASS } from '../../config/scoring.js';
 import * as audio from '../../audio/engine.js';
+import * as mic from '../../audio/mic.js';
 import { go } from '../../router.js';
 
 export const orientation = 'landscape';
@@ -35,7 +36,7 @@ export function render(root, params) {
   const screen = el(html`<main class="screen screen--landscape lesson">
     <header class="hud">
       <a class="circle-btn" href="#/map/${params.id}" aria-label="Back to map">${icons.close}</a>
-      <div class="hud__title"><span class="label">${info.label}</span><b class="display">${info.title}</b></div>
+      <div class="hud__title"><span class="label">${info.label} <span class="hud__in" hidden><i></i>Mic</span></span><b class="display">${info.title}</b></div>
       <button class="pill" data-act="listen" disabled>${icons.play} Listen</button>
       <button class="pill" data-act="tempo" disabled>${icons.metronome} <span class="tempo-val">—</span></button>
       <span class="hud__acc display"><span class="acc-val">—</span><small>%</small></span>
@@ -76,6 +77,14 @@ export function render(root, params) {
   let heardDemo = false;
   let alive = true;
   let state = 'loading';
+  const micMode = () => getSettings().inputMode === 'mic';
+  // Mic notes reach us ~100 ms after they're played; wait that long before calling a miss.
+  const MIC_JUDGE_DELAY_MS = 160;
+  const hudIn = $('.hud__in');
+  let micOff = [];
+  const micState = (st) => { hudIn.hidden = st !== 'on'; };
+  micOff.push(mic.onState(micState));
+  micOff.push(mic.onFrame((f) => { hudIn.style.setProperty('--lvl', Math.max(0, Math.min(1, (f.bandDb + 75) / 60)).toFixed(2)); }));
 
   // ---------- panels ----------
   const showPanel = (tpl) => {
@@ -102,6 +111,8 @@ export function render(root, params) {
       low: win.low,
       keys: win.keys,
       onPress: async (midi, ts) => {
+        // While the mic is scoring, taps are off (the phone's own sound would be heard as notes).
+        if (micMode() && state === 'running') return;
         if (!audio.running()) { try { await audio.unlock(); } catch { /* ignore */ } }
         audio.playNote(midi, 0.8);
         if (run && run.mode === 'play') run.input(midi, ts);
@@ -147,6 +158,11 @@ export function render(root, params) {
       <span class="label">${practice ? 'Practice · not scored for stars' : info.isTest ? `Pass with ${SECTION_TEST_PASS}%` : `Timing window ±${windowMs} ms`}</span>
       <h2 class="display">${info.title}</h2>
       ${note ? html`<p class="ready__note">${note}</p>` : ''}
+      <div class="seg" role="radiogroup" aria-label="Input">
+        <button class="seg__b ${micMode() ? 'is-on' : ''}" data-input="mic" role="radio" aria-checked="${micMode()}">${icons.mic} Keyboard</button>
+        <button class="seg__b ${micMode() ? '' : 'is-on'}" data-input="tap" role="radio" aria-checked="${!micMode()}">Taps</button>
+      </div>
+      ${micMode() && !getCalibration() ? html`<p class="ready__note">First, a 1-minute mic calibration. <a class="link" href="#/calibrate/lesson/${params.id}">Calibrate now →</a></p>` : ''}
       ${practice ? html`<div class="tempo-row">
           <span class="label">Tempo</span>
           <input type="range" min="${level.tempo.min}" max="${level.tempo.max}" step="2" value="${tempo}" aria-label="Tempo">
@@ -160,6 +176,11 @@ export function render(root, params) {
       ${rec?.best != null ? html`<p class="ready__best">Best ${fmtPct(rec.best)}% ${info.isTest ? '' : stars(rec.stars)}</p>` : ''}
     </div>`);
     p.querySelector('[data-act="go"]').addEventListener('click', onGo);
+    p.querySelectorAll('[data-input]').forEach((b) => b.addEventListener('click', async () => {
+      await saveSettings({ inputMode: b.dataset.input });
+      if (b.dataset.input === 'tap') mic.stop();
+      ready(note);
+    }));
     p.querySelector('[data-act="mode"]')?.addEventListener('click', () => {
       practice = !practice;
       if (!practice) tempo = level.tempo.default;
@@ -184,6 +205,18 @@ export function render(root, params) {
   async function onGo() {
     try { await audio.unlock(); } catch { /* handled below */ }
     if (!audio.running()) { ready('Tap again to turn on sound.'); return; }
+    if (micMode()) {
+      if (!getCalibration()) { location.hash = `#/calibrate/lesson/${params.id}`; return; }
+      const st = await mic.start();
+      if (st !== 'on') {
+        ready(st === 'denied'
+          ? 'Microphone blocked. Allow it in Settings → Safari → Microphone, or switch to Taps.'
+          : 'The microphone could not start. Try again, or switch to Taps.');
+        return;
+      }
+      const cal = getCalibration();
+      mic.configure({ noiseDb: cal.noiseDb, low: cal.low, high: cal.high });
+    }
     // The first scored attempt of a visit starts with the Listen demo (skippable).
     if (!heardDemo && !practice && !info.isTest) startListen(true);
     else startPlay();
@@ -191,6 +224,7 @@ export function render(root, params) {
 
   function startListen(thenPlay = false) {
     stopRun();
+    mic.setDetecting(false);
     state = 'running';
     heardDemo = true;
     listenBtn.disabled = true;
@@ -228,6 +262,7 @@ export function render(root, params) {
     let judged = 0;
     let hits = 0;
     let nextIds = '';
+    const useMic = micMode() && mic.getState() === 'on';
     const refreshNext = (scorer) => {
       const up = scorer.upcoming();
       const ids = up.map((n) => n.id).join();
@@ -238,7 +273,9 @@ export function render(root, params) {
     };
     run = createRun({
       notes, totalBeats: parsed.totalBeats, tempo, beatsPerBar: measureBeats(level.time || '4/4'), mode: 'play', windowMs,
-      metronome: !!getSettings().metronome, latencyMs: getSettings().tapLatencyMs || 0,
+      metronome: !!getSettings().metronome,
+      latencyMs: useMic ? (getCalibration()?.micLatencyMs ?? 80) : getSettings().tapLatencyMs || 0,
+      judgeDelayMs: useMic ? MIC_JUDGE_DELAY_MS : 0,
       onFrame: (beat, scorer) => {
         score.setBeat(beat);
         const counting = beat < 0;
@@ -264,15 +301,29 @@ export function render(root, params) {
         setHud({ acc: (hits / judged) * 100, combo: scorer ? scorer.combo : 0 });
       },
       onEnd: ({ completed, summary }) => {
+        stopMicNotes();
         countEl.textContent = '';
         countEl.classList.remove('is-on');
         if (alive && completed) results(summary);
       },
     });
     run.start();
+    if (useMic) {
+      const thisRun = run;
+      mic.setDetecting(true);
+      micNotesOff = mic.onNote((e) => { if (run === thisRun) run.input(e.midi, e.perf); });
+    }
+  }
+
+  let micNotesOff = null;
+  function stopMicNotes() {
+    micNotesOff?.();
+    micNotesOff = null;
+    mic.setDetecting(false);
   }
 
   function stopRun() {
+    stopMicNotes();
     if (run && !run.finished) run.stop();
     run = null;
   }
@@ -405,7 +456,9 @@ export function render(root, params) {
 
   // Pause if the app is backgrounded mid-run.
   const onHide = () => {
-    if (document.hidden && state === 'running') { stopRun(); ready('Paused: the app went to the background.'); }
+    if (!document.hidden) return;
+    if (state === 'running') { stopRun(); ready('Paused: the app went to the background.'); }
+    mic.stop(); // iOS ends the mic in the background anyway; reopened on the next Play
   };
   document.addEventListener('visibilitychange', onHide);
 
@@ -426,6 +479,8 @@ export function render(root, params) {
   return () => {
     alive = false;
     stopRun();
+    micOff.forEach((f) => f());
+    mic.stop();
     clearTimeout(rt);
     document.removeEventListener('visibilitychange', onHide);
     window.removeEventListener('resize', onResize);

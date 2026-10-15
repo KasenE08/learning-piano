@@ -48,28 +48,36 @@ export function salience(mag, binHz, midi) {
 
 /**
  * Is `midi` a new note between spectrum `before` and `after`?
- *  - its fundamental is a real peak in `after` (not just noise next to a loud bass),
- *  - it isn't just a harmonic of a lower note that's sounding,
+ * Judged on what got louder (after − before), so a note already being held
+ * (and its overtones) drops out:
+ *  - its fundamental is a real part of that rise (not noise beside a loud note),
+ *  - it isn't just a harmonic of a lower note that started too,
  *  - it stands out from both neighbouring semitones,
- *  - and it got clearly louder (a ringing note only fades).
+ *  - and its harmonics clearly grew (a ringing note only fades).
  */
 export function newNote(before, after, binHz, midi, { rise = 1.6, neighbour = 1.5, floor = 0.04 } = {}) {
   const f0 = frequencyOf(midi);
+  const up = new Float32Array(after.length);
   let top = 0;
-  for (let k = 1; k < after.length; k++) top = Math.max(top, after[k]);
-  const fund = peakNear(after, binHz, f0);
+  for (let k = 1; k < after.length; k++) {
+    up[k] = Math.max(0, after[k] - before[k]);
+    top = Math.max(top, up[k]);
+  }
+  const fund = peakNear(up, binHz, f0);
   if (fund < top * floor) return false;
-  // A lower note whose harmonic lands here (C3's 3rd harmonic is G4) explains
-  // this peak unless it's well above that note's neighbouring harmonics.
-  for (let d = 2; d <= 5; d++) {
+  // A lower note starting with it, whose harmonic lands here (C3's 3rd harmonic
+  // is G4), explains this peak unless it's well above that note's neighbouring harmonics.
+  for (let d = 2; d <= 8; d++) {
     const low = f0 / d;
     if (low < 50) break;
-    const pl = peakNear(after, binHz, low);
+    // Piano overtones run sharp (string stiffness), so look a little wider for the low note.
+    const pl = Math.max(peakNear(up, binHz, low), peakNear(up, binHz, low * 0.985));
     if (pl < top * floor || pl < fund * 0.25) continue;
-    const est = Math.sqrt(peakNear(after, binHz, low * (d - 1)) * peakNear(after, binHz, low * (d + 1)));
+    const near = (h) => Math.max(peakNear(up, binHz, low * h), peakNear(up, binHz, low * h * 1.015));
+    const est = (near(d - 1) + near(d + 1)) / 2;
     if (fund < 2 * est) return false;
   }
-  const s = salience(after, binHz, midi);
-  if (s < neighbour * Math.max(salience(after, binHz, midi - 1), salience(after, binHz, midi + 1))) return false;
-  return s > rise * salience(before, binHz, midi);
+  const s = salience(up, binHz, midi);
+  if (s < neighbour * Math.max(salience(up, binHz, midi - 1), salience(up, binHz, midi + 1))) return false;
+  return salience(after, binHz, midi) > rise * salience(before, binHz, midi);
 }

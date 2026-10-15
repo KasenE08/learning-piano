@@ -84,3 +84,26 @@ describe('score following on a real level (Intermediate 1, Ode to Joy over a bas
     expect(wrong).toBeLessThanOrEqual(1);
   }, 60000);
 });
+
+describe('right-hand keys over a held low C (the two-key check)', () => {
+  // Digital pianos through a phone mic: a loud held bass, a softer right hand,
+  // and weak fundamentals (most energy in the overtones).
+  const at = (sig, t) => spec.of(sig, Math.round(t * SR) - PROBE_SIZE);
+  for (const [lhVel, rhVel, fundamental] of [[0.6, 0.65, 1], [0.8, 0.45, 1], [0.8, 0.45, 0.4]]) {
+    it(`C4–C6 over a held C3 (bass ${lhVel}, melody ${rhVel}, fundamental ${fundamental})`, () => {
+      const missed = [];
+      const neighbour = [];
+      const bassAlone = [];
+      for (let rh = 60; rh <= 84; rh++) {
+        const sig = render({ notes: [{ midi: 48, at: 0.2, dur: 2.5, vel: lhVel }, { midi: rh, at: 1.4, dur: 0.6, vel: rhVel }], seconds: 2.4, phaseSeed: rh, fundamental });
+        const b = at(sig, 1.39);
+        const a = at(sig, 1.53);
+        if (!newNote(b, a, spec.binHz, rh)) missed.push(rh);
+        if (newNote(b, a, spec.binHz, rh - 1) || newNote(b, a, spec.binHz, rh + 1)) neighbour.push(rh);
+        const bass = render({ notes: [{ midi: 48, at: 1.4, dur: 1, vel: lhVel }], seconds: 2.4, phaseSeed: rh, fundamental });
+        if (newNote(at(bass, 1.39), at(bass, 1.53), spec.binHz, rh)) bassAlone.push(rh);
+      }
+      expect({ missed, neighbour, bassAlone }).toEqual({ missed: [], neighbour: [], bassAlone: [] });
+    }, 60000);
+  }
+});

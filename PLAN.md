@@ -1,6 +1,8 @@
 # learning-piano: Phase 0 plan
 
-Status: **draft, waiting for your approval.** Nothing in here has been built yet.
+Status: **approved.** Phase 0 done (design B chosen, with C's green/red for hit/miss); Phase 1 done.
+
+**Your keyboard:** Casio CTK-2400, 61 keys (36 white + 25 black), C2–C7, no octave-shift button. Calibration still detects the range.
 
 ## 1. Architecture
 
@@ -103,7 +105,7 @@ All numbers below live in `src/config/scoring.js` and are tunable.
 
 ## 3. Curriculum (draft, refine before Phase 5)
 
-Every level fits inside **C3–B5**, assuming a typical 36-key layout. Calibration detects your actual range, and pieces get octave-shifted to fit if needed. Every new note gets a "meet the note" card: its name, where it sits on the staff and where it is on the keyboard.
+Every level fits inside **C2–C7**, the 61-key range of the CTK-2400; early sections mostly stay within C3–C6. Calibration confirms your actual range. Every new note gets a "meet the note" card: its name, where it sits on the staff and where it is on the keyboard.
 
 **Noob: right hand, treble clef, C position**
 
@@ -151,7 +153,7 @@ Every level fits inside **C3–B5**, assuming a typical 36-key layout. Calibrati
 | 1 | Chord inversions | 9 | 6/8 time *(stays in Advanced)* |
 | 2 | Progressions I–IV–V–I, I–V–vi–IV in several keys | 10 | Sight-reading: generated unseen passages |
 | 3 | Accompaniment patterns: broken chords, Alberti bass | 11 | Reading 8va / 8vb |
-| 4 | More keys: A, E, E♭, A♭ major; D, G minor | 12 | Adapting to 3 octaves: choose what to shift |
+| 4 | More keys: A, E, E♭, A♭ major; D, G minor | 12 | Fit it on 61 keys: adapt 88-key pieces by shifting octaves |
 | 5 | 16th notes | 13 | 🎵 Prelude in C (Bach BWV 846), adapted |
 | 6 | Syncopation | 14 | 🎵 Gymnopédie No. 1 (Satie), adapted |
 | 7 | Triplets *(added)* | 15 | Capstone: learn an unseen piece with the self-study workflow |
@@ -168,3 +170,16 @@ Each sheet shows Home and Map (portrait 390×844) plus Lesson and Results (lands
 - **C, Grid:** brutalist arcade style with pixel type and hard shadows. The map is a board-game grid. Black & white, plus green and red used **only** for hit and miss.
 
 The lesson layout is the same in all three: a fixed playhead about a third of the way in, music scrolling under it, a sticky clef gutter, and a 36-key keyboard that shows the next key and its finger number.
+
+## 5. Decisions log
+
+- Design: B (Stage) layout, with green/red from C used only for hit/miss.
+- Octaves are strict: the right note in the wrong octave is a miss.
+- Wrong or extra notes break the combo but do not lower accuracy.
+- Section tests can be taken any time; passing one skips the section.
+- Curriculum changes approved (3/4 in Beginner, triplets added, dynamics taught but not scored, broken chords until Phase 7).
+- Work is pushed straight to `main`; every push deploys to GitHub Pages.
+
+## 6. Later (after Phase 8)
+
+- **Import your own sheet music:** load a MusicXML file (free from sites like MuseScore or IMSLP transcriptions) and practise it with the same playhead, Listen, slow-practice and scoring tools.

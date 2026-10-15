@@ -49,6 +49,12 @@ const HT_LEAD = 0.45 + 4 * htBeat;
 const htNotes = expectedNotes(parseLevel(ht)).map((n) => ({ midi: n.midi, at: HT_LEAD + n.beat * htBeat, dur: n.beats * htBeat * 0.92, vel: n.part === 'lh' ? 0.45 : 0.7 }));
 const htWav = wav(tmp('ht'), htNotes, HT_LEAD + 32 * htBeat + 2);
 
+// 2c) Two-key check: hold C3, then E4 G4 D4 F4 C5 A4, one every 2 s.
+const twoWav = wav(tmp('two'), [
+  { midi: 48, at: 1.0, dur: 15, vel: 0.6 },
+  ...[64, 67, 62, 65, 72, 69].map((midi, i) => ({ midi, at: 3.0 + i * 2, dur: 0.8, vel: 0.7 })),
+], 17);
+
 // 3) Scale for the mic test screen.
 const scale = [60, 62, 64, 65, 67, 69, 71, 72];
 const scaleWav = wav(tmp('scale'), scale.map((midi, i) => ({ midi, at: 1 + i * 0.66, dur: 0.6, vel: 0.7 })), 8);
@@ -160,6 +166,19 @@ const shot = (page, name) => page.screenshot({ path: `${outDir}/${name}.png` });
   const acc = Number((await page.textContent('.results__big')).replace(/\D/g, ''));
   check(acc >= 95, `scored Ode to Joy through the mic at ${acc}%`);
   await shot(page, 'lesson-mic-results');
+  await browser.close();
+}
+
+// ---------- two-key check on the mic test screen ----------
+{
+  const { browser, page } = await session(twoWav, { width: 390, height: 844 }, null, { noiseDb: -62, low: 36, high: 96, micLatencyMs: 120, spreadMs: 10, at: 1 });
+  await page.goto(`${base}#/mictest`);
+  await page.click('[data-two-start]');
+  await page.waitForSelector('.twokey__done', { timeout: 25000 });
+  const score = await page.textContent('.twokey__done b');
+  check(/^[56]\/6$/.test(score), `two-key check heard the right hand over a held C3 (${score})`);
+  await page.locator('[data-two]').scrollIntoViewIfNeeded();
+  await shot(page, 'mictest-two-key');
   await browser.close();
 }
 

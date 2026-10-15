@@ -339,6 +339,19 @@
 .mictest__hist { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; min-height: 34px; }
 .mictest__hist li { font: 700 15px/1 var(--font-display); background: var(--surface-2); border-radius: 8px; padding: 8px 10px; }
 .mictest__hist li:first-child { background: var(--ink); color: #000; }
+.twokey { margin-top: 14px; }
+.twokey__stage { min-height: 120px; display: flex; align-items: center; justify-content: center; margin-top: 10px; }
+.twokey__ask, .twokey__done { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+.twokey__ask b, .twokey__done b { font-size: 64px; font-weight: 900; line-height: 1; text-shadow: var(--glow-md); }
+.twokey__ask b small { font-size: 30px; color: var(--ink-3); }
+.twokey__hint { font: 600 13px var(--font-body); color: var(--ink-2); }
+.twokey__fb { font: 700 13px var(--font-body); color: var(--ink); margin-top: 4px; }
+.calib__card .twokey__fine { font-size: 12px !important; color: var(--ink-3) !important; }
+.twokey__dots { list-style: none; display: flex; justify-content: center; gap: 8px; margin-top: 8px; min-height: 12px; }
+.twokey__dots li { width: 12px; height: 12px; border-radius: 50%; background: var(--surface-3); }
+.twokey__dots li.is-now { background: var(--ink); box-shadow: var(--glow-sm); }
+.twokey__dots li.is-hit { background: var(--hit); }
+.twokey__dots li.is-miss { background: var(--miss); }
 
 /* ============ input switch, HUD mic badge, row links ============ */
 .seg { display: inline-flex; background: var(--surface-2); border-radius: var(--pill); padding: 3px; margin-top: 10px; gap: 2px; }

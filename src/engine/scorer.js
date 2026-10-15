@@ -4,6 +4,8 @@
 //  - The inner ON_TIME_FRACTION of the window is "on time"; the rest early/late.
 //  - A note never hit by the end of its window is a miss (breaks the combo).
 //  - Wrong or extra notes break the combo but do not change accuracy.
+//  - With chordRule 'all' (Advanced), notes starting together are one chord:
+//    if any of them is missed, the whole chord counts as missed.
 //  - "Ghost" notes are in the music but not scored (e.g. the left hand while the
 //    mic scores only the melody). Playing one is neither a hit nor an extra.
 import { ON_TIME_FRACTION, STAR_THRESHOLDS, XP, comboMultiplier } from '../config/scoring.js';
@@ -19,7 +21,7 @@ export function judgeTiming(offsetMs, windowMs, onTimeFraction = ON_TIME_FRACTIO
  * @param {Array<{id:number, midi:number, time:number}>} expected  time in ms from start
  * @param {{windowMs:number, onTimeFraction?:number, ghosts?:Array<{midi:number, time:number}>}} opts
  */
-export function createScorer(expected, { windowMs, onTimeFraction = ON_TIME_FRACTION, ghosts = [] }) {
+export function createScorer(expected, { windowMs, onTimeFraction = ON_TIME_FRACTION, ghosts = [], chordRule = 'each' }) {
   const notes = expected.map((n) => ({ ...n, result: null, offset: null }));
   let combo = 0;
   let maxCombo = 0;
@@ -92,11 +94,12 @@ export function createScorer(expected, { windowMs, onTimeFraction = ON_TIME_FRAC
     done() { return notes.every((n) => n.result); },
 
     get multiplier() { return comboMultiplier(combo); },
-    summary() { return { ...summarize(notes, { maxCombo, extras }), hitXp }; },
+    summary() { return { ...summarize(notes, { maxCombo, extras, chordRule }), hitXp }; },
   };
 }
 
-export function summarize(notes, { maxCombo = 0, extras = 0 } = {}) {
+export function summarize(notes, { maxCombo = 0, extras = 0, chordRule = 'each' } = {}) {
+  if (chordRule === 'all') notes = wholeChords(notes);
   const count = (r) => notes.filter((n) => n.result === r).length;
   const early = count('early');
   const ontime = count('ontime');
@@ -116,4 +119,22 @@ export function summarize(notes, { maxCombo = 0, extras = 0 } = {}) {
     maxCombo,
     extras,
   };
+}
+
+/** A chord with any missed note counts as missed in full (results only; notes keep their own marks). */
+export function wholeChords(notes) {
+  const byTime = new Map();
+  notes.forEach((n) => byTime.set(n.time, [...(byTime.get(n.time) || []), n]));
+  return notes.map((n) => {
+    const chord = byTime.get(n.time);
+    const broken = chord.length > 1 && chord.some((c) => c.result === 'miss' || !c.result);
+    return broken && n.result !== 'miss' ? { ...n, result: 'miss', chordMiss: true } : n;
+  });
+}
+
+/** Accuracy so far over the notes already judged (null before any), with the chord rule applied. */
+export function liveAccuracy(notes, chordRule = 'each') {
+  const judged = (chordRule === 'all' ? wholeChords(notes.filter((n) => n.result)) : notes).filter((n) => n.result);
+  if (!judged.length) return null;
+  return (100 * judged.filter((n) => n.result !== 'miss').length) / judged.length;
 }

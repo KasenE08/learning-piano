@@ -10,6 +10,7 @@ import * as audio from './engine.js';
 import { createAnalyzer, FRAME_SIZE } from './analysis.js';
 import { createNoteDetector } from './detector.js';
 import { createSpectrum, newNote, PROBE_SIZE } from './salience.js';
+import { chordHeard } from './chords.js';
 
 let state = 'off'; // off | starting | on | denied | unsupported | error
 let stream = null;
@@ -22,8 +23,9 @@ let detectorOpts = {};
 let workletLoaded = false;
 const noteListeners = new Set();
 const onsetListeners = new Set();
-// The last ~0.7 s of audio, for checking a specific note at an onset.
-const HIST = 32768;
+// The last ~2 s of audio, for checking specific notes at an onset (roomy, so a
+// check that runs late on a busy phone still finds its audio).
+const HIST = 98304;
 let hist = null;
 let histEnd = 0; // audio-clock time just after the newest sample
 let probeSpec = null;
@@ -145,6 +147,28 @@ export function noteStartedNear(midi, perfMs, spanMs = 100) {
     if (sp && newNote(sp[0], sp[1], probeSpec.binHz, midi)) return at;
   }
   return null;
+}
+
+/**
+ * Which of the notes `midis` (struck together) started near `perfMs`? Tries
+ * onsets within ±spanMs in 35 ms steps and keeps the one that hears the most.
+ * Returns { at, heard: Set } (heard may be empty).
+ */
+export function chordStartedNear(midis, perfMs, spanMs = 100) {
+  const none = { at: perfMs, heard: new Set() };
+  if (state !== 'on' || !hist) return none;
+  const sr = analyzer.sampleRate;
+  const steps = Math.floor(spanMs / 35);
+  let best = none;
+  for (const k of [0, ...Array.from({ length: steps }, (_, i) => [-(i + 1), i + 1]).flat()]) {
+    const at = perfMs + k * 35;
+    const sp = onsetSpectra(audio.perfToContext(at), sr);
+    if (!sp) continue;
+    const heard = chordHeard(sp[0], sp[1], probeSpec.binHz, midis);
+    if (heard.size > best.heard.size) best = { at, heard };
+    if (best.heard.size === midis.length) break;
+  }
+  return best;
 }
 
 /**

@@ -1,5 +1,5 @@
 {
-  "hands": "both",
+  "hands": "right",
   "key": "C",
   "time": "4/4",
   "tempo": {
@@ -11,16 +11,15 @@
     {
       "kind": "text",
       "title": "Block chords",
-      "text": "Now all three triad notes at once. I is C major, IV is F major, V is G major. The right hand moves as little as possible: only one or two fingers change."
+      "text": "Now all three triad notes at once, right hand alone. I is C major, IV is F major, V is G major. The hand moves as little as possible: only one or two fingers change."
     },
     {
       "kind": "text",
-      "title": "How the mic scores this",
-      "text": "Where both hands start notes together, Keyboard mode scores your right hand (the top note). Both hands get scored once chord detection lands. Taps mode scores every note."
+      "title": "Press together",
+      "text": "Put all three fingers on their keys first, then press them as one. Keyboard mode hears every note of the chord."
     }
   ],
   "parts": {
-    "rh": "[C4 E4 G4]/h:1-3-5 [C4 F4 A4]/h:1-4-5 | [C4 E4 G4]/h:1-3-5 [B3 D4 G4]/h:1-2-5 | [C4 E4 G4]/w:1-3-5 | [C4 F4 A4]/h:1-4-5 [B3 D4 G4]/h:1-2-5 | [C4 E4 G4]/h [C4 F4 A4]/h | [B3 D4 G4]/h [C4 E4 G4]/h | [C4 F4 A4]/h [B3 D4 G4]/h | [C4 E4 G4]/w",
-    "lh": "C3/h F2/h | C3/h G2/h | C3/w | F2/h G2/h | C3/h F2/h | G2/h C3/h | F2/h G2/h | C3/w"
+    "rh": "[C4 E4 G4]/h:1-3-5 [C4 F4 A4]/h:1-4-5 | [C4 E4 G4]/h:1-3-5 [B3 D4 G4]/h:1-2-5 | [C4 E4 G4]/w:1-3-5 | [C4 F4 A4]/h:1-4-5 [B3 D4 G4]/h:1-2-5 | [C4 E4 G4]/h [C4 F4 A4]/h | [B3 D4 G4]/h [C4 E4 G4]/h | [C4 F4 A4]/h [B3 D4 G4]/h | [C4 E4 G4]/w"
   }
 }

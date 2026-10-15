@@ -91,6 +91,11 @@ const SHOTS = [
   { name: 'p6-song-entertainer', path: '#/lesson/song-the-entertainer', vp: L, steps: [['beat', 9]] },
   { name: 'p6-map-advanced', path: '#/map/advanced', vp: P, demo: true },
   { name: 'p6-songs', path: '#/songs', vp: P, demo: true, steps: [['scroll', '.songlist li:nth-child(10)'], ['wait', 300]] },
+  // Phase 7 — chords
+  { name: 'p7-i12-mic-ready', path: '#/lesson/intermediate-12', vp: L, mic: true },
+  { name: 'p7-a01-mic-ready', path: '#/lesson/advanced-01', vp: L, mic: true },
+  { name: 'p7-i02-tenths', path: '#/lesson/intermediate-02', vp: L, steps: [['beat', 3.5]] },
+  { name: 'p7-mictest', path: '#/mictest', vp: P, steps: [['scroll', '[data-two]'], ['wait', 300]] },
 ];
 
 mkdirSync(outDir, { recursive: true });

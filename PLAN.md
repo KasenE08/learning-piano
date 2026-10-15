@@ -188,8 +188,16 @@ The lesson layout is the same in all three: a fixed playhead about a third of th
 - Songs in the later sections are longer versions (32+ bars); ~2-minute pieces are fine in Advanced.
 - Song swaps approved: sourced pieces over melodies written from memory.
 - Phase 7 order: block chords first, then full two-hand scoring in pieces (e.g. Für Elise).
+- Chord scoring: Advanced counts a chord only if every note is right; earlier sections score each note.
+- Notes the mic can't separate (an octave, 12th or two octaves above another note of the same chord) aren't scored, and the app says so (instead of risking unfair misses).
+- Phase 7 content tweaks: Intermediate 2 plays parallel 10ths (octaves can't be scored), Intermediate 12 block chords are right hand only.
+- Using another piano (e.g. acoustic, 88 keys): recalibrate on it; press C2/C7 for the lowest/highest steps.
 - Phase 6 sources: Mutopia Project editions converted via LilyPond → MIDI, simplified to ≤2 notes per hand at once and fitted to C2–C7.
 
-## 6. Later (after Phase 8)
+## 6. How the mic hears chords (Phase 7)
+
+The one-pitch detector (McLeod) finds when a key is struck and, for single notes, which one. For chords and two-hand playing the app follows the score: when a note or chord is due, it takes an 8192-point spectrum just before and ~130 ms after each possible onset (±window), keeps only what got louder, and explains that rise as a mix of note templates (the expected notes plus a key either side, a whole step and an octave away) with non-negative least squares. A note counts if it carries a real share of the sound, its own overtones are really there, and it beats the neighbouring keys. On simulated piano tone this hears ~97% of chord tones, never credits a left-out note, and credits a wrong key next to the right one about 5% of the time (mostly low bass notes). Real pianos differ; the Mic test's chord check shows how it does on yours.
+
+## 7. Later (after Phase 8)
 
 - **Import your own sheet music:** load a MusicXML file (free from sites like MuseScore or IMSLP transcriptions) and practise it with the same playhead, Listen, slow-practice and scoring tools.

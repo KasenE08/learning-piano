@@ -347,6 +347,7 @@
 .twokey__hint { font: 600 13px var(--font-body); color: var(--ink-2); }
 .twokey__fb { font: 700 13px var(--font-body); color: var(--ink); margin-top: 4px; }
 .calib__card .twokey__fine { font-size: 12px !important; color: var(--ink-3) !important; }
+.twokey__kb { position: relative; height: 92px; margin-top: 10px; border-radius: 8px; overflow: hidden; }
 .twokey__dots { list-style: none; display: flex; justify-content: center; gap: 8px; margin-top: 8px; min-height: 12px; }
 .twokey__dots li { width: 12px; height: 12px; border-radius: 50%; background: var(--surface-3); }
 .twokey__dots li.is-now { background: var(--ink); box-shadow: var(--glow-sm); }

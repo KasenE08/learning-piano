@@ -8,7 +8,8 @@ import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { render, SR } from '../tests/helpers/synth.js';
-import { parseLevel, expectedNotes } from '../src/engine/notation.js';
+import { midiOf } from '../src/core/music.js';
+import { parseLevel, expectedNotes, micScoring } from '../src/engine/notation.js';
 
 const outDir = process.argv[2] || 'screenshots/mic';
 mkdirSync(outDir, { recursive: true });
@@ -42,18 +43,10 @@ const LEAD = 3.45;
 const odeNotes = expectedNotes(parseLevel(ode)).map((n) => ({ midi: n.midi, at: LEAD + n.beat * beat, dur: n.beats * beat * 0.92, vel: 0.7 }));
 const odeWav = wav(tmp('ode'), odeNotes, LEAD + 32 * beat + 2);
 
-// 2b) Hands together (Intermediate 1): both hands sound; the mic scores the right-hand melody.
-const ht = JSON.parse(readFileSync('src/content/levels/intermediate/01.json', 'utf8'));
-const htBeat = 60 / ht.tempo.default;
-const HT_LEAD = 0.45 + 4 * htBeat;
-const htNotes = expectedNotes(parseLevel(ht)).map((n) => ({ midi: n.midi, at: HT_LEAD + n.beat * htBeat, dur: n.beats * htBeat * 0.92, vel: n.part === 'lh' ? 0.45 : 0.7 }));
-const htWav = wav(tmp('ht'), htNotes, HT_LEAD + 32 * htBeat + 2);
-
-// 2c) Two-key check: hold C3, then E4 G4 D4 F4 C5 A4, one every 2 s.
-const twoWav = wav(tmp('two'), [
-  { midi: 48, at: 1.0, dur: 15, vel: 0.6 },
-  ...[64, 67, 62, 65, 72, 69].map((midi, i) => ({ midi, at: 3.0 + i * 2, dur: 0.8, vel: 0.7 })),
-], 17);
+// 2c) Chord check: the five chords the Mic test screen asks for, one every 3 s.
+const chordNotes = [['C4', 'E4', 'G4'], ['C4', 'F4', 'A4'], ['B3', 'D4', 'G4'], ['A3', 'C4', 'E4'], ['C3', 'E4', 'G4']]
+  .flatMap((ch, i) => ch.map((n) => ({ midi: midiOf(n), at: 3.0 + i * 3, dur: 1.2, vel: 0.6 })));
+const chordWav = wav(tmp('chords'), chordNotes, 19);
 
 // 3) Scale for the mic test screen.
 const scale = [60, 62, 64, 65, 67, 69, 71, 72];
@@ -88,7 +81,7 @@ const base = 'http://localhost:5183/learning-piano/';
 const shot = (page, name) => page.screenshot({ path: `${outDir}/${name}.png` });
 
 // ---------- calibration ----------
-{
+if (!process.env.MIC_ONLY) {
   const { browser, page } = await session(calWav, { width: 390, height: 844 }, null, null);
   await page.goto(`${base}#/calibrate`);
   await page.evaluate(() => document.fonts.ready);
@@ -138,7 +131,7 @@ const shot = (page, name) => page.screenshot({ path: `${outDir}/${name}.png` });
 }
 
 // ---------- mic test screen ----------
-{
+if (!process.env.MIC_ONLY) {
   const { browser, page } = await session(scaleWav, { width: 390, height: 844 }, null, { noiseDb: -62, low: 36, high: 96, micLatencyMs: 120, spreadMs: 10, at: 1 });
   await page.goto(`${base}#/mictest`);
   await page.click('[data-start]');
@@ -150,7 +143,7 @@ const shot = (page, name) => page.screenshot({ path: `${outDir}/${name}.png` });
 }
 
 // ---------- scored lesson through the mic ----------
-{
+if (!process.env.MIC_ONLY) {
   const settings = { metronome: true, sfx: true, inputMode: 'mic', introsSeen: ['noob-09'] };
   const { browser, page } = await session(odeWav, { width: 844, height: 390 }, settings, { noiseDb: -60, low: 36, high: 96, micLatencyMs: 170, spreadMs: 10, at: 1 });
   await page.goto(`${base}#/lesson/noob-09`);
@@ -169,37 +162,72 @@ const shot = (page, name) => page.screenshot({ path: `${outDir}/${name}.png` });
   await browser.close();
 }
 
-// ---------- two-key check on the mic test screen ----------
-{
-  const { browser, page } = await session(twoWav, { width: 390, height: 844 }, null, { noiseDb: -62, low: 36, high: 96, micLatencyMs: 120, spreadMs: 10, at: 1 });
+// ---------- chord check on the mic test screen ----------
+if (!process.env.MIC_ONLY) {
+  const { browser, page } = await session(chordWav, { width: 390, height: 844 }, null, { noiseDb: -62, low: 36, high: 96, micLatencyMs: 120, spreadMs: 10, at: 1 });
   await page.goto(`${base}#/mictest`);
   await page.click('[data-two-start]');
-  await page.waitForSelector('.twokey__done', { timeout: 25000 });
-  const score = await page.textContent('.twokey__done b');
-  check(/^[56]\/6$/.test(score), `two-key check heard the right hand over a held C3 (${score})`);
+  await page.waitForTimeout(4300);
   await page.locator('[data-two]').scrollIntoViewIfNeeded();
-  await shot(page, 'mictest-two-key');
+  await shot(page, 'mictest-chord-heard');
+  await page.waitForSelector('.twokey__done', { timeout: 30000 });
+  const score = await page.textContent('.twokey__done b');
+  check(score === '5/5', `chord check heard every chord (${score})`);
+  if (score !== '5/5') console.log(JSON.stringify(await page.evaluate(() => window.__chordLog)));
+  await shot(page, 'mictest-chord-done');
   await browser.close();
 }
 
-// ---------- hands together through the mic: melody-only scoring ----------
-{
-  const settings = { metronome: true, sfx: true, inputMode: 'mic', introsSeen: ['intermediate-01'] };
-  const { browser, page } = await session(htWav, { width: 844, height: 390 }, settings, { noiseDb: -60, low: 36, high: 96, micLatencyMs: 170, spreadMs: 10, at: 1 });
-  await page.goto(`${base}#/lesson/intermediate-01`);
+// ---------- two hands and chords through the mic (Phase 7) ----------
+async function micLesson(id, file, minAcc, extra = async () => {}, { mutate = (n) => n, maxAcc = 100, tag = '' } = {}) {
+  if (process.env.MIC_ONLY && !process.env.MIC_ONLY.split(',').includes(id + tag)) return;
+  const lvl = JSON.parse(readFileSync(file, 'utf8'));
+  const pulse = lvl.time?.endsWith('/8') && Number(lvl.time.split('/')[0]) % 3 === 0 && Number(lvl.time.split('/')[0]) > 3 ? 1.5 : 4 / Number((lvl.time || '4/4').split('/')[1]);
+  const beatSec = 60 / (lvl.tempo.default * pulse);
+  const bar = (() => { const [n, d] = (lvl.time || '4/4').split('/').map(Number); return (n * 4) / d; })();
+  const lead = 0.45 + bar * beatSec;
+  const parsed = parseLevel(lvl);
+  const ns = expectedNotes(parsed).map(mutate).filter(Boolean).map((n) => ({ midi: n.midi, at: lead + n.beat * beatSec, dur: Math.max(0.12, n.beats * beatSec * 0.92), vel: n.part === 'lh' ? 0.5 : 0.65 }));
+  const f = wav(tmp(id + tag), ns, lead + parsed.totalBeats * beatSec + 2);
+  const settings = { metronome: true, sfx: true, inputMode: 'mic', introsSeen: [id] };
+  const { browser, page } = await session(f, { width: 844, height: 390 }, settings, { noiseDb: -60, low: 36, high: 96, micLatencyMs: 170, spreadMs: 10, at: 1 });
+  await page.goto(`${base}#/lesson/${id}`);
   await page.waitForFunction(() => document.querySelector('[data-act="go"]') && !document.querySelector('[data-act="go"][disabled]'), null, { timeout: 20000 });
-  check(/melody/.test(await page.textContent('.ready')), 'ready card explains melody-only mic scoring');
-  await page.click('[data-act="listen"]');
-  await page.click('[data-act="skip"]');
-  await page.waitForTimeout(200);
+  if (await page.locator('[data-act="listen"]:visible').count()) {
+    await page.click('[data-act="listen"]');
+    await page.click('[data-act="skip"]');
+    await page.waitForTimeout(200);
+  }
   await page.click('[data-act="go"]');
-  await page.waitForSelector('.results', { timeout: 60000 });
+  await page.waitForSelector('.results', { timeout: 300000 });
   const acc = Number((await page.textContent('.results__big')).replace(/\D/g, ''));
-  check(acc >= 90, `scored the hands-together melody through the mic at ${acc}%`);
-  const note = await page.textContent('.results__mic').catch(() => '');
-  check(/Melody scored: 30 of 39/.test(note), `results say melody-only (${note.slice(0, 40)})`);
-  await shot(page, 'lesson-mic-hands-together');
+  check(acc >= minAcc && acc <= maxAcc, `${id}${tag} through the mic: ${acc}% (want ${minAcc}–${maxAcc})`);
+  if (acc < minAcc || acc > maxAcc) {
+    console.log('  missed:', await page.evaluate(() => window.__lesson.run.scorer.summary().missed.map((n) => `${n.midi}@${Math.round(n.time)}`).join(' ')));
+  }
+  await extra(page);
+  await shot(page, `lesson-mic-${id}${tag}`);
   await browser.close();
+}
+
+await micLesson('intermediate-01', 'src/content/levels/intermediate/01.json', 90, async (page) => {
+  const note = await page.textContent('.results__mic').catch(() => '');
+  check(/weren't scored/.test(note), `results explain the unscored octave notes (${note.slice(0, 30)})`);
+});
+await micLesson('intermediate-12', 'src/content/levels/intermediate/12.json', 90);
+await micLesson('intermediate-15', 'src/content/levels/intermediate/15.json', 85);
+await micLesson('advanced-01', 'src/content/levels/advanced/01.json', 85);
+// Wrong notes must not score: the right hand plays every chord's top note a key too high…
+await micLesson('advanced-01', 'src/content/levels/advanced/01.json', 0, undefined, {
+  tag: '-wrong-top', maxAcc: 30,
+  mutate: (n, i, all) => (n.part === 'rh' && !all.some((o) => o.beat === n.beat && o.part === 'rh' && o.midi > n.midi) ? { ...n, midi: n.midi + 1 } : n),
+});
+// …and only the left hand plays the parallel-motion level.
+{
+  // The left-hand notes are real hits; no right-hand note may be credited.
+  const scored = micScoring(expectedNotes(parseLevel(JSON.parse(readFileSync('src/content/levels/intermediate/02.json', 'utf8'))))).scored;
+  const lhShare = Math.round((100 * scored.filter((n) => n.part === 'lh').length) / scored.length);
+  await micLesson('intermediate-02', 'src/content/levels/intermediate/02.json', 0, undefined, { tag: '-left-only', maxAcc: lhShare + 3, mutate: (n) => (n.part === 'lh' ? n : null) });
 }
 
 await server.close();

@@ -33,7 +33,7 @@ def J(*bars):
     return ' | '.join(bars)
 
 
-MIC = text("How the mic scores this", "Where both hands start notes together, Keyboard mode scores your right hand (the top note). Both hands get scored once chord detection lands. Taps mode scores every note.")
+MIC = text("How the mic scores this", "Keyboard mode hears chords and both hands, so every note counts. One exception: a note exactly an octave above another note in the same chord can't be told apart by any microphone, so it isn't scored.")
 
 L = {}
 
@@ -44,9 +44,10 @@ L["intermediate/01"] = {"hands": "both", "key": "C", "time": "4/4", "tempo": T(7
             "lh": J("C3/w:5", "G3/w:1", "C3/w:5", "G3/w:1", "C3/w:5", "G3/w:1", "C3/w:5", "G3/h:1 C3/h:5")}}
 
 L["intermediate/02"] = {"hands": "both", "key": "C", "time": "4/4", "tempo": T(72, 45, 110),
-  "intro": [text("Parallel motion", "Both hands play the same notes, an octave apart. The fingers don't match: right thumb on C4, left pinky on C3. Watch the left hand's finger numbers.")],
+  "intro": [text("Parallel motion", "Both hands play the same tune shape at the same time, a 10th apart: the left hand starts on A2 while the right starts on C4. Same direction, same finger pattern in reverse: right thumb, left pinky."),
+            text("Why a 10th", "Hands a 10th apart sound full and stay out of each other's way. (Exact octaves are common too, but the mic can't tell the upper octave from the lower one.)")],
   "parts": {"rh": J("C4/q:1 D4/q:2 E4/q:3 F4/q:4", "G4/h:5 E4/h:3", "F4/q:4 E4/q:3 D4/q:2 E4/q:3", "C4/w:1", "E4/q:3 F4/q:4 G4/q:5 E4/q:3", "D4/q:2 E4/q:3 C4/h:1", "D4/q:2 E4/q:3 F4/q:4 D4/q:2", "C4/w:1"),
-            "lh": J("C3/q:5 D3/q:4 E3/q:3 F3/q:2", "G3/h:1 E3/h:3", "F3/q:2 E3/q:3 D3/q:4 E3/q:3", "C3/w:5", "E3/q:3 F3/q:2 G3/q:1 E3/q:3", "D3/q:4 E3/q:3 C3/h:5", "D3/q:4 E3/q:3 F3/q:2 D3/q:4", "C3/w:5")}}
+            "lh": J("A2/q:5 B2/q:4 C3/q:3 D3/q:2", "E3/h:1 C3/h:3", "D3/q:2 C3/q:3 B2/q:4 C3/q:3", "A2/w:5", "C3/q:3 D3/q:2 E3/q:1 C3/q:3", "B2/q:4 C3/q:3 A2/h:5", "B2/q:4 C3/q:3 D3/q:2 B2/q:4", "A2/w:5")}}
 
 L["intermediate/03"] = {"hands": "both", "key": "C", "time": "4/4", "tempo": T(72, 45, 110),
   "intro": [text("Contrary motion", "Now the hands mirror each other: when the right hand steps up, the left steps down. Both thumbs start on a C, and the same finger numbers play at the same time.")],
@@ -110,11 +111,11 @@ L["intermediate/11"] = {"hands": "both", "key": "C", "time": "4/4", "tempo": T(8
                     "G4/q:1 B4/q:3 D5/q:5 B4/q:3", "A4/q:1 C5/q:3 E5/q:5 C5/q:3", "G4/q:1 B4/q:3 D5/q:5 B4/q:3", "C4/q:1 E4/q:3 G4/h:5"),
             "lh": J("C3/w", "D3/w", "E3/w", "F3/w", "G3/w", "A3/w", "G3/w", "C3/w")}}
 
-L["intermediate/12"] = {"hands": "both", "key": "C", "time": "4/4", "tempo": T(72, 45, 110),
-  "intro": [text("Block chords", "Now all three triad notes at once. I is C major, IV is F major, V is G major. The right hand moves as little as possible: only one or two fingers change."), MIC],
+L["intermediate/12"] = {"hands": "right", "key": "C", "time": "4/4", "tempo": T(72, 45, 110),
+  "intro": [text("Block chords", "Now all three triad notes at once, right hand alone. I is C major, IV is F major, V is G major. The hand moves as little as possible: only one or two fingers change."),
+            text("Press together", "Put all three fingers on their keys first, then press them as one. Keyboard mode hears every note of the chord.")],
   "parts": {"rh": J("[C4 E4 G4]/h:1-3-5 [C4 F4 A4]/h:1-4-5", "[C4 E4 G4]/h:1-3-5 [B3 D4 G4]/h:1-2-5", "[C4 E4 G4]/w:1-3-5", "[C4 F4 A4]/h:1-4-5 [B3 D4 G4]/h:1-2-5",
-                    "[C4 E4 G4]/h [C4 F4 A4]/h", "[B3 D4 G4]/h [C4 E4 G4]/h", "[C4 F4 A4]/h [B3 D4 G4]/h", "[C4 E4 G4]/w"),
-            "lh": J("C3/h F2/h", "C3/h G2/h", "C3/w", "F2/h G2/h", "C3/h F2/h", "G2/h C3/h", "F2/h G2/h", "C3/w")}}
+                    "[C4 E4 G4]/h [C4 F4 A4]/h", "[B3 D4 G4]/h [C4 E4 G4]/h", "[C4 F4 A4]/h [B3 D4 G4]/h", "[C4 E4 G4]/w")}}
 
 L["intermediate/13"] = {"hands": "both", "key": "C", "time": "4/4", "tempo": T(76, 45, 110),
   "intro": [text("Dynamics", "Dynamics say how loud: p (piano) soft, mp medium soft, mf medium loud, f (forte) loud. “cresc.” means get gradually louder, “dim.” gradually softer."),

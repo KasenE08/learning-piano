@@ -11,11 +11,16 @@
     {
       "kind": "text",
       "title": "Parallel motion",
-      "text": "Both hands play the same notes, an octave apart. The fingers don't match: right thumb on C4, left pinky on C3. Watch the left hand's finger numbers."
+      "text": "Both hands play the same tune shape at the same time, a 10th apart: the left hand starts on A2 while the right starts on C4. Same direction, same finger pattern in reverse: right thumb, left pinky."
+    },
+    {
+      "kind": "text",
+      "title": "Why a 10th",
+      "text": "Hands a 10th apart sound full and stay out of each other's way. (Exact octaves are common too, but the mic can't tell the upper octave from the lower one.)"
     }
   ],
   "parts": {
     "rh": "C4/q:1 D4/q:2 E4/q:3 F4/q:4 | G4/h:5 E4/h:3 | F4/q:4 E4/q:3 D4/q:2 E4/q:3 | C4/w:1 | E4/q:3 F4/q:4 G4/q:5 E4/q:3 | D4/q:2 E4/q:3 C4/h:1 | D4/q:2 E4/q:3 F4/q:4 D4/q:2 | C4/w:1",
-    "lh": "C3/q:5 D3/q:4 E3/q:3 F3/q:2 | G3/h:1 E3/h:3 | F3/q:2 E3/q:3 D3/q:4 E3/q:3 | C3/w:5 | E3/q:3 F3/q:2 G3/q:1 E3/q:3 | D3/q:4 E3/q:3 C3/h:5 | D3/q:4 E3/q:3 F3/q:2 D3/q:4 | C3/w:5"
+    "lh": "A2/q:5 B2/q:4 C3/q:3 D3/q:2 | E3/h:1 C3/h:3 | D3/q:2 C3/q:3 B2/q:4 C3/q:3 | A2/w:5 | C3/q:3 D3/q:2 E3/q:1 C3/q:3 | B2/q:4 C3/q:3 A2/h:5 | B2/q:4 C3/q:3 D3/q:2 B2/q:4 | A2/w:5"
   }
 }

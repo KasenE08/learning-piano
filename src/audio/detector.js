@@ -126,7 +126,12 @@ export function createNoteDetector(sampleRate, opts = {}) {
 
       function settle(p, sink) {
         pending = null;
-        if (!p.votes.length) { lastOnset = -Infinity; return; }
+        if (!p.votes.length) {
+          // No clear single pitch (a chord, say): still an attack for onset listeners.
+          if (o.reportDropped) sink.push({ midi: null, time: p.time, how: 'attack', dropped: true, pitchless: true });
+          lastOnset = -Infinity;
+          return;
+        }
         // Most common vote wins (ties → the latest).
         const count = new Map();
         p.votes.forEach((m) => count.set(m, (count.get(m) || 0) + 1));

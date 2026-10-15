@@ -7,9 +7,10 @@ import { createDrill, drillPrompts } from '../../engine/drill.js';
 import { sections, songs, getSettings, saveSettings, getProgress, saveProgress, getCalibration } from '../../core/store.js';
 import { mapState, recordAttempt, recordTest, recordSong, attemptXp, addXp, evaluateUnlocks, comboMultiplier, rankFor } from '../../core/progress.js';
 import { nameOf, midiOf } from '../../core/music.js';
-import { parseLevel, expectedNotes, noteRange, keyboardWindow, measureBeats, pulseBeats, micMelody, hasChords } from '../../engine/notation.js';
+import { parseLevel, expectedNotes, noteRange, keyboardWindow, measureBeats, pulseBeats, micScoring, hasChords, onsetGroups } from '../../engine/notation.js';
 import { generatePassage } from '../../engine/generate.js';
 import { createRun } from '../../engine/run.js';
+import { liveAccuracy } from '../../engine/scorer.js';
 import { loadLevel } from '../../content/levels.js';
 import { TIMING_WINDOWS_MS, SECTION_TEST_PASS } from '../../config/scoring.js';
 import * as audio from '../../audio/engine.js';
@@ -199,15 +200,18 @@ export function render(root, params) {
     return { list, total, offset };
   }
 
-  /** In mic mode, notes that start together can't all be heard yet: score the melody. */
+  /** In mic mode, a note an octave (12th, two octaves) above another chord tone can't be told apart: not scored. */
   function micSplit(list) {
-    if (!hasChords(list)) return { scored: list, ghosts: [], partial: false };
-    const { scored, ghosts } = micMelody(list);
-    return { scored, ghosts, partial: true };
+    const { scored, ghosts } = micScoring(list);
+    return { scored, ghosts, partial: ghosts.length > 0 };
   }
-  const micNote = () => (micMode() && notes.length && hasChords(notes)
-    ? 'Keyboard mode scores the melody (top notes) until chord detection lands.'
-    : '');
+  // Advanced: a chord counts only if every note in it is played.
+  const chordRule = () => (info.section.id === 'advanced' ? 'all' : 'each');
+  const micNote = () => {
+    if (!micMode() || !notes.length || !hasChords(notes)) return '';
+    const hidden = micScoring(notes).ghosts.length;
+    return `Keyboard mode hears chords and both hands.${hidden ? ' A note an octave above another one in the same chord can’t be told apart, so it isn’t scored.' : ''}${chordRule() === 'all' ? ' Advanced: a chord counts only if every note is right.' : ''}`;
+  };
 
   // ---------- flow ----------
   function ready(note = '') {
@@ -374,13 +378,11 @@ export function render(root, params) {
     score.clearMarks();
     lastTier = 1;
     setHud({ acc: null, combo: 0 });
-    let judged = 0;
-    let hits = 0;
     let nextIds = '';
     const useMic = micMode() && mic.getState() === 'on';
     const { list, total, offset } = playSet();
     const split = useMic ? micSplit(list) : { scored: list, ghosts: [], partial: false };
-    const verify = useMic && (split.partial || hasBothHands());
+    const verify = useMic && (hasChords(list) || hasBothHands());
     const byId = new Map(list.map((n) => [n.id, n]));
     const refreshNext = (scorer) => {
       const up = scorer.upcoming();
@@ -399,7 +401,7 @@ export function render(root, params) {
       panel.classList.add('panel--corner');
     }
     run = createRun({
-      notes: split.scored, ghosts: split.ghosts, totalBeats: total, tempo: quarterTempo(), beatsPerBar: measureBeats(time()), pulse: pulse(), mode: 'play', windowMs,
+      notes: split.scored, ghosts: split.ghosts, chordRule: chordRule(), totalBeats: total, tempo: quarterTempo(), beatsPerBar: measureBeats(time()), pulse: pulse(), mode: 'play', windowMs,
       metronome: !!getSettings().metronome,
       latencyMs: useMic ? (getCalibration()?.micLatencyMs ?? 80) : getSettings().tapLatencyMs || 0,
       // Score-following checks run ATTACK_MS after a note's window closes, so misses wait a bit longer.
@@ -413,21 +415,19 @@ export function render(root, params) {
       },
       onJudge: (res, scorer) => {
         if (res.type === 'hit') {
-          hits++;
-          judged++;
           score.mark(notes[res.note.id], 'hit');
           kb.flash(res.note.midi, 'hit');
           playheadFlash();
         } else if (res.type === 'extra') {
           kb.flash(res.midi, 'miss');
         }
-        setHud({ acc: judged ? (hits / judged) * 100 : null, combo: scorer.combo, bump: res.type === 'hit' });
+        setHud({ acc: liveAccuracy(scorer.notes, chordRule()), combo: scorer.combo, bump: res.type === 'hit' });
         refreshNext(scorer);
       },
       onMiss: (n, scorer) => {
-        judged++;
         score.mark(notes[n.id], 'miss');
-        setHud({ acc: (hits / judged) * 100, combo: scorer ? scorer.combo : 0 });
+        const sc = scorer || run?.scorer;
+        setHud({ acc: sc ? liveAccuracy(sc.notes, chordRule()) : null, combo: sc ? sc.combo : 0 });
       },
       onEnd: ({ completed, summary }) => {
         stopMicNotes();
@@ -440,7 +440,7 @@ export function render(root, params) {
           return;
         }
         loopAcc = null;
-        results({ ...summary, melodyOnly: split.partial ? { scored: split.scored.length, all: list.length } : null });
+        results({ ...summary, notScored: split.partial ? { hidden: split.ghosts.length, all: list.length } : null });
       },
     });
     run.start();
@@ -467,13 +467,22 @@ export function render(root, params) {
           if (due) run.input(e.midi, e.perf);
           else if (e.how === 'attack' && !list.some((n) => n.midi === e.midi && sounding(t))) run.input(e.midi, e.perf);
         });
-        const timers = split.scored.map((n) => setTimeout(() => {
+        // One check per onset: a single note, or a chord (both hands count).
+        const scoredIds = new Set(split.scored.map((n) => n.id));
+        const timers = onsetGroups(list).filter((g) => g.notes.some((n) => scoredIds.has(n.id))).map((g) => setTimeout(() => {
           if (run !== thisRun || run.finished) return;
-          const sn = run.scorer.notes.find((x) => x.id === n.id);
-          if (!sn || sn.result) return;
-          const at = mic.noteStartedNear(n.midi, run.perfBeat0 + sn.time + latency, windowMs);
-          if (at != null) run.input(n.midi, at);
-        }, Math.max(0, run.perfBeat0 + n.beat * run.msPerBeat + latency + windowMs + mic.ATTACK_MS + 10 - performance.now())));
+          const pending = g.notes.filter((n) => scoredIds.has(n.id) && !run.scorer.notes.find((x) => x.id === n.id)?.result);
+          if (!pending.length) return;
+          const t = run.perfBeat0 + g.beat * run.msPerBeat + latency;
+          if (g.notes.length === 1) {
+            const at = mic.noteStartedNear(g.notes[0].midi, t, windowMs);
+            if (at != null) run.input(g.notes[0].midi, at);
+            return;
+          }
+          // The model gets every note of the chord (hidden ones too, to explain their sound).
+          const { at, heard } = mic.chordStartedNear(g.notes.map((n) => n.midi), t, windowMs);
+          pending.forEach((n) => { if (heard.has(n.midi)) run.input(n.midi, at); });
+        }, Math.max(0, run.perfBeat0 + g.beat * run.msPerBeat + latency + windowMs + mic.ATTACK_MS + 10 - performance.now())));
         micNotesOff = () => { offNote(); timers.forEach(clearTimeout); };
       }
     }
@@ -546,7 +555,7 @@ export function render(root, params) {
         <div class="tile"><b class="display">${sum.maxCombo}</b><span class="label">Max combo</span></div>
         <div class="tile"><b class="display">${sum.hits}/${sum.total}</b><span class="label">Notes hit</span></div>
         <div class="tile tile--wide"><b class="display missed">${missedNames.length ? missedNames.slice(0, 5).join(' · ') : 'None'}</b><span class="label">Missed notes</span></div>
-        ${sum.melodyOnly ? html`<p class="results__mic">Melody scored: ${sum.melodyOnly.scored} of ${sum.melodyOnly.all} notes. The mic hears one note at a time for now; both hands get scored once chord detection lands.</p>` : ''}
+        ${sum.notScored ? html`<p class="results__mic">${sum.notScored.hidden} of ${sum.notScored.all} notes weren't scored: each sits an octave (or 12th, or two octaves) above another note in the same chord, and no microphone can tell them apart.</p>` : ''}
         ${sum.untimed ? html`<div class="timing"><span class="label">Untimed drill · your first answer to each note counts</span></div>` : html`<div class="timing">
           <div class="tbar">
             <i style="flex:${sum.early}" class="t-early"></i><i style="flex:${sum.ontime}" class="t-on"></i><i style="flex:${sum.late}" class="t-late"></i><i style="flex:${sum.missed.length}" class="t-miss"></i>

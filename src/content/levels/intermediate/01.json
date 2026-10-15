@@ -16,7 +16,7 @@
     {
       "kind": "text",
       "title": "How the mic scores this",
-      "text": "Where both hands start notes together, Keyboard mode scores your right hand (the top note). Both hands get scored once chord detection lands. Taps mode scores every note."
+      "text": "Keyboard mode hears chords and both hands, so every note counts. One exception: a note exactly an octave above another note in the same chord can't be told apart by any microphone, so it isn't scored."
     }
   ],
   "parts": {

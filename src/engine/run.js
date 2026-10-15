@@ -5,7 +5,7 @@ import * as audio from '../audio/engine.js';
 import { createScorer } from './scorer.js';
 
 export function createRun({
-  notes, ghosts = [], totalBeats, tempo, beatsPerBar, pulse = 1, mode, windowMs, metronome = true, countInBeats = beatsPerBar,
+  notes, ghosts = [], chordRule = 'each', totalBeats, tempo, beatsPerBar, pulse = 1, mode, windowMs, metronome = true, countInBeats = beatsPerBar,
   latencyMs = 0, judgeDelayMs = 0, onFrame = () => {}, onJudge = () => {}, onMiss = () => {}, onEnd = () => {},
 }) {
   const spb = 60 / tempo;
@@ -13,7 +13,7 @@ export function createRun({
   const play = mode === 'play';
   const countIn = play ? countInBeats : 0;
   const scorer = play ? createScorer(notes.map((n) => ({ id: n.id, midi: n.midi, time: n.beat * msPerBeat })), {
-    windowMs, ghosts: ghosts.map((n) => ({ midi: n.midi, time: n.beat * msPerBeat })),
+    windowMs, chordRule, ghosts: ghosts.map((n) => ({ midi: n.midi, time: n.beat * msPerBeat })),
   }) : null;
 
   // Clicks fall every `pulse` beats (a dotted quarter in 6/8); bar starts are accented.

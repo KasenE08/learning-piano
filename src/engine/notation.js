@@ -236,5 +236,41 @@ export function micMelody(notes) {
   return { scored, ghosts };
 }
 
+// Intervals (semitones) at which every overtone of the upper note is also an
+// overtone of the lower one: octave, 12th, two octaves. No microphone method can
+// tell whether that upper note was played too.
+export const HIDDEN_INTERVALS = new Set([12, 19, 24]);
+
+/** Notes (midi numbers) of a chord that sit entirely in another chord tone's overtones. */
+export function hiddenNotes(midis) {
+  return new Set(midis.filter((m) => midis.some((n) => n < m && HIDDEN_INTERVALS.has(m - n))));
+}
+
+/** Notes grouped by shared start (chords, or both hands together). */
+export function onsetGroups(notes) {
+  const groups = [];
+  for (const n of notes) {
+    const g = groups.at(-1);
+    if (g && Math.abs(g.beat - n.beat) < EPS) g.notes.push(n);
+    else groups.push({ beat: n.beat, notes: [n] });
+  }
+  return groups;
+}
+
+/**
+ * What the mic scores with chord detection: every note, except one hidden in
+ * another chord tone's overtones (octave, 12th, two octaves above it), which
+ * comes back as a ghost: heard, not scored.
+ */
+export function micScoring(notes) {
+  const scored = [];
+  const ghosts = [];
+  for (const g of onsetGroups(notes)) {
+    const hid = hiddenNotes(g.notes.map((n) => n.midi));
+    g.notes.forEach((n) => (hid.has(n.midi) ? ghosts : scored).push(n));
+  }
+  return { scored, ghosts };
+}
+
 /** Do any notes start together (so the mic can't score all of them yet)? */
 export const hasChords = (notes) => notes.some((n, i) => i > 0 && Math.abs(n.beat - notes[i - 1].beat) < EPS);

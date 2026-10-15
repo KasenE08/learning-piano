@@ -39,7 +39,15 @@ export const XP = {
   perNewStar: 30,
   firstClear: 50,
   testPass: 150,
+  songFirstClear: 40,
+  practiceFactor: 0.5, // practice runs earn half the attempt + note XP, no bonuses
 };
+
+export function comboMultiplier(combo) {
+  let m = 1;
+  for (const [min, mult] of COMBO_TIERS) if (combo >= min) m = mult;
+  return m;
+}
 
 // XP needed to go from `level` to `level + 1`.
 export const xpForNextLevel = (level) => 150 + 75 * (level - 1);

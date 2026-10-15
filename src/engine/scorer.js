@@ -4,7 +4,7 @@
 //  - The inner ON_TIME_FRACTION of the window is "on time"; the rest early/late.
 //  - A note never hit by the end of its window is a miss (breaks the combo).
 //  - Wrong or extra notes break the combo but do not change accuracy.
-import { ON_TIME_FRACTION, STAR_THRESHOLDS } from '../config/scoring.js';
+import { ON_TIME_FRACTION, STAR_THRESHOLDS, XP, comboMultiplier } from '../config/scoring.js';
 
 export function judgeTiming(offsetMs, windowMs, onTimeFraction = ON_TIME_FRACTION) {
   const a = Math.abs(offsetMs);
@@ -22,9 +22,14 @@ export function createScorer(expected, { windowMs, onTimeFraction = ON_TIME_FRAC
   let combo = 0;
   let maxCombo = 0;
   let extras = 0;
+  let hitXp = 0; // XP from notes, each multiplied by the combo multiplier at that moment
   let missFrom = 0; // index before which every note is judged (notes are time-sorted)
 
-  const bump = () => { combo++; maxCombo = Math.max(maxCombo, combo); };
+  const bump = () => {
+    combo++;
+    maxCombo = Math.max(maxCombo, combo);
+    hitXp += XP.perHit * comboMultiplier(combo);
+  };
 
   return {
     notes,
@@ -79,7 +84,8 @@ export function createScorer(expected, { windowMs, onTimeFraction = ON_TIME_FRAC
 
     done() { return notes.every((n) => n.result); },
 
-    summary() { return summarize(notes, { maxCombo, extras }); },
+    get multiplier() { return comboMultiplier(combo); },
+    summary() { return { ...summarize(notes, { maxCombo, extras }), hitXp }; },
   };
 }
 

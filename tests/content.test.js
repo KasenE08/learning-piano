@@ -32,6 +32,7 @@ describe('curriculum content', () => {
       if (s.unlock.level) expect(levelIds.has(s.unlock.level), `${s.id} → ${s.unlock.level}`).toBe(true);
       if (s.unlock.stars) expect(sectionIds.has(s.unlock.stars), `${s.id} → ${s.unlock.stars}`).toBe(true);
       expect(s.unlock.level || s.unlock.stars, `${s.id} has no unlock rule`).toBeTruthy();
+      expect(sectionIds.has(s.section), `${s.id} difficulty`).toBe(true);
     });
   });
 });

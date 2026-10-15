@@ -26,6 +26,7 @@ const stateListeners = new Set();
 const setState = (s) => { state = s; stateListeners.forEach((fn) => fn(s)); };
 
 export const getState = () => state;
+export const isDetecting = () => state === 'on' && detecting;
 export const onState = (fn) => { stateListeners.add(fn); return () => stateListeners.delete(fn); };
 /** fn({ midi, time (audio clock s), perf (performance.now ms), how }) */
 export const onNote = (fn) => { noteListeners.add(fn); return () => noteListeners.delete(fn); };

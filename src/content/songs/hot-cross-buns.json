@@ -1,0 +1,9 @@
+{
+  "hands": "right",
+  "key": "C",
+  "time": "4/4",
+  "tempo": { "default": 92, "min": 50, "max": 130 },
+  "parts": {
+    "rh": "E4/q:3 D4/q:2 C4/h:1 | E4/q:3 D4/q:2 C4/h:1 | C4/8:1 C4/8 C4/8 C4/8 D4/8:2 D4/8 D4/8 D4/8 | E4/q:3 D4/q:2 C4/h:1"
+  }
+}

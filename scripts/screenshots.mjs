@@ -8,7 +8,7 @@ import { mkdirSync } from 'node:fs';
 const [outDir = 'screenshots', ...only] = process.argv.slice(2);
 const P = { width: 390, height: 844 };
 const L = { width: 844, height: 390 };
-const SEEN = ['noob-01', 'noob-02', 'noob-03', 'noob-04', 'noob-05', 'noob-09', 'beginner-13', 'intermediate-01'];
+const SEEN = ['noob-01', 'noob-02', 'noob-03', 'noob-04', 'noob-05', 'noob-09', 'beginner-13', 'intermediate-01', 'song-hot-cross-buns'];
 
 // Taps every expected note on time, except the ones listed in `skip` (by index).
 const playAlong = (skip = [], wrongAt = []) => {
@@ -46,6 +46,14 @@ const SHOTS = [
   { name: 'lesson-grand', path: '#/lesson/beginner-13', vp: L },
   { name: 'lesson-hands-together', path: '#/lesson/intermediate-01', vp: L, heard: true, steps: [['click', '[data-act="go"]'], ['play', [], []], ['wait', 3333 + 5.3 * 833]] },
   { name: 'lesson-soon', path: '#/lesson/noob-06', vp: L },
+  // Phase 4 — gamification
+  { name: 'p4-combo-tier', path: '#/lesson/noob-09', vp: L, heard: true, steps: [['click', '[data-act="go"]'], ['play', [], []], ['wait', 3200 + 9.2 * 750]] },
+  { name: 'p4-results-xp', path: '#/lesson/noob-02', vp: L, fresh: true, heard: true, steps: [['click', '[data-act="go"]'], ['play', [], []], ['waitFor', '.results'], ['wait', 1250], ['shot', 'p4-results-stars'], ['wait', 900], ['shot', 'p4-level-up'], ['wait', 2000], ['shot', 'p4-unlock-toast'], ['goto', '#/map'], ['wait', 900], ['shot', 'p4-map-new'], ['goto', '#/'], ['wait', 500]] },
+  { name: 'p4-song', path: '#/lesson/song-hot-cross-buns', vp: L, demo: true },
+  { name: 'p4-songs', path: '#/songs', vp: P, demo: true },
+  { name: 'p4-test-ready', path: '#/lesson/noob-test', vp: L },
+  { name: 'p4-you', path: '#/you', vp: P, demo: true, steps: [['scroll', '[data-import]'], ['wait', 300]] },
+  { name: 'p4-import', path: '#/you', vp: P, demo: true, steps: [['upload', '[data-file]'], ['wait', 600]] },
 ];
 
 mkdirSync(outDir, { recursive: true });
@@ -59,13 +67,24 @@ for (const s of SHOTS.filter((x) => !only.length || only.includes(x.name))) {
   const page = await ctx.newPage();
   page.on('pageerror', (e) => console.error(`[${s.name}] pageerror:`, e.message));
   page.on('console', (m) => { if (m.type() === 'error') console.error(`[${s.name}] console:`, m.text()); });
+  if (s.fresh) {
+    // Start from a brand-new player who has cleared level 1 (so level 2 is the next one).
+    await page.addInitScript(() => {
+      const req = indexedDB.open('learning-piano', 1);
+      req.onupgradeneeded = () => req.result.createObjectStore('kv');
+      req.onsuccess = () => {
+        const tx = req.result.transaction('kv', 'readwrite');
+        tx.objectStore('kv').put({ version: 1, xp: 95, levels: { 'noob-01': { stars: 3, best: 98, attempts: 1 } }, tests: {}, songs: {}, fresh: [] }, 'progress');
+      };
+    });
+  }
   if (s.seen !== false) {
     await page.addInitScript((seen) => {
       const req = indexedDB.open('learning-piano', 1);
       req.onupgradeneeded = () => req.result.createObjectStore('kv');
       req.onsuccess = () => {
         const tx = req.result.transaction('kv', 'readwrite');
-        tx.objectStore('kv').put({ metronome: true, sfx: true, introsSeen: seen }, 'settings');
+        tx.objectStore('kv').put({ metronome: true, sfx: true, inputMode: 'tap', introsSeen: seen }, 'settings');
       };
     }, SEEN);
   }
@@ -88,6 +107,16 @@ for (const s of SHOTS.filter((x) => !only.length || only.includes(x.name))) {
     if (act === 'wait') await page.waitForTimeout(a);
     if (act === 'waitFor') await page.waitForSelector(a, { timeout: 30000 });
     if (act === 'play') await page.evaluate(`(${playAlong})(${JSON.stringify(a)}, ${JSON.stringify(b)})`);
+    if (act === 'shot') { await page.screenshot({ path: `${outDir}/${a}.png` }); console.log('shot', a); }
+    if (act === 'goto') {
+      if (s.vp === L) await page.setViewportSize(P);
+      await page.evaluate((h) => { location.hash = h; }, a);
+    }
+    if (act === 'scroll') await page.evaluate((sel) => document.querySelector(sel).scrollIntoView({ block: 'center' }), a);
+    if (act === 'upload') {
+      const backup = { app: 'learning-piano', version: 1, exportedAt: '2026-10-01T10:00:00Z', progress: { version: 1, xp: 2600, levels: Object.fromEntries(Array.from({ length: 15 }, (_, i) => [`noob-${String(i + 1).padStart(2, '0')}`, { stars: 3, best: 97, attempts: 2 }])), tests: { noob: { passed: true, best: 92, attempts: 1 } }, songs: {} }, settings: { metronome: true }, calibration: null };
+      await page.setInputFiles(a, { name: 'learning-piano-backup-2026-10-01.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(backup)) });
+    }
   }
   await page.screenshot({ path: `${outDir}/${s.name}.png` });
   console.log('shot', s.name);

@@ -326,6 +326,63 @@
 .seg--sm { margin-top: 0; }
 .seg--sm .seg__b { height: 28px; padding: 0 10px; font-size: 11px; }
 .row:has(.seg) { grid-template-columns: 30px 1fr auto; }
-.row__link { display: contents; }
+.row:has(> .row__link) { display: block; padding: 0; }
+.row__link { display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 6px; width: 100%; padding: 12px 14px; min-height: 56px; text-align: left; color: inherit; }
+.row__link > span:first-child { color: var(--ink-2); font-weight: 800; }
+.row__link > svg { width: 14px; height: 14px; color: var(--ink-4); }
 .hud__in { display: inline-flex; align-items: center; gap: 5px; margin-left: 8px; color: var(--ink); }
 .hud__in i { width: 8px; height: 8px; border-radius: 50%; background: var(--hit); box-shadow: 0 0 calc(4px + var(--lvl, 0) * 14px) rgba(47, 209, 107, calc(0.3 + var(--lvl, 0) * 0.7)); }
+
+/* ============ Phase 4: combo escalation, XP, level up, unlocks ============ */
+.hud__combo { transition: box-shadow 0.2s, background 0.2s; }
+.hud__combo[data-tier='2'] { background: var(--hit); box-shadow: 0 0 22px rgba(47, 209, 107, 0.5); }
+.hud__combo[data-tier='3'] { background: var(--hit); box-shadow: 0 0 30px 4px rgba(47, 209, 107, 0.65), 0 0 0 2px #fff; }
+.hud__combo[data-tier='4'] { background: #fff; box-shadow: 0 0 36px 8px rgba(47, 209, 107, 0.8), 0 0 0 3px var(--hit); animation: tier4 0.9s ease-in-out infinite; }
+@keyframes tier4 { 50% { box-shadow: 0 0 46px 12px rgba(47, 209, 107, 0.95), 0 0 0 3px var(--hit); } }
+.hud__combo.bump { animation: bump 0.18s var(--ease-out); }
+.hud__combo[data-tier='4'].bump { animation: bump 0.18s var(--ease-out), tier4 0.9s ease-in-out infinite; }
+@keyframes bump { 40% { transform: scale(1.12); } }
+.playhead.is-hit::after { animation: ph-hit 0.28s ease-out; }
+@keyframes ph-hit { 0% { background: var(--hit); box-shadow: 0 0 24px 6px rgba(47, 209, 107, 0.9); } 100% { background: #fff; } }
+
+.tierup { position: absolute; left: 50%; top: 50%; z-index: 6; transform: translate(-50%, -50%); text-align: center; pointer-events: none; animation: tierup 1.3s var(--ease-out) forwards; }
+.tierup b { display: block; font-size: 64px; font-weight: 900; color: var(--hit); text-shadow: 0 0 30px rgba(47, 209, 107, 0.8), 0 0 2px #fff; }
+.tierup span { font: 800 11px var(--font-body); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink); }
+.tierup--4 b { color: #fff; text-shadow: 0 0 40px rgba(47, 209, 107, 1), 0 0 12px rgba(255, 255, 255, 0.9); }
+@keyframes tierup { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); } 15% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); } 30% { transform: translate(-50%, -50%) scale(1); } 75% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -62%) scale(1); } }
+
+.results__big { font-size: 112px; }
+.results__stars svg { transition: transform 0.25s var(--ease-out), opacity 0.2s; }
+.results__stars svg.pre { opacity: 0; transform: scale(0.3); }
+.results__stars svg.pop { animation: starpop 0.35s var(--ease-out); filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8)); }
+@keyframes starpop { 0% { transform: scale(0.3); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+.results__xp { margin-top: 10px; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 4px 10px; }
+.results__xp b { font-size: 26px; font-weight: 900; }
+.results__xp .label { grid-column: 1 / 3; }
+.xpbar { height: 6px; border-radius: 3px; background: var(--surface-3); overflow: hidden; min-width: 80px; }
+.xpbar i { display: block; height: 100%; background: var(--ink); box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); transition: width 0.05s linear; }
+.results__btns { align-items: center; }
+.xpparts { flex: 1; display: flex; flex-wrap: wrap; gap: 4px; }
+.xpparts i { font: 700 10px var(--font-body); font-style: normal; color: var(--ink-3); background: var(--surface-1); border: 1px solid var(--surface-2); border-radius: 6px; padding: 3px 6px; }
+
+.lvlup { position: absolute; inset: 0; z-index: 8; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; background: radial-gradient(60% 80% at 50% 50%, rgba(40, 40, 40, 0.97), rgba(0, 0, 0, 0.98) 70%); animation: fadein 0.25s ease-out; cursor: pointer; }
+.lvlup b { font-size: 110px; font-weight: 900; line-height: 0.9; text-shadow: 0 0 50px rgba(255, 255, 255, 0.7), 0 0 14px #fff; animation: lvlpop 0.6s var(--ease-out); }
+.lvlup .label { color: var(--ink); font-size: 12px; }
+.lvlup__rank { font-size: 20px; font-weight: 700; color: var(--hit); }
+.lvlup.out, .unlock.out { opacity: 0; transition: opacity 0.22s; }
+@keyframes lvlpop { 0% { transform: scale(0.4); opacity: 0; } 60% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes fadein { from { opacity: 0; } }
+
+.unlock { position: absolute; left: 50%; top: 10px; z-index: 9; transform: translateX(-50%); min-width: 240px; background: var(--ink); color: #000; border-radius: var(--radius-md); padding: 10px 16px; box-shadow: 0 0 40px rgba(255, 255, 255, 0.45); animation: drop 0.35s var(--ease-out); cursor: pointer; }
+.unlock .label { color: #555; }
+.unlock b { display: block; font-size: 30px; font-weight: 900; margin-top: 2px; }
+@keyframes drop { from { transform: translate(-50%, -30px); opacity: 0; } }
+
+/* NEW badges on the map / songs */
+.new { display: inline-block; font: 900 10px/1 var(--font-body); letter-spacing: 0.12em; background: var(--hit); color: #000; border-radius: 4px; padding: 3px 5px; margin-left: 8px; vertical-align: middle; box-shadow: 0 0 12px rgba(47, 209, 107, 0.6); }
+.song__link { display: contents; }
+.song__hint .stars svg { width: 12px; height: 12px; }
+a.stop__main { color: inherit; }
+.newbar { display: flex; align-items: center; gap: 4px; margin-top: 20px; font: 700 13px var(--font-body); color: var(--ink); }
+.newbar .new { margin-left: 0; }
+.newbar + .hero { margin-top: 12px; }

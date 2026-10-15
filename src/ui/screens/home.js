@@ -51,6 +51,7 @@ export function render(root) {
     <div class="vu" role="progressbar" aria-valuemin="0" aria-valuemax="${need}" aria-valuenow="${into}">${raw(vuMeter(into / need))}</div>
     <div class="vu__row"><span><b>${into.toLocaleString()}</b> / ${need.toLocaleString()} XP</span><span>${(need - into).toLocaleString()} to go</span></div>
 
+    ${p.fresh?.length ? html`<a class="newbar" href="#/map"><span class="new">NEW</span> ${p.fresh.length} new unlock${p.fresh.length > 1 ? 's' : ''} on the map →</a>` : ''}
     <a class="hero" href="${hero.href}">
       <span class="hero__num display" aria-hidden="true">${hero.num}</span>
       <span class="label">${hero.eyebrow}</span>

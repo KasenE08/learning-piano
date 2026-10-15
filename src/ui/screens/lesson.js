@@ -3,8 +3,8 @@ import { html, el, raw, pad2 } from '../dom.js';
 import { icons, stars } from '../icons.js';
 import { createKeyboard, createKeyMap } from '../components/keyboard.js';
 import { createScore } from '../components/score.js';
-import { sections, getSettings, saveSettings, getProgress, saveProgress, getCalibration } from '../../core/store.js';
-import { mapState, recordAttempt, recordTest } from '../../core/progress.js';
+import { sections, songs, getSettings, saveSettings, getProgress, saveProgress, getCalibration } from '../../core/store.js';
+import { mapState, recordAttempt, recordTest, recordSong, attemptXp, addXp, evaluateUnlocks, comboMultiplier, rankFor } from '../../core/progress.js';
 import { nameOf, midiOf } from '../../core/music.js';
 import { parseLevel, expectedNotes, noteRange, keyboardWindow, measureBeats } from '../../engine/notation.js';
 import { createRun } from '../../engine/run.js';
@@ -12,11 +12,19 @@ import { loadLevel } from '../../content/levels.js';
 import { TIMING_WINDOWS_MS, SECTION_TEST_PASS } from '../../config/scoring.js';
 import * as audio from '../../audio/engine.js';
 import * as mic from '../../audio/mic.js';
+import { sfx } from '../../audio/sfx.js';
 import { go } from '../../router.js';
 
 export const orientation = 'landscape';
 
 function lookup(id) {
+  const sg = /^song-([\w-]+)$/.exec(id || '');
+  if (sg) {
+    const song = songs.find((x) => x.id === sg[1]);
+    if (!song) return null;
+    const section = sections.find((x) => x.id === song.section);
+    return { section, isSong: true, songId: song.id, isTest: false, n: null, title: song.title, sub: song.by, label: `Song · ${song.by}` };
+  }
   const m = /^([a-z]+)-(\d+|test)$/.exec(id || '');
   const s = m && sections.find((x) => x.id === m[1]);
   if (!s) return null;
@@ -94,10 +102,29 @@ export function render(root, params) {
   };
   const hidePanel = () => { panel.hidden = true; panel.replaceChildren(); panel.classList.remove('panel--corner'); };
 
-  function setHud({ acc = null, combo = 0 } = {}) {
+  let lastTier = 1;
+  function setHud({ acc = null, combo = 0, bump = false } = {}) {
     accEl.textContent = acc == null ? '—' : fmtPct(acc);
     comboEl.textContent = `×${combo}`;
-    comboBox.classList.toggle('is-hot', combo >= 10);
+    const tier = comboMultiplier(combo);
+    comboBox.dataset.tier = tier;
+    comboBox.querySelector('span').textContent = tier > 1 ? `${tier}× XP` : 'combo';
+    if (bump) { comboBox.classList.remove('bump'); void comboBox.offsetWidth; comboBox.classList.add('bump'); }
+    if (tier > lastTier && state === 'running') tierUp(tier);
+    lastTier = tier;
+  }
+  const playheadEl = $('.playhead');
+  function playheadFlash() {
+    playheadEl.classList.remove('is-hit');
+    void playheadEl.offsetWidth;
+    playheadEl.classList.add('is-hit');
+  }
+  // Escalating feedback when the combo reaches a new multiplier.
+  function tierUp(tier) {
+    const t = el(html`<div class="tierup tierup--${tier} display"><b>${tier}× XP</b><span>Combo ${[0, 0, 10, 25, 50][tier]}</span></div>`);
+    screen.querySelector('.stage').append(t);
+    setTimeout(() => t.remove(), 1300);
+    sfx.comboTier(tier - 1);
   }
   const updateTempoBtn = () => {
     tempoBtn.querySelector('.tempo-val').textContent = `${tempo} BPM`;
@@ -151,7 +178,7 @@ export function render(root, params) {
     listenBtn.disabled = false;
     tempoBtn.disabled = false;
     updateTempoBtn();
-    const rec = info.isTest ? getProgress().tests[info.section.id] : getProgress().levels[params.id];
+    const rec = info.isTest ? getProgress().tests[info.section.id] : info.isSong ? getProgress().songs[info.songId] : getProgress().levels[params.id];
     const loaded = audio.isLoaded();
     hidePanel();
     const p = showPanel(html`<div class="card ready">
@@ -258,6 +285,7 @@ export function render(root, params) {
     listenBtn.disabled = true;
     tempoBtn.disabled = true;
     score.clearMarks();
+    lastTier = 1;
     setHud({ acc: null, combo: 0 });
     let judged = 0;
     let hits = 0;
@@ -289,10 +317,11 @@ export function render(root, params) {
           judged++;
           score.mark(notes[res.note.id], 'hit');
           kb.flash(res.note.midi, 'hit');
+          playheadFlash();
         } else {
           kb.flash(res.midi, 'miss');
         }
-        setHud({ acc: judged ? (hits / judged) * 100 : null, combo: scorer.combo });
+        setHud({ acc: judged ? (hits / judged) * 100 : null, combo: scorer.combo, bump: res.type === 'hit' });
         refreshNext(scorer);
       },
       onMiss: (n, scorer) => {
@@ -342,24 +371,38 @@ export function render(root, params) {
     kb.setMarks({});
     listenBtn.disabled = false;
     tempoBtn.disabled = false;
+
+    // ---- record, XP, unlocks ----
+    const before = getProgress();
     let rec = null;
     if (!practice) {
-      const r = info.isTest
-        ? recordTest(getProgress(), info.section.id, sum.accuracy)
-        : recordAttempt(getProgress(), params.id, sum.accuracy);
-      await saveProgress(r.progress);
-      rec = r;
+      rec = info.isTest ? recordTest(before, info.section.id, sum.accuracy)
+        : info.isSong ? recordSong(before, info.songId, sum.accuracy)
+          : recordAttempt(before, params.id, sum.accuracy);
     }
-    const next = !practice ? nextLevelId() : null;
+    const xp = attemptXp({ hitXp: sum.hitXp, practice, newStars: rec?.newStars || 0, firstClear: !!rec?.firstClear, firstPass: !!rec?.firstPass, song: !!info.isSong });
+    const { progress: unlockedP, unlocks } = evaluateUnlocks(before, rec ? rec.progress : before, sections, songs);
+    const gained = addXp(unlockedP, xp.total);
+    await saveProgress(gained.progress);
+
+    const next = info.isSong ? null : !practice ? nextLevelId() : null;
     const missedNames = [...new Set(sum.missed.map((n) => nameOf(n.midi)))];
-    const headline = practice ? 'Practice run · not saved'
+    const headline = practice ? 'Practice run · stars not saved'
       : info.isTest ? (rec.passed ? 'Test passed' : `Need ${SECTION_TEST_PASS}% to pass`)
-        : sum.stars ? (rec.firstClear ? 'Level cleared' : rec.newBest ? 'New best' : 'Cleared') : 'Not quite · 70% clears it';
+        : sum.stars ? (rec.firstClear ? (info.isSong ? 'Song cleared' : 'Level cleared') : rec.newBest ? 'New best' : 'Cleared') : 'Not quite · 70% clears it';
+    const { before: lv0, after: lv1 } = gained;
+    const fill0 = lv0.into / lv0.need;
+    const fill1 = gained.levelUp ? 1 : lv1.into / lv1.need;
     const p = showPanel(html`<div class="results">
       <div class="results__score">
         <span class="label">${headline}</span>
         <div class="results__big display">${fmtPct(sum.accuracy)}<small>%</small></div>
         ${info.isTest ? '' : html`<div class="results__stars">${stars(sum.stars)}</div>`}
+        <div class="results__xp">
+          <b class="display">+<span data-xp>0</span> XP</b>
+          <div class="xpbar"><i style="width:${(fill0 * 100).toFixed(1)}%"></i></div>
+          <span class="label">LV ${pad2(lv0.level)}${gained.levelUp ? ` → ${pad2(lv1.level)}` : ''}</span>
+        </div>
       </div>
       <div class="results__panel">
         <div class="tile"><b class="display">${sum.maxCombo}</b><span class="label">Max combo</span></div>
@@ -373,14 +416,71 @@ export function render(root, params) {
           <div class="tlegend"><span><b>${sum.early}</b> early</span><span><b>${sum.ontime}</b> on time</span><span><b>${sum.late}</b> late</span><span><b>${sum.missed.length}</b> missed</span></div>
         </div>
         <div class="results__btns">
+          <span class="xpparts">${xp.parts.map((x) => html`<i>${x.label} +${x.xp}</i>`)}</span>
           <button class="btn" data-act="retry">Retry</button>
-          <button class="btn" data-act="practice">${practice ? 'Practice again' : 'Practice'}</button>
-          ${next ? html`<a class="btn btn--primary" href="#/lesson/${next}">Next →</a>` : html`<a class="btn btn--primary" href="#/map/${params.id}">Map</a>`}
+          ${info.isTest ? '' : html`<button class="btn" data-act="practice">${practice ? 'Practice again' : 'Practice'}</button>`}
+          ${next ? html`<a class="btn btn--primary" href="#/lesson/${next}">Next →</a>`
+            : html`<a class="btn btn--primary" href="${info.isSong ? '#/songs' : `#/map/${params.id}`}">${info.isSong ? 'Songs' : 'Map'}</a>`}
         </div>
       </div>
     </div>`);
     p.querySelector('[data-act="retry"]').addEventListener('click', () => startPlay());
-    p.querySelector('[data-act="practice"]').addEventListener('click', () => { practice = true; ready(); });
+    p.querySelector('[data-act="practice"]')?.addEventListener('click', () => { practice = true; ready(); });
+
+    // ---- the reveal: stars, XP count-up, level up, unlocks ----
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    const starEls = [...p.querySelectorAll('.results__stars svg')];
+    starEls.forEach((e) => e.classList.add('pre'));
+    await wait(250);
+    for (let i = 0; i < starEls.length; i++) {
+      if (!alive || state !== 'results') return;
+      starEls[i].classList.remove('pre');
+      if (i < sum.stars) { starEls[i].classList.add('pop'); sfx.star(i + 1); }
+      await wait(i < sum.stars ? 260 : 80);
+    }
+    if (!sum.stars && !practice && !info.isTest) sfx.fail();
+    const xpEl = p.querySelector('[data-xp]');
+    const bar = p.querySelector('.xpbar i');
+    const steps = 14;
+    for (let k = 1; k <= steps; k++) {
+      if (!alive || state !== 'results') return;
+      xpEl.textContent = Math.round((xp.total * k) / steps);
+      bar.style.width = `${((fill0 + (fill1 - fill0) * (k / steps)) * 100).toFixed(1)}%`;
+      if (k % 3 === 0) sfx.tick();
+      await wait(32);
+    }
+    if (gained.levelUp) await levelUpMoment(lv1.level, gained.rankUp);
+    for (const u of unlocks) {
+      if (!alive || state !== 'results') return;
+      await unlockToast(u);
+    }
+  }
+
+  function levelUpMoment(level, rankUp) {
+    return new Promise((resolve) => {
+      const o = el(html`<div class="lvlup" role="status">
+        <span class="label">Level up</span>
+        <b class="display">LV ${pad2(level)}</b>
+        ${rankUp ? html`<span class="lvlup__rank display">New rank · ${rankFor(level)}</span>` : ''}
+      </div>`);
+      screen.querySelector('.stage').append(o);
+      sfx.levelUp();
+      const done = () => { o.classList.add('out'); setTimeout(() => { o.remove(); resolve(); }, 250); };
+      o.addEventListener('click', done);
+      setTimeout(done, 2200);
+    });
+  }
+
+  function unlockToast(u) {
+    return new Promise((resolve) => {
+      const what = { level: 'New level', levels: 'Unlocked', section: 'New section', song: u.hidden ? 'Hidden song found' : 'New song' }[u.kind];
+      const t = el(html`<div class="unlock"><span class="label">${what}</span><b class="display">${u.title}</b></div>`);
+      screen.querySelector('.stage').append(t);
+      sfx.unlock();
+      const done = () => { t.classList.add('out'); setTimeout(() => { t.remove(); resolve(); }, 220); };
+      t.addEventListener('click', done);
+      setTimeout(done, 1900);
+    });
   }
 
   function intro(cards, i = 0) {

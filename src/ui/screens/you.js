@@ -1,7 +1,9 @@
 import { html, el, pad2 } from '../dom.js';
 import { icons } from '../icons.js';
 import { dock } from '../components/dock.js';
-import { getProgress, getSettings, saveSettings, getCalibration } from '../../core/store.js';
+import { getProgress, getSettings, saveSettings, getCalibration, saveProgress, saveCalibration } from '../../core/store.js';
+import { makeBackup, parseBackup, backupFileName, describeBackup } from '../../core/backup.js';
+import { openSheet } from '../components/sheet.js';
 import { nameOf } from '../../core/music.js';
 import { playerLevel, rankFor } from '../../core/progress.js';
 
@@ -33,8 +35,9 @@ export function render(root) {
 
     <h2 class="group-title label">Your data</h2>
     <ul class="rows">
-      <li class="row is-soon"><span>↓</span><span class="row__t">Export backup<small>Save progress as a JSON file · Phase 4</small></span>${icons.chevron}</li>
-      <li class="row is-soon"><span>↑</span><span class="row__t">Import backup<small>Load a JSON backup · Phase 4</small></span>${icons.chevron}</li>
+      <li class="row"><button class="row__link" data-export><span>↓</span><span class="row__t">Export backup<small>Save everything as a JSON file (Files, iCloud, AirDrop…)</small></span>${icons.chevron}</button></li>
+      <li class="row"><button class="row__link" data-import><span>↑</span><span class="row__t">Import backup<small>Restore from a backup file</small></span>${icons.chevron}</button></li>
+      <input type="file" accept="application/json,.json" data-file hidden>
     </ul>
 
     <h2 class="group-title label">About</h2>
@@ -54,5 +57,51 @@ export function render(root) {
     screen.querySelectorAll('[data-input]').forEach((x) => x.classList.toggle('is-on', x === b));
     b.closest('.row').querySelector('small').textContent = b.dataset.input === 'mic' ? 'Your keyboard, heard through the mic' : 'On-screen keys';
   }));
+  // ---------- backup ----------
+  const message = (title, text) => openSheet(el(html`<div class="lsheet"><h3 class="lsheet__t display">${title}</h3><p class="lsheet__sub">${text}</p></div>`));
+  screen.querySelector('[data-export]').addEventListener('click', async () => {
+    const data = makeBackup({ progress: getProgress(), settings: getSettings(), calibration: getCalibration() });
+    const name = backupFileName();
+    const file = new File([JSON.stringify(data, null, 2)], name, { type: 'application/json' });
+    try {
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'Learning Piano backup' });
+        return;
+      }
+    } catch (e) {
+      if (e?.name === 'AbortError') return;
+    }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(file);
+    a.download = name;
+    document.body.append(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  });
+  const fileInput = screen.querySelector('[data-file]');
+  screen.querySelector('[data-import]').addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', async () => {
+    const f = fileInput.files?.[0];
+    fileInput.value = '';
+    if (!f) return;
+    let b;
+    try { b = parseBackup(await f.text()); } catch (e) { message('Can’t import', e.message); return; }
+    const body = el(html`<div class="lsheet">
+      <span class="label">Import backup${b.exportedAt ? ` · saved ${new Date(b.exportedAt).toLocaleDateString()}` : ''}</span>
+      <h3 class="lsheet__t display">Replace your progress?</h3>
+      <p class="lsheet__sub">Backup: ${describeBackup(b, playerLevel)}.<br>Now: ${describeBackup({ progress: getProgress() }, playerLevel)}.<br>This replaces what's on this phone.</p>
+      <div class="ready__btns"><button class="btn btn--primary" data-yes>Replace</button><button class="btn btn--ghost" data-no>Cancel</button></div>
+    </div>`);
+    const close = openSheet(body);
+    body.querySelector('[data-no]').addEventListener('click', close);
+    body.querySelector('[data-yes]').addEventListener('click', async () => {
+      await saveProgress(b.progress);
+      if (b.settings) await saveSettings(b.settings);
+      if (b.calibration) await saveCalibration(b.calibration);
+      close();
+      setTimeout(() => { location.hash = '#/'; }, 300);
+    });
+  });
+
   root.append(screen, dock('you'));
 }

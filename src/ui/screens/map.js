@@ -3,8 +3,8 @@ import { html, el, pad2 } from '../dom.js';
 import { icons, stars } from '../icons.js';
 import { dock } from '../components/dock.js';
 import { openSheet } from '../components/sheet.js';
-import { sections, songs, getProgress } from '../../core/store.js';
-import { mapState, nextUp } from '../../core/progress.js';
+import { sections, songs, getProgress, saveProgress } from '../../core/store.js';
+import { mapState, nextUp, clearFresh } from '../../core/progress.js';
 import { SECTION_TEST_PASS, TIMING_WINDOWS_MS } from '../../config/scoring.js';
 
 export const orientation = 'portrait';
@@ -16,11 +16,15 @@ function songStops(sectionId, p) {
   for (const s of songs) {
     const lvl = s.unlock.level;
     const unlocked = !!p.songs[s.id]?.unlocked;
-    if (lvl && lvl.startsWith(`${sectionId}-`) && !s.hidden) (after[lvl] ||= []).push({ ...s, unlocked });
-    else if (s.hidden && (s.unlock.stars === sectionId || lvl?.startsWith(`${sectionId}-`))) hidden.push({ ...s, unlocked });
+    const starsGot = p.songs[s.id]?.stars || 0;
+    if (lvl && lvl.startsWith(`${sectionId}-`) && !s.hidden) (after[lvl] ||= []).push({ ...s, unlocked, stars: starsGot });
+    else if (s.hidden && (s.unlock.stars === sectionId || lvl?.startsWith(`${sectionId}-`))) hidden.push({ ...s, unlocked, stars: starsGot });
   }
   return { after, hidden };
 }
+
+let fresh = new Set();
+const newBadge = (id) => (fresh.has(id) ? html`<span class="new">NEW</span>` : '');
 
 function stopHtml(kind, data, lit, current) {
   if (kind === 'level') {
@@ -29,7 +33,7 @@ function stopHtml(kind, data, lit, current) {
       return html`<li class="stop stop--current is-lit" data-level="${l.id}">
         <button class="stop__dot" aria-label="Level ${l.n}"></button>
         <button class="stop__card">
-          <span class="stop__t display">${l.title}<small>Level ${pad2(l.n)} · ${l.sub}</small></span>
+          <span class="stop__t display">${l.title}${newBadge(l.id)}<small>Level ${pad2(l.n)} · ${l.sub}</small></span>
           <span class="stop__go display">Play</span>
         </button>
       </li>`;
@@ -37,16 +41,17 @@ function stopHtml(kind, data, lit, current) {
     return html`<li class="stop ${l.unlocked ? '' : 'is-locked'} ${lit ? 'is-lit' : ''} ${l.stars ? 'is-done' : ''}" data-level="${l.id}">
       <button class="stop__dot" aria-hidden="true" tabindex="-1"></button>
       <button class="stop__main">
-        <span class="stop__t display">${l.title}<small>Level ${pad2(l.n)}${l.song ? ' · song' : ''}</small></span>
+        <span class="stop__t display">${l.title}${newBadge(l.id)}<small>Level ${pad2(l.n)}${l.song ? ' · song' : ''}</small></span>
         ${l.stars ? stars(l.stars) : l.unlocked ? '' : html`<span class="stop__lock">${icons.lock}</span>`}
       </button>
     </li>`;
   }
   if (kind === 'song') {
     const s = data;
+    const inner = html`<span class="stop__t display stop__t--song">${s.hidden && !s.unlocked ? '???' : s.title}${newBadge(s.id)}<small>${s.unlocked ? `Bonus song · ${s.stars ? '★'.repeat(s.stars) : 'tap to play'}` : s.hidden ? 'Hidden song · keep playing' : 'Bonus song · locked'}</small></span>`;
     return html`<li class="stop stop--song ${lit ? 'is-lit' : ''} ${s.unlocked ? 'is-done' : 'is-locked'}">
       <span class="stop__dot" aria-hidden="true"></span>
-      <span class="stop__main"><span class="stop__t display stop__t--song">${s.hidden && !s.unlocked ? '???' : s.title}<small>${s.unlocked ? 'Bonus song · unlocked' : s.hidden ? 'Hidden song · keep playing' : 'Bonus song · locked'}</small></span></span>
+      ${s.unlocked ? html`<a class="stop__main" href="#/lesson/song-${s.id}">${inner}</a>` : html`<span class="stop__main">${inner}</span>`}
     </li>`;
   }
   // test
@@ -97,6 +102,7 @@ function testSheet(section, nextTitle) {
 
 export function render(root, params) {
   const p = getProgress();
+  fresh = new Set(p.fresh || []);
   const state = mapState(sections, p);
   const up = nextUp(state);
   const currentId = up.kind === 'level' ? up.level.id : up.kind === 'test' ? up.section.test.id : null;
@@ -127,7 +133,7 @@ export function render(root, params) {
     const sec = el(html`<section class="msec ${s.unlocked ? '' : 'is-locked'}" id="sec-${s.id}">
       <div class="msec__head">
         <span class="label">Setlist ${pad2(i + 1)} / 04</span>
-        <h2 class="msec__title display">${s.title}</h2>
+        <h2 class="msec__title display">${s.title}${newBadge(s.id)}</h2>
         <p class="msec__tag">${s.tagline}</p>
         ${s.unlocked
           ? html`<div class="msec__stats">
@@ -157,4 +163,7 @@ export function render(root, params) {
       : screen.querySelector('.stop--current, .stop--test.is-current');
     if (target) target.scrollIntoView({ block: params.focus ? 'start' : 'center' });
   });
+
+  // NEW badges are shown once: clear them when leaving the map.
+  return () => { if (getProgress().fresh?.length) saveProgress(clearFresh(getProgress())); };
 }

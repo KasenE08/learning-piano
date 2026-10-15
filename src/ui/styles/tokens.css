@@ -1,0 +1,47 @@
+/* Design system: "Stage" (concept B) + green/red signal colours (from concept C).
+   Black and white everywhere; green and red appear ONLY for hit / miss feedback. */
+:root {
+  color-scheme: dark;
+
+  /* surfaces */
+  --bg: #000;
+  --surface-1: #0f0f0f;
+  --surface-2: #1c1c1c;
+  --surface-3: #2a2a2a;
+  --line: #262626;
+
+  /* ink */
+  --ink: #f2f2f2;
+  --ink-2: #b5b5b5;
+  --ink-3: #7a7a7a;
+  --ink-4: #3a3a3a;
+
+  /* signal: the only colours in the app */
+  --hit: #2fd16b;
+  --miss: #ff4545;
+
+  /* glow */
+  --glow-sm: 0 0 10px rgba(255, 255, 255, 0.55);
+  --glow-md: 0 0 24px rgba(255, 255, 255, 0.35);
+  --glow-lg: 0 0 40px rgba(255, 255, 255, 0.25);
+  --spot: radial-gradient(120% 60% at 50% -10%, #262626 0%, #000 60%);
+
+  /* type */
+  --font-display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+  --font-body: 'Manrope', system-ui, -apple-system, sans-serif;
+
+  /* geometry */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --pill: 999px;
+
+  /* safe areas */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+
+  --dock-h: 62px;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}

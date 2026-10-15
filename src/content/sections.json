@@ -1,0 +1,92 @@
+{
+  "sections": [
+    {
+      "id": "noob",
+      "title": "Noob",
+      "tagline": "Right hand, treble clef, C position",
+      "levels": [
+        { "title": "The keyboard", "sub": "Black-key groups, find every C" },
+        { "title": "Finger numbers", "sub": "C, D, E by feel" },
+        { "title": "Meet the treble clef", "sub": "Middle C, D, E on the staff" },
+        { "title": "F and G", "sub": "The full C position" },
+        { "title": "Quarter notes", "sub": "A steady pulse" },
+        { "title": "Half notes", "sub": "Hold for two" },
+        { "title": "Whole notes", "sub": "Bars and 4/4 time" },
+        { "title": "Skipping thirds", "sub": "Jumping over a key" },
+        { "title": "Ode to Joy", "sub": "Song · right hand", "song": true },
+        { "title": "A, B and high C", "sub": "Moving the hand" },
+        { "title": "Lines and spaces", "sub": "E G B D F · F A C E" },
+        { "title": "Ties and repeats", "sub": "Joining and looping" },
+        { "title": "Twinkle Twinkle", "sub": "Song · right hand", "song": true },
+        { "title": "Below Middle C", "sub": "B, A, G and ledger lines" },
+        { "title": "Little songs medley", "sub": "Mary Had a Little Lamb + more", "song": true }
+      ]
+    },
+    {
+      "id": "beginner",
+      "title": "Beginner",
+      "tagline": "Bass clef, left hand, rhythm, first keys",
+      "levels": [
+        { "title": "Meet the bass clef", "sub": "Left hand C position" },
+        { "title": "Bass clef C to G", "sub": "Reading low notes" },
+        { "title": "Left-hand melodies", "sub": "Quarters and halves" },
+        { "title": "Bass lines and spaces", "sub": "G B D F A · A C E G" },
+        { "title": "Rests", "sub": "Quarter, half, whole" },
+        { "title": "Eighth notes", "sub": "1 & 2 &" },
+        { "title": "Three-four time", "sub": "Waltz feel and dotted halves" },
+        { "title": "Dotted rhythms", "sub": "Dotted quarter + eighth" },
+        { "title": "G major", "sub": "F♯ in the key signature" },
+        { "title": "F major", "sub": "B♭ in the key signature" },
+        { "title": "Hands separately", "sub": "One piece, two parts" },
+        { "title": "Aura Lee", "sub": "Song · hands separately", "song": true },
+        { "title": "The grand staff", "sub": "Melody passes between hands" },
+        { "title": "Sight-reading I", "sub": "C, G and F major" },
+        { "title": "Amazing Grace", "sub": "Song · 3/4, hands separately", "song": true }
+      ]
+    },
+    {
+      "id": "intermediate",
+      "title": "Intermediate",
+      "tagline": "Hands together, accidentals, scales, triads",
+      "levels": [
+        { "title": "Hands together I", "sub": "Left holds, right moves" },
+        { "title": "Hands together II", "sub": "Parallel motion" },
+        { "title": "Contrary motion", "sub": "Hands moving apart" },
+        { "title": "Sharps and flats", "sub": "Black keys and enharmonics" },
+        { "title": "Accidentals", "sub": "Naturals inside a bar" },
+        { "title": "D and B♭ major", "sub": "More key signatures" },
+        { "title": "Minor keys", "sub": "A minor and E minor" },
+        { "title": "Major scales", "sub": "Thumb-under, one octave" },
+        { "title": "Scales together", "sub": "Left hand, then both" },
+        { "title": "Intervals", "sub": "Seconds to octaves" },
+        { "title": "Broken triads", "sub": "Major and minor" },
+        { "title": "Block chords", "sub": "I, IV and V" },
+        { "title": "Dynamics", "sub": "p, mf, f and crescendo" },
+        { "title": "Minuet in G", "sub": "Song · Petzold, simplified", "song": true },
+        { "title": "Für Elise", "sub": "Song · the opening", "song": true }
+      ]
+    },
+    {
+      "id": "advanced",
+      "title": "Advanced",
+      "tagline": "Harmony, rhythm, independence, real music",
+      "levels": [
+        { "title": "Inversions", "sub": "Chords turned around" },
+        { "title": "Progressions", "sub": "I–IV–V–I and I–V–vi–IV" },
+        { "title": "Accompaniment", "sub": "Broken chords, Alberti bass" },
+        { "title": "More keys", "sub": "A, E, E♭, A♭ major · D, G minor" },
+        { "title": "Sixteenth notes", "sub": "1 e & a" },
+        { "title": "Syncopation", "sub": "Off the beat" },
+        { "title": "Triplets", "sub": "Three in the space of two" },
+        { "title": "Independence", "sub": "Melody over accompaniment" },
+        { "title": "Six-eight time", "sub": "Two big beats" },
+        { "title": "Sight-reading II", "sub": "Unseen passages" },
+        { "title": "8va and 8vb", "sub": "Reading octave marks" },
+        { "title": "Fit it in 3 octaves", "sub": "Choose what to shift" },
+        { "title": "Prelude in C", "sub": "Song · Bach, adapted", "song": true },
+        { "title": "Gymnopédie No. 1", "sub": "Song · Satie, adapted", "song": true },
+        { "title": "Capstone", "sub": "Learn an unseen piece yourself" }
+      ]
+    }
+  ]
+}

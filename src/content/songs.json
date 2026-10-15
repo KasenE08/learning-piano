@@ -1,0 +1,19 @@
+{
+  "songs": [
+    { "id": "hot-cross-buns", "title": "Hot Cross Buns", "by": "Traditional", "unlock": { "level": "noob-05" } },
+    { "id": "lightly-row", "title": "Lightly Row", "by": "Traditional", "unlock": { "level": "noob-12" } },
+    { "id": "jingle-bells", "title": "Jingle Bells", "by": "J. Pierpont, 1857", "hidden": true, "unlock": { "stars": "noob", "min": 2 } },
+    { "id": "oh-susanna", "title": "Oh! Susanna", "by": "S. Foster, 1848", "unlock": { "level": "beginner-06" } },
+    { "id": "when-the-saints", "title": "When the Saints", "by": "Traditional", "unlock": { "level": "beginner-10" } },
+    { "id": "greensleeves", "title": "Greensleeves", "by": "Traditional", "hidden": true, "unlock": { "stars": "beginner", "min": 2 } },
+    { "id": "scarborough-fair", "title": "Scarborough Fair", "by": "Traditional", "unlock": { "level": "intermediate-07" } },
+    { "id": "morning-mood", "title": "Morning Mood", "by": "Grieg, 1875", "unlock": { "level": "intermediate-10" } },
+    { "id": "nachtmusik", "title": "Eine kleine Nachtmusik", "by": "Mozart, 1787", "hidden": true, "unlock": { "stars": "intermediate", "min": 2 } },
+    { "id": "swan-lake", "title": "Swan Lake theme", "by": "Tchaikovsky, 1876", "unlock": { "level": "advanced-03" } },
+    { "id": "canon-in-d", "title": "Canon in D", "by": "Pachelbel", "unlock": { "level": "advanced-06" } },
+    { "id": "turkish-march", "title": "Turkish March", "by": "Mozart, 1783", "unlock": { "level": "advanced-09" } },
+    { "id": "maple-leaf-rag", "title": "Maple Leaf Rag", "by": "Joplin, 1899", "hidden": true, "unlock": { "level": "advanced-11", "stars3": true } },
+    { "id": "the-entertainer", "title": "The Entertainer", "by": "Joplin, 1902", "unlock": { "level": "advanced-12" } },
+    { "id": "clair-de-lune", "title": "Clair de Lune", "by": "Debussy, 1905", "hidden": true, "unlock": { "stars": "advanced", "min": 2 } }
+  ]
+}

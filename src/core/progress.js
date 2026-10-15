@@ -138,7 +138,8 @@ export function recordSong(p, id, accuracy) {
 export function attemptXp({ hitXp = 0, practice = false, newStars = 0, firstClear = false, firstPass = false, song = false }) {
   const parts = [];
   if (practice) {
-    parts.push({ label: 'Practice', xp: Math.round((XP.perAttempt + hitXp) * XP.practiceFactor) });
+    const xp = Math.round((XP.perAttempt + hitXp) * XP.practiceFactor);
+    if (xp) parts.push({ label: 'Practice', xp });
   } else {
     parts.push({ label: 'Attempt', xp: XP.perAttempt });
     if (hitXp) parts.push({ label: 'Notes', xp: Math.round(hitXp) });

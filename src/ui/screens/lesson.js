@@ -2,7 +2,8 @@
 import { html, el, raw, pad2 } from '../dom.js';
 import { icons, stars } from '../icons.js';
 import { createKeyboard, createKeyMap } from '../components/keyboard.js';
-import { createScore } from '../components/score.js';
+import { createScore, renderNoteCard, staffLayout } from '../components/score.js';
+import { createDrill, drillPrompts } from '../../engine/drill.js';
 import { sections, songs, getSettings, saveSettings, getProgress, saveProgress, getCalibration } from '../../core/store.js';
 import { mapState, recordAttempt, recordTest, recordSong, attemptXp, addXp, evaluateUnlocks, comboMultiplier, rankFor } from '../../core/progress.js';
 import { nameOf, midiOf } from '../../core/music.js';
@@ -62,7 +63,7 @@ export function render(root, params) {
     </div>
   </main>`);
   root.append(screen);
-  if (import.meta.env.DEV) window.__lesson = { get run() { return run; }, get notes() { return notes; } };
+  if (import.meta.env.DEV) window.__lesson = { get run() { return run; }, get notes() { return notes; }, get drill() { return drill; } };
 
   const $ = (s) => screen.querySelector(s);
   const scoreHost = $('.score');
@@ -143,6 +144,7 @@ export function render(root, params) {
         if (!audio.running()) { try { await audio.unlock(); } catch { /* ignore */ } }
         audio.playNote(midi, 0.8);
         if (run && run.mode === 'play') run.input(midi, ts);
+        else if (drillAnswer) drillAnswer(midi);
         else showFreeNote(midi);
       },
     });
@@ -169,6 +171,7 @@ export function render(root, params) {
 
   // ---------- flow ----------
   function ready(note = '') {
+    if (isDrill()) return drillReady(note);
     state = 'ready';
     run = null;
     countEl.textContent = '';
@@ -244,8 +247,10 @@ export function render(root, params) {
       const cal = getCalibration();
       mic.configure({ noiseDb: cal.noiseDb, low: cal.low, high: cal.high });
     }
-    // The first scored attempt of a visit starts with the Listen demo (skippable).
-    if (!heardDemo && !practice && !info.isTest) startListen(true);
+    if (isDrill()) return startDrill();
+    // The first scored attempt of a visit starts with the Listen demo (skippable),
+    // except in tests and sight-reading levels.
+    if (!heardDemo && !practice && !info.isTest && !level.noListen) startListen(true);
     else startPlay();
   }
 
@@ -353,6 +358,8 @@ export function render(root, params) {
 
   function stopRun() {
     stopMicNotes();
+    drill = null;
+    drillAnswer = null;
     if (run && !run.finished) run.stop();
     run = null;
   }
@@ -408,23 +415,23 @@ export function render(root, params) {
         <div class="tile"><b class="display">${sum.maxCombo}</b><span class="label">Max combo</span></div>
         <div class="tile"><b class="display">${sum.hits}/${sum.total}</b><span class="label">Notes hit</span></div>
         <div class="tile tile--wide"><b class="display missed">${missedNames.length ? missedNames.slice(0, 5).join(' · ') : 'None'}</b><span class="label">Missed notes</span></div>
-        <div class="timing">
+        ${sum.untimed ? html`<div class="timing"><span class="label">Untimed drill · your first answer to each note counts</span></div>` : html`<div class="timing">
           <div class="tbar">
             <i style="flex:${sum.early}" class="t-early"></i><i style="flex:${sum.ontime}" class="t-on"></i><i style="flex:${sum.late}" class="t-late"></i><i style="flex:${sum.missed.length}" class="t-miss"></i>
             ${sum.total ? '' : raw('<i style="flex:1"></i>')}
           </div>
           <div class="tlegend"><span><b>${sum.early}</b> early</span><span><b>${sum.ontime}</b> on time</span><span><b>${sum.late}</b> late</span><span><b>${sum.missed.length}</b> missed</span></div>
-        </div>
+        </div>`}
         <div class="results__btns">
           <span class="xpparts">${xp.parts.map((x) => html`<i>${x.label} +${x.xp}</i>`)}</span>
           <button class="btn" data-act="retry">Retry</button>
-          ${info.isTest ? '' : html`<button class="btn" data-act="practice">${practice ? 'Practice again' : 'Practice'}</button>`}
+          ${info.isTest || isDrill() ? '' : html`<button class="btn" data-act="practice">${practice ? 'Practice again' : 'Practice'}</button>`}
           ${next ? html`<a class="btn btn--primary" href="#/lesson/${next}">Next →</a>`
             : html`<a class="btn btn--primary" href="${info.isSong ? '#/songs' : `#/map/${params.id}`}">${info.isSong ? 'Songs' : 'Map'}</a>`}
         </div>
       </div>
     </div>`);
-    p.querySelector('[data-act="retry"]').addEventListener('click', () => startPlay());
+    p.querySelector('[data-act="retry"]').addEventListener('click', () => (isDrill() ? startDrill() : startPlay()));
     p.querySelector('[data-act="practice"]')?.addEventListener('click', () => { practice = true; ready(); });
 
     // ---- the reveal: stars, XP count-up, level up, unlocks ----
@@ -483,22 +490,140 @@ export function render(root, params) {
     });
   }
 
+  // ---------- find-the-key drills ----------
+  let drill = null;
+  let drillAnswer = null;
+  let prompts = [];
+  const isDrill = () => level?.type === 'find';
+  const octave = (name) => name.match(/-?\d/)[0];
+  const letter = (name) => name.replace(/-?\d/, '');
+
+  function drillStage() {
+    scoreHost.replaceChildren(el(html`<div class="drill">
+      <div class="drill__prompt"></div>
+      <ol class="drill__dots" aria-hidden="true">${prompts.map(() => html`<li></li>`)}</ol>
+    </div>`));
+    $('.playhead').hidden = true;
+  }
+
+  function showPrompt(pr, result = null) {
+    const box = scoreHost.querySelector('.drill__prompt');
+    const mode = level.show || 'name';
+    const showName = mode !== 'staff' || result === 'miss';
+    box.replaceChildren(el(html`<div class="drill__card ${result ? `is-${result}` : ''}">
+      ${mode !== 'name' ? html`<div class="drill__staff"></div>` : ''}
+      ${showName ? html`<div class="drill__name"><b class="display">${letter(pr.name)}<small>${octave(pr.name)}</small></b>${level.hints?.[pr.name] ? html`<span class="label">${level.hints[pr.name]}</span>` : ''}</div>` : ''}
+      ${result === 'miss' ? html`<span class="drill__fb">It was ${pr.name}: here's the key</span>` : ''}
+    </div>`));
+    if (mode !== 'name') renderNoteCard(box.querySelector('.drill__staff'), { note: pr.name, clef: level.clef || 'treble', keySig: level.key || 'C' });
+  }
+
+  function drillReady(note = '') {
+    state = 'ready';
+    drill = null;
+    drillAnswer = null;
+    kb.setMarks({});
+    scoreHost.querySelectorAll('.drill__dots li').forEach((d) => { d.className = ''; });
+    const box = scoreHost.querySelector('.drill__prompt');
+    box.replaceChildren(el(html`<div class="drill__card drill__card--idle"><b class="display">?</b></div>`));
+    const rec = getProgress().levels[params.id];
+    const p = showPanel(html`<div class="card ready">
+      <span class="label">Untimed · ${prompts.length} notes · first answer counts</span>
+      <h2 class="display">${info.title}</h2>
+      <p>${(level.show || 'name') === 'staff' ? 'A note appears on the staff. Find it and play it.' : 'The app names a note. Find that key and play it.'}</p>
+      ${note ? html`<p class="ready__note">${note}</p>` : ''}
+      <div class="seg" role="radiogroup" aria-label="Input">
+        <button class="seg__b ${micMode() ? 'is-on' : ''}" data-input="mic" role="radio" aria-checked="${micMode()}">${icons.mic} Keyboard</button>
+        <button class="seg__b ${micMode() ? '' : 'is-on'}" data-input="tap" role="radio" aria-checked="${!micMode()}">Taps</button>
+      </div>
+      ${micMode() && !getCalibration() ? html`<p class="ready__note">First, a 1-minute mic calibration. <a class="link" href="#/calibrate/lesson/${params.id}">Calibrate now →</a></p>` : ''}
+      <div class="ready__btns"><button class="btn btn--primary" data-act="go">${icons.play} Start</button></div>
+      ${rec?.best != null ? html`<p class="ready__best">Best ${fmtPct(rec.best)}% ${stars(rec.stars)}</p>` : ''}
+    </div>`);
+    p.querySelector('[data-act="go"]').addEventListener('click', onGo);
+    p.querySelectorAll('[data-input]').forEach((b) => b.addEventListener('click', async () => {
+      await saveSettings({ inputMode: b.dataset.input });
+      if (b.dataset.input === 'tap') mic.stop();
+      drillReady(note);
+    }));
+  }
+
+  function startDrill() {
+    stopRun();
+    hidePanel();
+    state = 'running';
+    lastTier = 1;
+    setHud({ acc: null, combo: 0 });
+    drill = createDrill(prompts);
+    const d = drill;
+    const dots = [...scoreHost.querySelectorAll('.drill__dots li')];
+    dots.forEach((x) => { x.className = ''; });
+    let hits = 0;
+    let locked = false;
+    const next = () => {
+      if (drill !== d) return;
+      if (d.done()) {
+        const sum = d.summary();
+        stopRun();
+        results(sum);
+        return;
+      }
+      dots.forEach((x, i) => x.classList.toggle('is-now', i === d.index));
+      kb.setMarks({});
+      showPrompt(d.current);
+      locked = false;
+    };
+    drillAnswer = (midi) => {
+      if (locked || drill !== d || d.done()) return;
+      locked = true;
+      const idx = d.index;
+      const r = d.answer(midi);
+      dots[idx].classList.remove('is-now');
+      dots[idx].classList.add(r.type === 'hit' ? 'is-hit' : 'is-miss');
+      if (r.type === 'hit') hits++;
+      setHud({ acc: (hits / (idx + 1)) * 100, combo: d.combo, bump: r.type === 'hit' });
+      if (r.type === 'hit') {
+        kb.flash(midi, 'hit');
+        showPrompt(r.prompt, 'hit');
+        setTimeout(next, 420);
+      } else {
+        kb.flash(midi, 'miss');
+        kb.setMarks({ [r.prompt.midi]: 'next' });
+        showPrompt(r.prompt, 'miss');
+        setTimeout(next, 1400);
+      }
+    };
+    if (micMode() && mic.getState() === 'on') {
+      mic.setDetecting(true);
+      micNotesOff = mic.onNote((e) => drillAnswer?.(e.midi));
+    }
+    next();
+  }
+
   function intro(cards, i = 0) {
     state = 'intro';
     const c = cards[i];
     const last = i === cards.length - 1;
-    const p = showPanel(html`<div class="card intro">
-      <span class="label">${info.label} · ${i + 1}/${cards.length}</span>
-      <div class="intro__head">
-        ${c.kind === 'note' ? html`<div class="intro__note"><b class="display">${c.note.replace(/-?\d/, '')}<small>${c.note.match(/-?\d/)[0]}</small></b>${c.finger ? html`<span>finger ${c.finger}</span>` : ''}</div>` : ''}
+    const isNote = c.kind === 'note';
+    const p = showPanel(html`<div class="card intro ${isNote ? 'intro--note' : ''}">
+      ${isNote ? html`<div class="intro__head">
+        <div class="intro__note"><b class="display">${c.note.replace(/-?\d/, '')}<small>${c.note.match(/-?\d/)[0]}</small></b>${c.finger ? html`<span>finger ${c.finger}</span>` : ''}</div>
+      </div>` : ''}
+      <div class="intro__body">
+        <span class="label">${info.label} · ${i + 1}/${cards.length}</span>
         <h2 class="display">${c.title || info.title}</h2>
-      </div>
-      <p>${c.text}</p>
-      <div class="ready__btns">
-        <button class="btn btn--primary" data-act="next">${last ? 'Got it' : 'Next'}</button>
-        ${i > 0 ? html`<button class="btn btn--ghost" data-act="prev">Back</button>` : ''}
+        <p>${c.text}</p>
+        <div class="ready__btns">
+          <button class="btn btn--primary" data-act="next">${last ? 'Got it' : 'Next'}</button>
+          ${i > 0 ? html`<button class="btn btn--ghost" data-act="prev">Back</button>` : ''}
+        </div>
       </div>
     </div>`);
+    if (c.kind === 'note') {
+      const staff = el(html`<div class="intro__staff" aria-hidden="true"></div>`);
+      p.querySelector('.intro__head').prepend(staff);
+      renderNoteCard(staff, { note: c.note, clef: c.clef || level.clef || staffLayout(level)[0]?.clef || 'treble', keySig: level.key || 'C', scale: 0.72 });
+    }
     // Light the relevant keys on the keyboard.
     if (c.kind === 'note') kb.setMarks({ [midiOf(c.note)]: 'next' }, c.finger ? { [midiOf(c.note)]: c.finger } : {});
     else if (c.kind === 'keys') kb.setMarks(Object.fromEntries((c.highlight || []).map((n) => [midiOf(n), 'next'])));
@@ -516,12 +641,12 @@ export function render(root, params) {
 
   // ---------- HUD buttons ----------
   listenBtn.addEventListener('click', async () => {
-    if (state === 'running' || !level) return;
+    if (state === 'running' || !level || isDrill()) return;
     try { await audio.unlock(); } catch { /* ignore */ }
     if (audio.running()) startListen(false);
   });
   tempoBtn.addEventListener('click', () => {
-    if (state === 'running' || !level || info.isTest) return;
+    if (state === 'running' || !level || info.isTest || isDrill()) return;
     practice = true;
     ready();
   });
@@ -543,11 +668,20 @@ export function render(root, params) {
       </div>`);
       return;
     }
-    parsed = parseLevel(level);
-    notes = expectedNotes(parsed);
-    tempo = level.tempo.default;
-    buildKeyboard(noteRange(notes));
-    await buildScore();
+    if (isDrill()) {
+      prompts = drillPrompts(level);
+      buildKeyboard(noteRange(prompts));
+      listenBtn.hidden = true;
+      tempoBtn.hidden = true;
+      drillStage();
+    } else {
+      parsed = parseLevel(level);
+      notes = expectedNotes(parsed);
+      tempo = level.tempo.default;
+      buildKeyboard(noteRange(notes));
+      await buildScore();
+      if (level.noListen) listenBtn.hidden = true;
+    }
     if (!alive) return;
     const seen = new Set(getSettings().introsSeen || []);
     if (level.intro?.length && !seen.has(params.id)) intro(level.intro);
@@ -567,7 +701,7 @@ export function render(root, params) {
   const onResize = () => {
     clearTimeout(rt);
     rt = setTimeout(async () => {
-      if (!level || !alive) return;
+      if (!level || !alive || isDrill()) return;
       const wasRunning = state === 'running';
       if (wasRunning) stopRun();
       await buildScore();

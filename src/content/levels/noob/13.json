@@ -1,0 +1,20 @@
+{
+  "hands": "right",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 96,
+    "min": 60,
+    "max": 130
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Twinkle Twinkle",
+      "text": "A French folk melody from the 1700s, famous from Mozart's variations. Your hand stretches: finger 5 reaches up to A, then the hand settles back into C position."
+    }
+  ],
+  "parts": {
+    "rh": "C4/q:1 C4/q G4/q:4 G4/q | A4/q:5 A4/q G4/h:4 | F4/q:4 F4/q E4/q:3 E4/q | D4/q:2 D4/q C4/h:1 | G4/q:5 G4/q F4/q:4 F4/q | E4/q:3 E4/q D4/h:2 | G4/q:5 G4/q F4/q:4 F4/q | E4/q:3 E4/q D4/h:2 | C4/q:1 C4/q G4/q:4 G4/q | A4/q:5 A4/q G4/h:4 | F4/q:4 F4/q E4/q:3 E4/q | D4/q:2 D4/q C4/h:1"
+  }
+}

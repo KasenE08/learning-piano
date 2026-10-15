@@ -89,3 +89,20 @@ describe('keyboard window', () => {
     expect(noteRange([{ midi: 64 }, { midi: 55 }, { midi: 72 }])).toEqual({ lo: 55, hi: 72 });
   });
 });
+
+describe('repeat signs', () => {
+  it('plays the passage twice but engraves it once', () => {
+    const p = parseLevel({ repeat: true, parts: { rh: 'C4/h D4/h | E4/w' } });
+    expect(p.displayBars).toBe(2);
+    expect(p.bars).toBe(4);
+    expect(p.totalBeats).toBe(16);
+    expect(p.repeatBeats).toBe(8);
+    const n = expectedNotes(p);
+    expect(n.map((x) => [x.name, x.beat])).toEqual([['C4', 0], ['D4', 2], ['E4', 4], ['C4', 8], ['D4', 10], ['E4', 12]]);
+    expect(n[3].event.orig).toBe(n[0].event);
+  });
+  it('keeps ties working across the repeat', () => {
+    const n = expectedNotes(parseLevel({ repeat: true, parts: { rh: 'C4/h E4/h~ | E4/h D4/h' } }));
+    expect(n.map((x) => [x.name, x.beat, x.beats])).toEqual([['C4', 0, 2], ['E4', 2, 4], ['D4', 6, 2], ['C4', 8, 2], ['E4', 10, 4], ['D4', 14, 2]]);
+  });
+});

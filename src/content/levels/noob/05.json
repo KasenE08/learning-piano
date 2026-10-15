@@ -2,11 +2,19 @@
   "hands": "right",
   "key": "C",
   "time": "4/4",
-  "tempo": { "default": 80, "min": 50, "max": 120 },
+  "tempo": {
+    "default": 80,
+    "min": 50,
+    "max": 120
+  },
   "intro": [
-    { "kind": "text", "title": "Quarter notes", "text": "A quarter note is one beat: a filled head with a stem. Four of them fill a bar of 4/4. Count 1, 2, 3, 4 with the clicks." }
+    {
+      "kind": "text",
+      "title": "Quarter notes",
+      "text": "A quarter note is one beat: a filled head with a stem. Four fill a bar of 4/4. Count 1, 2, 3, 4 along with the clicks."
+    }
   ],
   "parts": {
-    "rh": "C4/q:1 E4/q:3 G4/q:5 E4/q:3 | D4/q:2 F4/q:4 E4/q:3 D4/q:2 | C4/q:1 D4/q:2 E4/q:3 F4/q:4 | G4/q:5 E4/q:3 C4/h:1"
+    "rh": "C4/q:1 E4/q:3 G4/q:5 E4/q:3 | D4/q:2 F4/q:4 E4/q:3 D4/q:2 | C4/q:1 D4/q:2 E4/q:3 F4/q:4 | G4/q:5 F4/q:4 E4/q:3 D4/q:2 | E4/q:3 E4/q D4/q:2 D4/q | C4/q:1 E4/q:3 G4/q:5 G4/q | F4/q:4 E4/q:3 D4/q:2 E4/q:3 | C4/q:1 C4/q C4/q C4/q"
   }
 }

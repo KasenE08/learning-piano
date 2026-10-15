@@ -2,12 +2,20 @@
   "hands": "both",
   "key": "C",
   "time": "4/4",
-  "tempo": { "default": 76, "min": 50, "max": 110 },
+  "tempo": {
+    "default": 76,
+    "min": 50,
+    "max": 110
+  },
   "intro": [
-    { "kind": "text", "title": "The grand staff", "text": "Treble staff on top for the right hand, bass staff below for the left. Here the melody passes between them: one hand plays while the other rests." }
+    {
+      "kind": "text",
+      "title": "The grand staff",
+      "text": "Treble staff on top for the right hand, bass staff below for the left, joined by a brace. Middle C sits between them. Here the melody passes from hand to hand, sometimes mid-bar."
+    }
   ],
   "parts": {
-    "rh": "C4/q:1 D4/q:2 E4/q:3 F4/q:4 | r/w | G4/q:5 F4/q:4 E4/q:3 D4/q:2 | r/w | E4/h:3 G4/h:5 | r/w | C4/w:1 | r/w",
-    "lh": "r/w | C3/q:5 D3/q:4 E3/q:3 F3/q:2 | r/w | G3/q:1 F3/q:2 E3/q:3 D3/q:4 | r/w | E3/h:3 G3/h:1 | r/w | C3/w:5"
+    "rh": "C4/q:1 D4/q:2 E4/q:3 F4/q:4 | r/h G4/h:5 | E4/q:3 C4/q:1 r/h | r/w | E4/q:3 G4/q:5 r/h | r/h D4/q:2 E4/q:3 | C4/w:1 | r/w",
+    "lh": "r/w | G3/q:1 F3/q:2 r/h | r/h G3/q:1 E3/q:3 | C3/q:5 D3/q:4 E3/q:3 F3/q:2 | r/h G3/q:1 E3/q:3 | C3/q:5 D3/q:4 r/h | r/w | C3/w:5"
   }
 }

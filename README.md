@@ -15,6 +15,7 @@ npm run build            # production build into dist/
 npm run verify:offline   # build, then prove every screen loads with the network off
 npm run shots -- <dir>   # iPhone screenshots (390×844 portrait, 844×390 landscape)
 npm run e2e:mic -- <dir> # fake-microphone browser tests: calibration, mic test, a scored lesson
+npm run e2e:levels       # plays every Noob/Beginner level and song with perfect taps; expects 100%
 ```
 
 ## Layout

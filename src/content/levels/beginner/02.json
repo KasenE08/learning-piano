@@ -1,0 +1,31 @@
+{
+  "hands": "left",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 72,
+    "min": 40,
+    "max": 110
+  },
+  "intro": [
+    {
+      "kind": "note",
+      "note": "F3",
+      "title": "F",
+      "text": "F3 is on the fourth line: the one between the clef's dots.",
+      "finger": 2,
+      "clef": "bass"
+    },
+    {
+      "kind": "note",
+      "note": "G3",
+      "title": "G",
+      "text": "G3 is in the top space, under your left thumb.",
+      "finger": 1,
+      "clef": "bass"
+    }
+  ],
+  "parts": {
+    "lh": "C3/q:5 D3/q:4 E3/q:3 F3/q:2 | G3/w:1 | G3/q:1 F3/q:2 E3/q:3 D3/q:4 | C3/w:5 | C3/q:5 E3/q:3 G3/h:1 | F3/q:2 D3/q:4 E3/h:3 | G3/q:1 E3/q:3 D3/q:4 F3/q:2 | C3/w:5"
+  }
+}

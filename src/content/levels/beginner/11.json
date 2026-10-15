@@ -1,0 +1,21 @@
+{
+  "hands": "both",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 80,
+    "min": 50,
+    "max": 120
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Hands separately",
+      "text": "One piece, two parts. The right hand plays a phrase on the top staff; the left hand answers with the same phrase an octave lower on the bottom staff. Only one hand plays at a time."
+    }
+  ],
+  "parts": {
+    "rh": "C4/q:1 D4/q:2 E4/q:3 C4/q:1 | r/w | E4/q:3 F4/q:4 G4/h:5 | r/w | G4/q:5 F4/q:4 E4/q:3 D4/q:2 | r/w | C4/w:1 | r/w",
+    "lh": "r/w | C3/q:5 D3/q:4 E3/q:3 C3/q:5 | r/w | E3/q:3 F3/q:2 G3/h:1 | r/w | G3/q:1 F3/q:2 E3/q:3 D3/q:4 | r/w | C3/w:5"
+  }
+}

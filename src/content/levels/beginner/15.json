@@ -1,0 +1,22 @@
+{
+  "hands": "both",
+  "key": "C",
+  "time": "3/4",
+  "tempo": {
+    "default": 80,
+    "min": 50,
+    "max": 110
+  },
+  "pickup": true,
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Amazing Grace",
+      "text": "The hymn tune “New Britain” (1829). It starts with a pickup: one beat before the first full bar. The right hand plays the first half; the left hand plays the second half two octaves lower."
+    }
+  ],
+  "parts": {
+    "rh": "G4/q:1 | C5/h:3 E5/8:5 C5/8:3 | E5/h:5 D5/q:4 | C5/h:3 A4/q:2 | G4/h:1 G4/q | C5/h:3 E5/8:5 C5/8:3 | E5/h:5 D5/q:4 | G5/hd:5 | r/hd | r/hd | r/hd | r/hd | r/hd | r/hd | r/hd | r/hd",
+    "lh": "r/q | r/hd | r/hd | r/hd | r/hd | r/hd | r/hd | r/hd | G3/h:1 E3/q:3 | G3/h:1 E3/8:3 C3/8:5 | E3/h:3 D3/q:4 | C3/h:5 A2/q:2 | G2/h:3 G2/q | C3/h:5 E3/8:3 C3/8:5 | E3/h:3 D3/q:4 | C3/hd:5"
+  }
+}

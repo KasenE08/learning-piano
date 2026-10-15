@@ -1,0 +1,20 @@
+{
+  "hands": "right",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 84,
+    "min": 50,
+    "max": 120
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Rests",
+      "text": "A rest is a beat of silence: lift your hand, but keep counting. A quarter rest is a squiggle (1 beat), a half rest sits on the middle line (2 beats), a whole rest hangs below it (a whole bar)."
+    }
+  ],
+  "parts": {
+    "rh": "C4/q:1 r/q E4/q:3 r/q | G4/h:5 r/h | E4/q:3 D4/q:2 C4/q:1 r/q | r/w | G4/q:5 F4/q:4 E4/q:3 r/q | D4/h:2 r/h | C4/q:1 E4/q:3 G4/q:5 r/q | C4/h:1 r/h"
+  }
+}

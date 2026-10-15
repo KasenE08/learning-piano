@@ -111,13 +111,13 @@ Every level fits inside **C2–C7**, the 61-key range of the CTK-2400; early sec
 
 | # | Level | # | Level |
 |---|---|---|---|
-| 1 | The keyboard: black-key groups, find every C | 9 | 🎵 Ode to Joy (RH) |
+| 1 | The keyboard: black-key groups, find every C *(find-the-key drill)* | 9 | 🎵 Ode to Joy (RH) |
 | 2 | Finger numbers + C D E by feel | 10 | A, B and high C: moving the hand |
-| 3 | Treble clef: Middle C, D, E on the staff | 11 | Lines & spaces drill (E G B D F / F A C E) |
+| 3 | Treble clef: Middle C, D, E on the staff | 11 | Lines & spaces *(find-the-key drill, from the staff)* |
 | 4 | F and G: full C position | 12 | Ties and repeat signs |
 | 5 | Quarter notes and steady pulse | 13 | 🎵 Twinkle Twinkle (RH) |
 | 6 | Half notes | 14 | Below Middle C: B, A, G and ledger lines |
-| 7 | Whole notes, bars and 4/4 | 15 | 🎵 Mary Had a Little Lamb + Hot Cross Buns |
+| 7 | Whole notes, bars and 4/4 | 15 | 🎵 Mary Had a Little Lamb |
 | 8 | Skips (thirds) | ⚑ | **Noob Test** |
 
 **Beginner: bass clef, left hand, rhythm, first keys**
@@ -127,7 +127,7 @@ Every level fits inside **C2–C7**, the 61-key range of the CTK-2400; early sec
 | 1 | Bass clef + LH C position, LH finger numbers | 9 | G major: F♯ key signature, G position |
 | 2 | Bass clef C–G reading | 10 | F major: B♭ key signature |
 | 3 | LH melodies (quarter/half) | 11 | Hands separately: same piece, RH then LH |
-| 4 | Bass lines & spaces drill (G B D F A / A C E G) | 12 | 🎵 Aura Lee (hands separately) |
+| 4 | Bass lines & spaces *(find-the-key drill)* | 12 | 🎵 Aura Lee (hands separately) |
 | 5 | Rests: quarter, half, whole | 13 | Grand staff: melody passes between hands |
 | 6 | Eighth notes ("1 & 2 &") | 14 | Sight-reading drill in C/G/F |
 | 7 | 3/4 time + dotted half *(moved from Advanced)* | 15 | 🎵 Amazing Grace (3/4, hands separately) |
@@ -179,6 +179,9 @@ The lesson layout is the same in all three: a fixed playhead about a third of th
 - Section tests can be taken any time; passing one skips the section.
 - Curriculum changes approved (3/4 in Beginner, triplets added, dynamics taught but not scored, broken chords until Phase 7).
 - Work is pushed straight to `main`; every push deploys to GitHub Pages.
+- Practice earns no XP. Levels stay 4–8 bars (songs ~16).
+- "Find the key" drills (untimed, first answer counts) for keyboard geography and staff reading.
+- Noob and Beginner content is strictly one note at a time so the mic can score it (checked by tests).
 
 ## 6. Later (after Phase 8)
 

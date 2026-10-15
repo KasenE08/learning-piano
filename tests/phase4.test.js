@@ -36,8 +36,8 @@ describe('attempt XP', () => {
   it('replays without new stars still earn attempt + notes', () => {
     expect(attemptXp({ hitXp: 30 }).total).toBe(XP.perAttempt + 30);
   });
-  it('practice earns half, no bonuses', () => {
-    expect(attemptXp({ hitXp: 30, practice: true, newStars: 3, firstClear: true }).total).toBe(Math.round((XP.perAttempt + 30) * XP.practiceFactor));
+  it('practice earns no XP', () => {
+    expect(attemptXp({ hitXp: 30, practice: true, newStars: 3, firstClear: true })).toEqual({ total: 0, parts: [] });
   });
   it('test pass bonus', () => {
     expect(attemptXp({ hitXp: 0, firstPass: true }).total).toBe(XP.perAttempt + XP.testPass);

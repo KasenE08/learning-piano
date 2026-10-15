@@ -1,0 +1,49 @@
+{
+  "hands": "left",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 70,
+    "min": 40,
+    "max": 100
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "The bass clef",
+      "text": "This is the bass clef, for lower notes, usually your left hand. Its two dots wrap around the F line (F3)."
+    },
+    {
+      "kind": "text",
+      "title": "Left-hand fingers",
+      "text": "The left hand is numbered the same way: thumb 1, pinky 5. In C position your left pinky is on C3, the C below middle C."
+    },
+    {
+      "kind": "note",
+      "note": "C3",
+      "title": "C",
+      "text": "C3 is in the second space from the top.",
+      "finger": 5,
+      "clef": "bass"
+    },
+    {
+      "kind": "note",
+      "note": "D3",
+      "title": "D",
+      "text": "D3 is on the middle line.",
+      "finger": 4,
+      "clef": "bass"
+    },
+    {
+      "kind": "note",
+      "note": "E3",
+      "title": "E",
+      "text": "E3 is in the space above the middle line.",
+      "finger": 3,
+      "clef": "bass"
+    }
+  ],
+  "parts": {
+    "lh": "C3/q:5 D3/q:4 E3/q:3 D3/q:4 | C3/w:5 | E3/q:3 D3/q:4 C3/h:5 | E3/q:3 E3/q D3/h:4 | C3/q:5 E3/q:3 D3/q:4 E3/q:3 | C3/w:5"
+  }
+}

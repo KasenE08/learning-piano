@@ -2,13 +2,40 @@
   "hands": "right",
   "key": "C",
   "time": "4/4",
-  "tempo": { "default": 66, "min": 40, "max": 96 },
+  "tempo": {
+    "default": 66,
+    "min": 40,
+    "max": 96
+  },
   "intro": [
-    { "kind": "text", "title": "Finger numbers", "text": "Your fingers are numbered 1 to 5: thumb is 1, pinky is 5. The small numbers above the notes tell you which finger to use." },
-    { "kind": "note", "note": "D4", "finger": 2, "title": "D", "text": "D is the white key between the two black keys. Finger 2." },
-    { "kind": "note", "note": "E4", "finger": 3, "title": "E", "text": "E is just right of the two-black-key group. Finger 3." }
+    {
+      "kind": "text",
+      "title": "Finger numbers",
+      "text": "Your fingers are numbered 1 to 5: thumb is 1, pinky is 5. The small numbers above the notes tell you which finger to use."
+    },
+    {
+      "kind": "note",
+      "note": "C4",
+      "title": "C, finger 1",
+      "text": "Right thumb on middle C.",
+      "finger": 1
+    },
+    {
+      "kind": "note",
+      "note": "D4",
+      "title": "D, finger 2",
+      "text": "D is the white key between the two black keys.",
+      "finger": 2
+    },
+    {
+      "kind": "note",
+      "note": "E4",
+      "title": "E, finger 3",
+      "text": "E is just right of the two black keys.",
+      "finger": 3
+    }
   ],
   "parts": {
-    "rh": "C4/h:1 D4/h:2 | E4/h:3 D4/h:2 | C4/q:1 D4/q:2 E4/q:3 D4/q:2 | C4/w:1"
+    "rh": "C4/h:1 D4/h:2 | E4/h:3 D4/h:2 | C4/q:1 D4/q:2 E4/q:3 D4/q:2 | C4/w:1 | E4/q:3 D4/q:2 E4/h:3 | C4/q:1 D4/q:2 C4/h:1"
   }
 }

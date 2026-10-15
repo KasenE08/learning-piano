@@ -1,0 +1,14 @@
+{
+  "hands": "right",
+  "key": "C",
+  "time": "3/4",
+  "tempo": {
+    "default": 96,
+    "min": 60,
+    "max": 130
+  },
+  "pickup": true,
+  "parts": {
+    "rh": "A4/q:1 | C5/h:3 D5/q:4 | E5/qd:5 F5/8 E5/q | D5/h:4 B4/q:2 | G4/qd:1 A4/8:2 B4/q:3 | C5/h:4 A4/q:2 | A4/qd:2 G4/8:1 A4/q:2 | B4/h:3 G4/q:1 | E4/hd:1 | A4/q:1 C5/q:3 D5/q:4 | E5/qd:5 F5/8 E5/q | D5/h:4 B4/q:2 | G4/qd:1 A4/8:2 B4/q:3 | C5/qd:4 B4/8:3 A4/q:2 | B4/qd:3 A4/8:2 B4/q:3 | A4/hd:2"
+  }
+}

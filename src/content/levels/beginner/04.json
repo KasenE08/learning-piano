@@ -1,0 +1,42 @@
+{
+  "type": "find",
+  "show": "staff",
+  "clef": "bass",
+  "prompts": [
+    "G2",
+    "B2",
+    "A2",
+    "D3",
+    "C3",
+    "F3",
+    "E3",
+    "A3",
+    "G3",
+    "B2",
+    "G2",
+    "D3",
+    "A2",
+    "F3",
+    "C3",
+    "A3",
+    "E3",
+    "G3"
+  ],
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Bass lines",
+      "text": "The bass clef's lines, bottom to top, are G B D F A: Good Boys Do Fine Always."
+    },
+    {
+      "kind": "text",
+      "title": "Bass spaces",
+      "text": "The spaces, bottom to top, are A C E G: All Cows Eat Grass."
+    },
+    {
+      "kind": "text",
+      "title": "How this drill works",
+      "text": "A note appears on the bass staff. Find it and play it. Only your first answer counts."
+    }
+  ]
+}

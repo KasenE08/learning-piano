@@ -1,0 +1,25 @@
+{
+  "hands": "right",
+  "key": "C",
+  "time": "3/4",
+  "tempo": {
+    "default": 90,
+    "min": 60,
+    "max": 130
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Three-four time",
+      "text": "3/4 means 3 beats in a bar: count 1 2 3, 1 2 3, leaning on the 1. It's the waltz feel."
+    },
+    {
+      "kind": "text",
+      "title": "Dotted half notes",
+      "text": "A dot adds half the note's length. A dotted half note lasts 3 beats: a whole bar in 3/4."
+    }
+  ],
+  "parts": {
+    "rh": "C4/q:1 E4/q:3 G4/q:5 | G4/hd:5 | F4/q:4 E4/q:3 D4/q:2 | E4/hd:3 | C4/q:1 D4/q:2 E4/q:3 | F4/h:4 E4/q:3 | D4/q:2 E4/q:3 D4/q:2 | C4/hd:1"
+  }
+}

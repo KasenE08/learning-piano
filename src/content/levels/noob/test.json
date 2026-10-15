@@ -2,8 +2,12 @@
   "hands": "right",
   "key": "C",
   "time": "4/4",
-  "tempo": { "default": 84, "min": 84, "max": 84 },
+  "tempo": {
+    "default": 84,
+    "min": 84,
+    "max": 84
+  },
   "parts": {
-    "rh": "C4/q:1 D4/q:2 E4/q:3 F4/q:4 | G4/h:5 E4/h:3 | D4/q:2 F4/q:4 E4/q:3 D4/q:2 | C4/w:1 | E4/q:1 G4/q:3 A4/q:4 B4/q:5 | C5/h G4/h:3 | A4/q:4 G4/q:3 F4/q:2 E4/q:1 | D4/h C4/h | B3/q:1 C4/q:2 D4/q:3 C4/q:2 | C4/w:2"
+    "rh": "C4/q:1 D4/q:2 E4/q:3 F4/q:4 | G4/h:5 E4/h:3 | D4/q:2 F4/q:4 E4/q:3 D4/q:2 | C4/w:1 | G4/q:1 A4/q:2 B4/q:3 C5/q:4 | B4/h:3 G4/h:1 | A4/q:2 C5/q:4 B4/q:3 A4/q:2 | G4/w:1 | D4/q:5 C4/q:4 B3/q:3 A3/q:2 | G3/h:1 B3/h:3 | C4/h:4 D4/h:5~ | D4/q C4/q:4 B3/q:3 C4/q:4"
   }
 }

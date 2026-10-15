@@ -1,0 +1,41 @@
+{
+  "hands": "right",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 76,
+    "min": 50,
+    "max": 110
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Below middle C",
+      "text": "Notes below middle C hang under the staff on extra ledger lines. Move your thumb down to G: G A B C D."
+    },
+    {
+      "kind": "note",
+      "note": "B3",
+      "title": "B",
+      "text": "B sits just under middle C's ledger line.",
+      "finger": 3
+    },
+    {
+      "kind": "note",
+      "note": "A3",
+      "title": "A",
+      "text": "A sits on a second ledger line.",
+      "finger": 2
+    },
+    {
+      "kind": "note",
+      "note": "G3",
+      "title": "G",
+      "text": "G hangs below the second ledger line.",
+      "finger": 1
+    }
+  ],
+  "parts": {
+    "rh": "D4/q:5 C4/q:4 B3/q:3 A3/q:2 | G3/w:1 | A3/q:2 B3/q:3 C4/q:4 D4/q:5 | C4/h:4 B3/h:3 | A3/q:2 C4/q:4 B3/q:3 A3/q:2 | G3/h:1 B3/h:3 | D4/q:5 B3/q:3 A3/q:2 B3/q:3 | G3/w:1"
+  }
+}

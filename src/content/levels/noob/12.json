@@ -1,0 +1,26 @@
+{
+  "hands": "right",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 84,
+    "min": 50,
+    "max": 120
+  },
+  "repeat": true,
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Ties",
+      "text": "A curved line joining two notes of the same pitch is a tie: play the first, and keep holding through the second."
+    },
+    {
+      "kind": "text",
+      "title": "Repeat signs",
+      "text": "The double bar with two dots means repeat: when you reach it, go back to the start sign and play it all again."
+    }
+  ],
+  "parts": {
+    "rh": "C4/q:1 E4/q:3 G4/h:5~ | G4/h F4/q:4 E4/q:3 | D4/q:2 F4/q:4 E4/h:3~ | E4/q D4/q:2 C4/h:1"
+  }
+}

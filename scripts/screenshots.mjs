@@ -8,7 +8,7 @@ import { mkdirSync } from 'node:fs';
 const [outDir = 'screenshots', ...only] = process.argv.slice(2);
 const P = { width: 390, height: 844 };
 const L = { width: 844, height: 390 };
-const SEEN = ['noob-01', 'noob-02', 'noob-03', 'noob-04', 'noob-05', 'noob-09', 'beginner-13', 'intermediate-01', 'song-hot-cross-buns'];
+const SEEN = [...['noob', 'beginner'].flatMap((s) => Array.from({ length: 15 }, (_, i) => `${s}-${String(i + 1).padStart(2, '0')}`)), 'intermediate-01', 'song-hot-cross-buns'];
 
 // Taps every expected note on time, except the ones listed in `skip` (by index).
 const playAlong = (skip = [], wrongAt = []) => {
@@ -54,6 +54,23 @@ const SHOTS = [
   { name: 'p4-test-ready', path: '#/lesson/noob-test', vp: L },
   { name: 'p4-you', path: '#/you', vp: P, demo: true, steps: [['scroll', '[data-import]'], ['wait', 300]] },
   { name: 'p4-import', path: '#/you', vp: P, demo: true, steps: [['upload', '[data-file]'], ['wait', 600]] },
+  // Phase 5 — content
+  { name: 'p5-noob01-intro', path: '#/lesson/noob-01', vp: L, seen: false, steps: [['click', '[data-act="next"]'], ['click', '[data-act="next"]'], ['wait', 300]] },
+  { name: 'p5-noob01-drill', path: '#/lesson/noob-01', vp: L, steps: [['click', '[data-act="go"]'], ['wait', 400], ['press', 60], ['wait', 700], ['press', 60], ['wait', 300]] },
+  { name: 'p5-noob11-drill', path: '#/lesson/noob-11', vp: L, steps: [['click', '[data-act="go"]'], ['wait', 400], ['press', 64], ['wait', 700], ['press', 69], ['wait', 300]] },
+  { name: 'p5-noob03-intro', path: '#/lesson/noob-03', vp: L, seen: false, steps: [['click', '[data-act="next"]'], ['wait', 400]] },
+  { name: 'p5-noob12-repeat', path: '#/lesson/noob-12', vp: L },
+  { name: 'p5-noob14-intro', path: '#/lesson/noob-14', vp: L, seen: false, steps: [['click', '[data-act="next"]'], ['wait', 400]] },
+  { name: 'p5-b01-intro', path: '#/lesson/beginner-01', vp: L, seen: false, steps: [['click', '[data-act="next"]'], ['click', '[data-act="next"]'], ['wait', 400]] },
+  { name: 'p5-b04-drill', path: '#/lesson/beginner-04', vp: L, steps: [['click', '[data-act="go"]'], ['wait', 500]] },
+  { name: 'p5-b06-eighths', path: '#/lesson/beginner-06', vp: L },
+  { name: 'p5-b07-threefour', path: '#/lesson/beginner-07', vp: L },
+  { name: 'p5-b09-gmajor', path: '#/lesson/beginner-09', vp: L },
+  { name: 'p5-b12-auralee', path: '#/lesson/beginner-12', vp: L, heard: true, steps: [['click', '[data-act="go"]'], ['play', [], []], ['wait', 3200 + 17 * 714]] },
+  { name: 'p5-b14-sightread', path: '#/lesson/beginner-14', vp: L },
+  { name: 'p5-b15-grace', path: '#/lesson/beginner-15', vp: L },
+  { name: 'p5-btest', path: '#/lesson/beginner-test', vp: L },
+  { name: 'p5-song-jingle', path: '#/lesson/song-jingle-bells', vp: L },
 ];
 
 mkdirSync(outDir, { recursive: true });
@@ -111,6 +128,12 @@ for (const s of SHOTS.filter((x) => !only.length || only.includes(x.name))) {
     if (act === 'goto') {
       if (s.vp === L) await page.setViewportSize(P);
       await page.evaluate((h) => { location.hash = h; }, a);
+    }
+    if (act === 'press') {
+      const box = await page.locator(`.kb__key[data-midi="${a}"]`).boundingBox();
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height - 14);
+      await page.mouse.down();
+      await page.mouse.up();
     }
     if (act === 'scroll') await page.evaluate((sel) => document.querySelector(sel).scrollIntoView({ block: 'center' }), a);
     if (act === 'upload') {

@@ -49,11 +49,13 @@ export async function createScore(host, { level, parsed, fingers = true }) {
 
   // ---------- build notes per bar, measure widths ----------
   const bars = [];
-  for (let i = 0; i < parsed.bars; i++) {
+  const parts = parsed.display || parsed.parts;
+  const nBars = parsed.displayBars ?? parsed.bars;
+  for (let i = 0; i < nBars; i++) {
     const voices = [];
     const all = [];
     for (const { part, clef } of layout) {
-      const m = parsed.parts[part][i];
+      const m = parts[part][i];
       const notes = m.events.map((e) => {
         const n = new VF.StaveNote({
           keys: e.rest ? [clef === 'bass' ? 'd/3' : 'b/4'] : e.names.map(vfKey),
@@ -80,7 +82,7 @@ export async function createScore(host, { level, parsed, fingers = true }) {
     const fmt = new VF.Formatter();
     voices.forEach(({ voice }) => fmt.joinVoices([voice]));
     const minW = fmt.preCalculateMinTotalWidth(all);
-    const beats = parsed.parts[layout[0].part][i].beats;
+    const beats = parts[layout[0].part][i].beats;
     const width = Math.max(minW * 1.5 + 36, beats * 46, 120);
     bars.push({ voices, fmt, width, all });
   }
@@ -112,7 +114,8 @@ export async function createScore(host, { level, parsed, fingers = true }) {
       const w = bar.width + (i === 0 ? firstExtra : 0);
       const st = new VF.Stave(x, top + s * STAVE_GAP, w);
       if (i === 0) st.addClef(clef).addKeySignature(key).addTimeSignature(time);
-      if (i === bars.length - 1) st.setEndBarType(VF.Barline.type.END);
+      if (i === 0 && parsed.repeatBeats) st.setBegBarType(VF.Barline.type.REPEAT_BEGIN);
+      if (i === bars.length - 1) st.setEndBarType(parsed.repeatBeats ? VF.Barline.type.REPEAT_END : VF.Barline.type.END);
       st.setStyle({ strokeStyle: ink, fillStyle: ink });
       st.setContext(ctx).draw();
       return st;
@@ -131,19 +134,19 @@ export async function createScore(host, { level, parsed, fingers = true }) {
       v.voice.draw(ctx, staves[s]);
       VF.Beam.generateBeams(v.notes.filter((n) => !n.isRest())).forEach((b) => b.setContext(ctx).draw());
     });
-    const mStart = parsed.parts[layout[0].part][i].start;
+    const mStart = parts[layout[0].part][i].start;
     anchors.push([mStart, startX - 4]);
     bar.voices.forEach((v) => v.events.forEach((e) => {
       anchors.push([e.beat, e._vf.getAbsoluteX() + 6]);
       if (e.tie) ties.push(e);
     }));
     x += bar.width + (i === 0 ? firstExtra : 0);
-    if (i === bars.length - 1) anchors.push([mStart + parsed.parts[layout[0].part][i].beats, staves[0].getNoteEndX() - 6]);
+    if (i === bars.length - 1) anchors.push([mStart + parts[layout[0].part][i].beats, staves[0].getNoteEndX() - 6]);
   });
 
   // Ties (drawn after all notes exist).
   for (const { part } of layout) {
-    const flat = parsed.parts[part].flatMap((m) => m.events);
+    const flat = parts[part].flatMap((m) => m.events);
     flat.forEach((e, i) => {
       const nx = flat[i + 1];
       if (e.tie && nx && !e.rest) {
@@ -202,18 +205,23 @@ export async function createScore(host, { level, parsed, fingers = true }) {
   const marked = new Map();
 
   const api = {
+    pass: 0,
     playX,
     scale,
     beatToX,
     setBeat(beat) {
-      const tx = playX - beatToX(beat) * scale;
+      // With repeat signs the second pass scrolls the same music again.
+      const rb = parsed.repeatBeats;
+      const pass = rb && beat >= rb ? 1 : 0;
+      if (rb && pass !== api.pass) { api.pass = pass; api.clearMarks(); }
+      const tx = playX - beatToX(pass ? beat - rb : beat) * scale;
       strip.style.transform = `translate3d(${tx.toFixed(1)}px,0,0)`;
       // Gutter appears once the first bar's own clefs have slid under it.
       gutter.classList.toggle('is-on', tx < -10);
     },
     /** state: 'hit' | 'miss' | 'next' | null, applied to the note's event (chords share). */
     mark(note, state) {
-      const el = svgOf(note.event);
+      const el = svgOf(note.event.orig || note.event);
       if (!el) return;
       const prev = marked.get(el);
       if (prev === 'miss' && state === 'hit') return; // a chord with any miss stays red
@@ -229,4 +237,27 @@ export async function createScore(host, { level, parsed, fingers = true }) {
   };
   api.setBeat(-0.5);
   return api;
+}
+
+/** A single note on a small staff, for intro cards and drills. */
+export async function renderNoteCard(host, { note, clef = 'treble', keySig = 'C', scale = 1.25 }) {
+  const VF = await vexflow();
+  const ink = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#f2f2f2';
+  host.replaceChildren();
+  const w = 150;
+  const h = 128;
+  const r = new VF.Renderer(host, VF.Renderer.Backends.SVG);
+  r.resize(w * scale, h * scale);
+  const ctx = r.getContext();
+  ctx.scale(scale, scale);
+  ctx.setFillStyle(ink);
+  ctx.setStrokeStyle(ink);
+  const st = new VF.Stave(4, 14, w - 8).addClef(clef).addKeySignature(keySig);
+  st.setStyle({ strokeStyle: ink, fillStyle: ink });
+  st.setContext(ctx).draw();
+  const n = new VF.StaveNote({ keys: [vfKey(note)], duration: 'w', clef });
+  const v = new VF.Voice({ numBeats: 4, beatValue: 4 }).addTickables([n]);
+  VF.Accidental.applyAccidentals([v], keySig);
+  new VF.Formatter().joinVoices([v]).format([v], w - st.getNoteStartX() - 10);
+  v.draw(ctx, st);
 }

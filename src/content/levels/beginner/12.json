@@ -1,0 +1,21 @@
+{
+  "hands": "both",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 84,
+    "min": 50,
+    "max": 120
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Aura Lee",
+      "text": "A love song from 1861 (later the tune of “Love Me Tender”). The right hand starts in G position; the left hand answers an octave and a half lower, then takes the middle section."
+    }
+  ],
+  "parts": {
+    "rh": "G4/q:1 C5/q:4 B4/q:3 C5/q:4 | D5/q:5 A4/q:2 D5/h:5 | C5/q:4 B4/q:3 A4/q:2 B4/q:3 | C5/w:4 | r/w | r/w | r/w | r/w | r/w | r/w | r/w | r/w | G4/q:1 C5/q:4 B4/q:3 C5/q:4 | D5/q:5 A4/q:2 D5/h:5 | C5/q:4 B4/q:3 A4/q:2 B4/q:3 | C5/w:4",
+    "lh": "r/w | r/w | r/w | r/w | G2/q:5 C3/q:2 B2/q:3 C3/q:2 | D3/q:1 A2/q:4 D3/h:1 | C3/q:2 B2/q:3 A2/q:4 B2/q:3 | C3/w:2 | E3/q:3 E3/q E3/h | E3/q E3/q E3/h | E3/q:3 D3/q:4 C3/q:5 D3/q:4 | E3/w:3 | r/w | r/w | r/w | r/w"
+  }
+}

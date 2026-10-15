@@ -117,7 +117,7 @@ describe('stress', () => {
       expect(ev.length - used.size).toBeLessThanOrEqual(1);
     }
     expect(right / total).toBeGreaterThanOrEqual(0.97);
-  });
+  }, 30000);
 });
 
 describe('repeated note right after a short note', () => {

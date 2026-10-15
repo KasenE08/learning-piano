@@ -1,0 +1,42 @@
+{
+  "type": "find",
+  "show": "staff",
+  "clef": "treble",
+  "prompts": [
+    "E4",
+    "G4",
+    "F4",
+    "B4",
+    "A4",
+    "D5",
+    "C5",
+    "F5",
+    "E5",
+    "G4",
+    "E4",
+    "B4",
+    "F4",
+    "D5",
+    "A4",
+    "C5",
+    "F5",
+    "E5"
+  ],
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Lines",
+      "text": "The five lines, bottom to top, are E G B D F: Every Good Boy Does Fine."
+    },
+    {
+      "kind": "text",
+      "title": "Spaces",
+      "text": "The four spaces spell F A C E, bottom to top."
+    },
+    {
+      "kind": "text",
+      "title": "How this drill works",
+      "text": "A note appears on the staff. Name it in your head, find the key and play it. Only your first answer counts."
+    }
+  ]
+}

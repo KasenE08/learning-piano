@@ -1,0 +1,27 @@
+{
+  "hands": "right",
+  "key": "G",
+  "time": "4/4",
+  "tempo": {
+    "default": 84,
+    "min": 50,
+    "max": 120
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Key signatures",
+      "text": "The sharp right after the clef is the key signature: every F in the piece is played as F sharp (F#), the black key just right of F."
+    },
+    {
+      "kind": "note",
+      "note": "F#4",
+      "title": "F sharp",
+      "text": "Put your thumb on D: D E F# G A. Finger 3 plays F#, the black key.",
+      "finger": 3
+    }
+  ],
+  "parts": {
+    "rh": "G4/q:4 F#4/q:3 E4/q:2 D4/q:1 | E4/q:2 F#4/q:3 G4/h:4 | A4/q:5 G4/q:4 F#4/q:3 E4/q:2 | D4/w:1 | D4/q:1 F#4/q:3 A4/h:5 | G4/q:4 F#4/q:3 E4/h:2 | F#4/q:3 E4/q:2 D4/q:1 F#4/q:3 | G4/w:4"
+  }
+}

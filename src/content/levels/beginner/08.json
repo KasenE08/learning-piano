@@ -1,0 +1,20 @@
+{
+  "hands": "right",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 80,
+    "min": 50,
+    "max": 110
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Dotted rhythms",
+      "text": "A dotted quarter lasts a beat and a half, so the eighth after it lands on the “&” of beat 2: long, short. Count “1 (2) & 3 4”."
+    }
+  ],
+  "parts": {
+    "rh": "C4/qd:1 D4/8:2 E4/h:3 | E4/qd:3 F4/8:4 G4/h:5 | G4/qd:5 F4/8:4 E4/q:3 D4/q:2 | C4/w:1 | E4/qd:3 D4/8:2 C4/q:1 E4/q:3 | D4/qd:2 E4/8:3 D4/h:2 | C4/qd:1 D4/8:2 E4/q:3 G4/q:5 | C4/w:1"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "hands": "right",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 72,
+    "min": 50,
+    "max": 110
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Eighth notes",
+      "text": "An eighth note is half a beat; two fit in one beat, often joined by a beam. Count “1 & 2 & 3 & 4 &”: the number on the click, the “&” halfway between."
+    }
+  ],
+  "parts": {
+    "rh": "C4/8:1 D4/8:2 E4/8:3 F4/8:4 G4/h:5 | G4/8:5 F4/8:4 E4/8:3 D4/8:2 C4/h:1 | E4/q:3 E4/8 F4/8:4 G4/q:5 G4/q | F4/8:4 E4/8:3 D4/8:2 E4/8:3 C4/h:1 | C4/8:1 E4/8:3 G4/8:5 E4/8:3 C4/q:1 r/q | D4/8:2 F4/8:4 E4/8:3 D4/8:2 C4/h:1"
+  }
+}

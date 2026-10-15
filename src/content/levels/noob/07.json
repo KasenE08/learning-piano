@@ -1,0 +1,25 @@
+{
+  "hands": "right",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 84,
+    "min": 50,
+    "max": 120
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Whole notes",
+      "text": "A whole note is a hollow head with no stem: it fills a whole bar of 4 beats."
+    },
+    {
+      "kind": "text",
+      "title": "Bars and 4/4",
+      "text": "Bar lines split music into bars. The 4/4 at the start means 4 beats in every bar, each a quarter note."
+    }
+  ],
+  "parts": {
+    "rh": "C4/w:1 | E4/w:3 | G4/w:5 | E4/h:3 D4/h:2 | C4/q:1 D4/q:2 E4/q:3 F4/q:4 | G4/w:5 | F4/h:4 D4/h:2 | C4/w:1"
+  }
+}

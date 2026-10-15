@@ -1,0 +1,20 @@
+{
+  "hands": "right",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 84,
+    "min": 50,
+    "max": 120
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Half notes",
+      "text": "A half note is a hollow head with a stem. It lasts 2 beats: play it on 1 and keep holding through 2."
+    }
+  ],
+  "parts": {
+    "rh": "C4/h:1 E4/h:3 | G4/h:5 E4/h:3 | D4/h:2 F4/h:4 | E4/h:3 C4/h:1 | E4/q:3 F4/q:4 G4/h:5 | F4/q:4 E4/q:3 D4/h:2 | E4/h:3 D4/h:2 | C4/h:1 C4/h"
+  }
+}

@@ -40,7 +40,7 @@ export const XP = {
   firstClear: 50,
   testPass: 150,
   songFirstClear: 40,
-  practiceFactor: 0.5, // practice runs earn half the attempt + note XP, no bonuses
+  practiceFactor: 0, // practice runs earn no XP
 };
 
 export function comboMultiplier(combo) {

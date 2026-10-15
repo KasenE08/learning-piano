@@ -1,0 +1,27 @@
+{
+  "hands": "right",
+  "key": "F",
+  "time": "4/4",
+  "tempo": {
+    "default": 84,
+    "min": 50,
+    "max": 120
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "One flat",
+      "text": "This key signature has one flat: every B is played as B flat (B♭), the black key just left of B."
+    },
+    {
+      "kind": "note",
+      "note": "Bb4",
+      "title": "B flat",
+      "text": "Thumb on F: F G A B♭ C. Finger 4 plays B♭, the black key.",
+      "finger": 4
+    }
+  ],
+  "parts": {
+    "rh": "F4/q:1 G4/q:2 A4/q:3 Bb4/q:4 | C5/h:5 A4/h:3 | Bb4/q:4 A4/q:3 G4/q:2 F4/q:1 | G4/w:2 | A4/q:3 Bb4/q:4 C5/q:5 A4/q:3 | G4/q:2 A4/q:3 F4/h:1 | C5/q:5 Bb4/q:4 A4/q:3 G4/q:2 | F4/w:1"
+  }
+}

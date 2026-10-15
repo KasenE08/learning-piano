@@ -2,13 +2,40 @@
   "hands": "right",
   "key": "C",
   "time": "4/4",
-  "tempo": { "default": 70, "min": 40, "max": 100 },
+  "tempo": {
+    "default": 70,
+    "min": 40,
+    "max": 100
+  },
   "intro": [
-    { "kind": "note", "note": "C4", "finger": 1, "title": "C on the staff", "text": "Middle C hangs below the staff on a short ledger line." },
-    { "kind": "note", "note": "D4", "finger": 2, "title": "D on the staff", "text": "D sits just under the bottom line, in the space below it." },
-    { "kind": "note", "note": "E4", "finger": 3, "title": "E on the staff", "text": "E sits on the bottom line. Step up: line, space, line." }
+    {
+      "kind": "text",
+      "title": "The treble clef",
+      "text": "The curly sign at the start is the treble clef. It's for higher notes, usually your right hand. Each line and space is one white key, stepping up as you go up."
+    },
+    {
+      "kind": "note",
+      "note": "C4",
+      "title": "C on the staff",
+      "text": "Middle C sits on its own short line below the staff, a ledger line.",
+      "finger": 1
+    },
+    {
+      "kind": "note",
+      "note": "D4",
+      "title": "D on the staff",
+      "text": "D hangs just under the bottom line.",
+      "finger": 2
+    },
+    {
+      "kind": "note",
+      "note": "E4",
+      "title": "E on the staff",
+      "text": "E sits on the bottom line. Line, space, line: one step each.",
+      "finger": 3
+    }
   ],
   "parts": {
-    "rh": "E4/q:3 D4/q:2 C4/h:1 | E4/q:3 D4/q:2 C4/h:1 | C4/q:1 C4/q D4/q:2 D4/q | E4/w:3"
+    "rh": "E4/q:3 D4/q:2 C4/h:1 | E4/q:3 D4/q:2 C4/h:1 | C4/q:1 C4/q D4/q:2 D4/q | E4/w:3 | C4/q:1 E4/q:3 D4/q:2 E4/q:3 | C4/w:1"
   }
 }

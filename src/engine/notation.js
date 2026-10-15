@@ -68,7 +68,21 @@ export function parseLevel(level) {
   if (!counts.length) throw new Error('Level has no parts');
   if (new Set(counts).size > 1) throw new Error(`Parts have different bar counts: ${counts.join(', ')}`);
   const last = Object.values(parts)[0].at(-1);
-  return { parts, bars: counts[0], totalBeats: last.start + last.beats };
+  const passage = last.start + last.beats;
+  if (!level.repeat) return { parts, display: parts, bars: counts[0], displayBars: counts[0], totalBeats: passage, repeatBeats: null };
+  // Repeat signs: engrave once (display), play twice (parts). Second-pass events
+  // point back at the first-pass event they repeat (orig) for highlighting.
+  const played = {};
+  for (const [name, measures] of Object.entries(parts)) {
+    const again = measures.map((m, i) => ({
+      ...m,
+      index: measures.length + i,
+      start: m.start + passage,
+      events: m.events.map((e) => ({ ...e, beat: e.beat + passage, orig: e })),
+    }));
+    played[name] = [...measures, ...again];
+  }
+  return { parts: played, display: parts, bars: counts[0] * 2, displayBars: counts[0], totalBeats: passage * 2, repeatBeats: passage };
 }
 
 /**

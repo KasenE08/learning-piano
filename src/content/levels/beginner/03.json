@@ -1,0 +1,20 @@
+{
+  "hands": "left",
+  "key": "C",
+  "time": "4/4",
+  "tempo": {
+    "default": 80,
+    "min": 50,
+    "max": 120
+  },
+  "intro": [
+    {
+      "kind": "text",
+      "title": "Left-hand melodies",
+      "text": "Ode to Joy again, now with your left hand an octave lower. Keep the beat steady; the left hand often feels slower at first."
+    }
+  ],
+  "parts": {
+    "lh": "E3/q:3 E3/q F3/q:2 G3/q:1 | G3/q:1 F3/q:2 E3/q:3 D3/q:4 | C3/q:5 C3/q D3/q:4 E3/q:3 | E3/h:3 D3/h:4 | E3/q:3 E3/q F3/q:2 G3/q:1 | G3/q:1 F3/q:2 E3/q:3 D3/q:4 | C3/q:5 C3/q D3/q:4 E3/q:3 | D3/h:4 C3/h:5"
+  }
+}

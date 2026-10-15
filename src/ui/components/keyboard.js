@@ -3,6 +3,7 @@
 import { isBlack, nameOf, octaveOf } from '../../core/music.js';
 
 export function createKeyboard({ low = 48, keys = 36, onPress = () => {}, onRelease = () => {} } = {}) {
+  // onPress(midi, timeStamp) — timeStamp is on the performance.now() clock.
   const root = document.createElement('div');
   root.className = 'kb';
   root.setAttribute('role', 'group');
@@ -45,12 +46,12 @@ export function createKeyboard({ low = 48, keys = 36, onPress = () => {}, onRele
     const t = document.elementFromPoint(x, y)?.closest('.kb__key');
     return t && root.contains(t) ? t : null;
   };
-  const press = (id, k) => {
+  const press = (id, k, ts) => {
     const prev = active.get(id);
     if (prev === k) return;
     if (prev) { prev.classList.remove('is-down'); onRelease(Number(prev.dataset.midi)); }
     active.set(id, k);
-    if (k) { k.classList.add('is-down'); onPress(Number(k.dataset.midi)); }
+    if (k) { k.classList.add('is-down'); onPress(Number(k.dataset.midi), ts); }
   };
   const release = (id) => {
     const k = active.get(id);
@@ -59,14 +60,27 @@ export function createKeyboard({ low = 48, keys = 36, onPress = () => {}, onRele
   };
   root.addEventListener('pointerdown', (e) => {
     e.preventDefault();
-    root.setPointerCapture?.(e.pointerId);
-    press(e.pointerId, keyAt(e.clientX, e.clientY));
+    try { root.setPointerCapture(e.pointerId); } catch { /* synthetic or already-released pointer */ }
+    press(e.pointerId, keyAt(e.clientX, e.clientY), e.timeStamp);
   });
-  root.addEventListener('pointermove', (e) => { if (active.has(e.pointerId)) press(e.pointerId, keyAt(e.clientX, e.clientY)); });
+  root.addEventListener('pointermove', (e) => { if (active.has(e.pointerId)) press(e.pointerId, keyAt(e.clientX, e.clientY), e.timeStamp); });
   ['pointerup', 'pointercancel', 'lostpointercapture'].forEach((t) => root.addEventListener(t, (e) => release(e.pointerId)));
 
   return {
     el: root,
+    low,
+    keys,
+    /** Briefly flash a key green (hit) or red (miss). */
+    flash(midi, state, ms = 260) {
+      const k = byMidi.get(midi);
+      if (!k) return;
+      const cls = `is-flash-${state}`;
+      k.classList.remove('is-flash-hit', 'is-flash-miss');
+      void k.offsetWidth;
+      k.classList.add(cls);
+      clearTimeout(k._ft);
+      k._ft = setTimeout(() => k.classList.remove(cls), ms);
+    },
     /** states: { [midi]: 'next' | 'hit' | 'miss' }, fingers: { [midi]: 1..5 } */
     setMarks(states = {}, fingers = {}) {
       byMidi.forEach((k, m) => {
@@ -81,4 +95,23 @@ export function createKeyboard({ low = 48, keys = 36, onPress = () => {}, onRele
       });
     },
   };
+}
+
+/** Thin overview of the whole physical keyboard with the on-screen window marked. */
+export function createKeyMap({ min = 36, max = 96, low, keys }) {
+  const root = document.createElement('div');
+  root.className = 'keymap';
+  root.setAttribute('aria-hidden', 'true');
+  const whites = [];
+  for (let m = min; m <= max; m++) if (!isBlack(m)) whites.push(m);
+  const w = 100 / whites.length;
+  whites.forEach((m, i) => {
+    const k = document.createElement('i');
+    k.style.left = `${i * w}%`;
+    k.style.width = `${w}%`;
+    if (m >= low && m < low + keys) k.className = 'in';
+    if (m === 60) k.classList.add('mc');
+    root.appendChild(k);
+  });
+  return root;
 }

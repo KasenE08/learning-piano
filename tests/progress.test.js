@@ -94,3 +94,30 @@ describe('unlocks', () => {
     expect(nextUp(mapState(sections, p)).kind).toBe('done');
   });
 });
+
+import { recordAttempt, recordTest } from '../src/core/progress.js';
+
+describe('recording attempts', () => {
+  it('keeps the best score and stars, counts attempts', () => {
+    let p = newProgress();
+    let r = recordAttempt(p, 'noob-01', 80);
+    expect(r).toMatchObject({ stars: 1, newBest: true, firstClear: true, newStars: 1 });
+    p = r.progress;
+    r = recordAttempt(p, 'noob-01', 60);
+    expect(r).toMatchObject({ stars: 0, newBest: false, firstClear: false, newStars: 0 });
+    expect(r.progress.levels['noob-01']).toEqual({ stars: 1, best: 80, attempts: 2 });
+    r = recordAttempt(r.progress, 'noob-01', 96);
+    expect(r).toMatchObject({ stars: 3, newBest: true, newStars: 2 });
+  });
+  it('does not mutate the old progress object', () => {
+    const p = newProgress();
+    recordAttempt(p, 'noob-01', 90);
+    expect(p.levels).toEqual({});
+  });
+  it('passes a test at 85% and never un-passes it', () => {
+    let r = recordTest(newProgress(), 'noob', 90);
+    expect(r).toMatchObject({ passed: true, firstPass: true });
+    r = recordTest(r.progress, 'noob', 50);
+    expect(r.progress.tests.noob).toMatchObject({ passed: true, best: 90, attempts: 2 });
+  });
+});

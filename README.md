@@ -19,7 +19,9 @@ npm run shots -- <dir>   # iPhone screenshots (390×844 portrait, 844×390 lands
 ## Layout
 
 - `src/config/scoring.js`: every scoring number (timing windows, stars, XP, combo)
-- `src/content/`: curriculum and songs as JSON (no engine changes needed to add content)
+- `src/content/`: curriculum, songs and level files (`levels/<section>/<NN>.json`; notation is documented in `src/engine/notation.js`)
+- `src/engine/`: notation parser, scorer, and the listen/play run loop
+- `src/audio/`: Tone.js piano (self-hosted Salamander samples in `public/samples/piano/`) and metronome
 - `src/core/`: storage, progress and unlock rules, music helpers, orientation, service worker
 - `src/ui/`: design tokens, components (keyboard, staff, dock, sheet), screens
 - `PLAN.md`: the overall plan and curriculum

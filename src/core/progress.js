@@ -88,3 +88,35 @@ export function nextUp(state) {
   const last = state[state.length - 1];
   return { kind: 'done', section: last };
 }
+
+/**
+ * Record a scored attempt (not practice). Returns the new progress object plus
+ * what changed. XP and rewards arrive in Phase 4.
+ */
+export function recordAttempt(p, id, accuracy) {
+  const prev = p.levels[id] || { stars: 0, best: null, attempts: 0 };
+  const stars = starsFor(accuracy);
+  const next = {
+    stars: Math.max(prev.stars, stars),
+    best: prev.best == null ? accuracy : Math.max(prev.best, accuracy),
+    attempts: (prev.attempts || 0) + 1,
+  };
+  return {
+    progress: { ...p, levels: { ...p.levels, [id]: next } },
+    stars,
+    newBest: prev.best == null || accuracy > prev.best,
+    firstClear: prev.stars === 0 && stars > 0,
+    newStars: Math.max(0, stars - prev.stars),
+  };
+}
+
+/** Record a section test attempt. */
+export function recordTest(p, sectionId, accuracy) {
+  const prev = p.tests[sectionId] || { passed: false, best: null, attempts: 0 };
+  const passed = testPassed(accuracy);
+  return {
+    progress: { ...p, tests: { ...p.tests, [sectionId]: { passed: prev.passed || passed, best: Math.max(prev.best ?? 0, accuracy), attempts: (prev.attempts || 0) + 1 } } },
+    passed,
+    firstPass: passed && !prev.passed,
+  };
+}

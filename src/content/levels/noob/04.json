@@ -1,0 +1,13 @@
+{
+  "hands": "right",
+  "key": "C",
+  "time": "4/4",
+  "tempo": { "default": 72, "min": 40, "max": 110 },
+  "intro": [
+    { "kind": "note", "note": "F4", "finger": 4, "title": "F", "text": "F is just left of the three-black-key group. On the staff it sits in the first space." },
+    { "kind": "note", "note": "G4", "finger": 5, "title": "G", "text": "G is the next white key up, on the second line. Now all five fingers rest on C D E F G: that's C position." }
+  ],
+  "parts": {
+    "rh": "C4/q:1 D4/q:2 E4/q:3 F4/q:4 | G4/w:5 | G4/q:5 F4/q:4 E4/q:3 D4/q:2 | C4/w:1"
+  }
+}

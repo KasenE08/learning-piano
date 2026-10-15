@@ -1,0 +1,14 @@
+{
+  "hands": "right",
+  "key": "C",
+  "time": "4/4",
+  "tempo": { "default": 60, "min": 40, "max": 90 },
+  "intro": [
+    { "kind": "keys", "title": "Black keys come in groups", "text": "Look at the black keys: they repeat in groups of two and three. That pattern is your map of the whole keyboard.", "highlight": ["C#4", "D#4", "F#4", "G#4", "A#4"] },
+    { "kind": "keys", "title": "C sits left of the two", "text": "Every white key just left of a two-black-key group is a C. Middle C (C4) is the one closest to the middle of your keyboard.", "highlight": ["C3", "C4", "C5"] },
+    { "kind": "note", "note": "C4", "finger": 1, "title": "Middle C", "text": "Thumb (finger 1) of your right hand on middle C. On the staff it sits on its own little line below the five lines." }
+  ],
+  "parts": {
+    "rh": "C4/w:1 | C5/w:1 | C4/h:1 C5/h:1 | C4/w:1"
+  }
+}

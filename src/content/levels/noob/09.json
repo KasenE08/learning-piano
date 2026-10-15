@@ -1,0 +1,12 @@
+{
+  "hands": "right",
+  "key": "C",
+  "time": "4/4",
+  "tempo": { "default": 80, "min": 50, "max": 120 },
+  "intro": [
+    { "kind": "text", "title": "Ode to Joy", "text": "Beethoven's melody from his Ninth Symphony (1824). It only uses the five notes of C position. Watch the dotted quarter in bar 4: hold it a little longer." }
+  ],
+  "parts": {
+    "rh": "E4/q:3 E4/q F4/q:4 G4/q:5 | G4/q F4/q:4 E4/q:3 D4/q:2 | C4/q:1 C4/q D4/q:2 E4/q:3 | E4/qd:3 D4/8:2 D4/h | E4/q:3 E4/q F4/q:4 G4/q:5 | G4/q F4/q:4 E4/q:3 D4/q:2 | C4/q:1 C4/q D4/q:2 E4/q:3 | D4/qd:2 C4/8:1 C4/h"
+  }
+}

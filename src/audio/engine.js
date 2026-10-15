@@ -1,0 +1,106 @@
+// Audio: one shared context (Tone.js), the sampled piano and the metronome.
+// iOS rules handled here:
+//  - The context may only start inside a user tap: call unlock() from a tap handler.
+//  - The ring/silent switch mutes Web Audio unless the audio session is 'playback'.
+//  - After backgrounding, the context is suspended; resume() on return (may need a tap).
+import { nameOf } from '../core/music.js';
+
+let Tone = null;
+let piano = null;
+let click = null;
+let loading = null;
+
+const SAMPLE_NOTES = [];
+for (let o = 1; o <= 8; o++) {
+  for (const [n, file] of [['C', 'C'], ['D#', 'Ds'], ['F#', 'Fs'], ['A', 'A']]) {
+    const midi = (o + 1) * 12 + { C: 0, 'D#': 3, 'F#': 6, A: 9 }[n];
+    if (midi >= 33 && midi <= 108) SAMPLE_NOTES.push([`${n}${o}`, `${file}${o}.mp3`]);
+  }
+}
+
+/** Load Tone.js and the piano samples. Safe to call before any user gesture. */
+export function load() {
+  if (loading) return loading;
+  loading = (async () => {
+    Tone = await import('tone');
+    piano = new Tone.Sampler({
+      urls: Object.fromEntries(SAMPLE_NOTES),
+      baseUrl: `${import.meta.env.BASE_URL}samples/piano/`,
+      release: 1.2,
+    }).toDestination();
+    click = new Tone.Synth({
+      oscillator: { type: 'triangle' },
+      envelope: { attack: 0.001, decay: 0.045, sustain: 0, release: 0.02 },
+      volume: -6,
+    }).toDestination();
+    await Tone.loaded();
+  })();
+  return loading;
+}
+
+export const isLoaded = () => !!piano?.loaded;
+
+function setSession(type) {
+  try { if (navigator.audioSession) navigator.audioSession.type = type; } catch { /* unsupported */ }
+}
+
+/** Must run inside a tap/click handler. */
+export async function unlock() {
+  await load();
+  setSession('playback');
+  await Tone.start();
+}
+
+export async function resume() {
+  if (!Tone) return true;
+  const ctx = Tone.getContext().rawContext;
+  if (ctx.state !== 'running') {
+    try { await ctx.resume(); } catch { /* needs a gesture */ }
+  }
+  return ctx.state === 'running';
+}
+
+export const running = () => !!Tone && Tone.getContext().rawContext.state === 'running';
+export const now = () => Tone.now();
+
+/** Converts an audio-clock time (s) to the performance.now() clock (ms) and adds output latency. */
+export function audioToPerf(t) {
+  const ctx = Tone.getContext().rawContext;
+  const ts = ctx.getOutputTimestamp?.();
+  const lat = ((ctx.outputLatency || 0) + (ctx.baseLatency || 0)) * 1000;
+  if (ts && ts.performanceTime) return ts.performanceTime + (t - ts.contextTime) * 1000 + lat;
+  return performance.now() + (t - ctx.currentTime) * 1000 + lat;
+}
+
+export function playNote(midi, durSec = 0.6, time, velocity = 0.8) {
+  if (!piano?.loaded) return;
+  piano.triggerAttackRelease(nameOf(midi), durSec, time, velocity);
+}
+
+export function playClick(time, accent = false) {
+  click?.triggerAttackRelease(accent ? 'A6' : 'E6', 0.03, time, accent ? 1 : 0.6);
+}
+
+/** Schedules callbacks on the transport; returns the audio time at which beat 0 sounds. */
+export function startTransport(events, leadSec = 0.15) {
+  const tr = Tone.getTransport();
+  tr.stop();
+  tr.cancel(0);
+  tr.position = 0;
+  for (const e of events) tr.schedule((time) => e.fn(time), e.at);
+  const startAt = Tone.now() + leadSec;
+  tr.start(startAt);
+  return startAt;
+}
+
+export function stopAll() {
+  if (!Tone) return;
+  const tr = Tone.getTransport();
+  tr.stop();
+  tr.cancel(0);
+  piano?.releaseAll();
+}
+
+// Resume audio when the app comes back to the foreground.
+document.addEventListener('visibilitychange', () => { if (!document.hidden) resume(); });
+window.addEventListener('pageshow', () => resume());

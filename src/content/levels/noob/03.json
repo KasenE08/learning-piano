@@ -1,0 +1,14 @@
+{
+  "hands": "right",
+  "key": "C",
+  "time": "4/4",
+  "tempo": { "default": 70, "min": 40, "max": 100 },
+  "intro": [
+    { "kind": "note", "note": "C4", "finger": 1, "title": "C on the staff", "text": "Middle C hangs below the staff on a short ledger line." },
+    { "kind": "note", "note": "D4", "finger": 2, "title": "D on the staff", "text": "D sits just under the bottom line, in the space below it." },
+    { "kind": "note", "note": "E4", "finger": 3, "title": "E on the staff", "text": "E sits on the bottom line. Step up: line, space, line." }
+  ],
+  "parts": {
+    "rh": "E4/q:3 D4/q:2 C4/h:1 | E4/q:3 D4/q:2 C4/h:1 | C4/q:1 C4/q D4/q:2 D4/q | E4/w:3"
+  }
+}

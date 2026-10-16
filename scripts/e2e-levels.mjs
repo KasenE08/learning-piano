@@ -26,6 +26,17 @@ async function playLevel(id) {
   await page.goto(`http://localhost:5185/learning-piano/#/lesson/${id}`);
   await page.waitForSelector('[data-act="go"]:not([disabled])', { timeout: 20000 });
   const isDrill = await page.evaluate(() => !!document.querySelector('.drill'));
+  if (!isDrill) {
+    // The score must scroll at one steady speed (beat → x is a straight line),
+    // with every note drawn close to its time.
+    const sc = await page.evaluate(() => {
+      const s = window.__lesson.score;
+      const slopes = [0, 3.3, 7.1, 15.6, 40.2].map((b) => s.beatToX(b + 1) - s.beatToX(b));
+      return { spread: Math.max(...slopes) - Math.min(...slopes), drift: s.drift };
+    });
+    if (sc.spread > 1e-6) errors.push(`scroll speed varies (${sc.spread.toFixed(2)} px/beat)`);
+    if (sc.drift > 16) errors.push(`a note is drawn ${sc.drift.toFixed(1)} px from its time`);
+  }
   if (!isDrill && await page.locator('[data-act="listen"]:visible').count()) {
     await page.click('[data-act="listen"]');
     await page.click('[data-act="skip"]');

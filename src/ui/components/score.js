@@ -109,10 +109,31 @@ export async function createScore(host, { level, parsed, fingers = true }) {
     }
     const fmt = new VF.Formatter();
     voices.forEach(({ voice }) => fmt.joinVoices([voice]));
-    const minW = fmt.preCalculateMinTotalWidth(all);
-    const beats = parts[layout[0].part][i].beats;
-    const width = Math.max(minW * 1.5 + 36, beats * 46, 120) + (clefChangesAt(i) ? 28 : 0);
-    bars.push({ voices, fmt, width, all });
+    fmt.preCalculateMinTotalWidth(all); // sizes each tick context (accidentals, dots…)
+    const m0 = parts[layout[0].part][i];
+    // Onsets in this bar (both hands share them): room each needs left and right of its x.
+    // Beamed notes draw no flag, so their flag's width doesn't count (beams group by
+    // beat, by dotted quarter in compound time, and each triplet on its own: as drawn below).
+    const beatLen = time.endsWith('/8') ? 1.5 : 1;
+    const onsets = new Map();
+    voices.forEach(({ events }) => {
+      const tri = new Map();
+      tripletGroups(events).forEach((g, k) => g.events.forEach((e) => tri.set(e, `t${k}`)));
+      const group = (e) => tri.get(e) ?? Math.floor((e.beat - m0.start) / beatLen + 1e-6);
+      const flagged = (e) => e && !e.rest && !BEAMLESS.has(e._vf.getDuration());
+      events.forEach((e, k) => {
+        const n = e._vf;
+        const mt = n.getMetrics();
+        const beamed = flagged(e) && [events[k - 1], events[k + 1]].some((o) => flagged(o) && group(o) === group(e));
+        const flag = beamed && n.getStemDirection() === VF.Stem.UP ? n.getGlyphWidth() : 0;
+        const key = Math.round(e.beat * 1e6);
+        const o = onsets.get(key) || { beat: e.beat, left: 0, right: 0 };
+        o.left = Math.max(o.left, mt.modLeftPx + mt.leftDisplacedHeadPx);
+        o.right = Math.max(o.right, mt.notePx - flag + mt.modRightPx + mt.rightDisplacedHeadPx);
+        onsets.set(key, o);
+      });
+    });
+    bars.push({ voices, fmt, all, start: m0.start, beats: m0.beats, onsets: [...onsets.values()].sort((a, b) => a.beat - b.beat) });
   }
 
   // ---------- engrave ----------
@@ -122,7 +143,69 @@ export async function createScore(host, { level, parsed, fingers = true }) {
     if (withTime) st.addTimeSignature(time);
     return st.getNoteStartX();
   };
-  const firstExtra = probe(true) + 6;
+  // ---------- time-proportional layout ----------
+  // Every beat gets the same width, so the score scrolls at one steady speed.
+  // A note sits at X(beat); barlines, clef/key/time signatures and accidentals fit
+  // in the gap before it. The width per beat is the least that keeps the busiest
+  // spot in the piece from colliding.
+  const staveFor = (i, x = 0, y = 0, w = 600) => layout.map(({ part }, s) => {
+    const clef = clefAt(part, i);
+    const st = new VF.Stave(x, y + s * STAVE_GAP, w);
+    if (i === 0) st.addClef(clef).addKeySignature(key).addTimeSignature(time);
+    else if (clef !== clefAt(part, i - 1)) st.addClef(clef, 'small');
+    if (i === 0 && parsed.repeatBeats) st.setBegBarType(VF.Barline.type.REPEAT_BEGIN);
+    return st;
+  });
+  // From a stave's left edge to where a note with tick-context x = 0 is drawn.
+  const notePad = (() => {
+    const st = new VF.Stave(0, 0, 600);
+    const n = new VF.StaveNote({ keys: ['c/4'], duration: 'q' }).setStave(st);
+    new VF.TickContext().addTickable(n).preFormat().setX(0);
+    return n.getAbsoluteX() - st.getNoteStartX();
+  })();
+  // Room from a barline to the next note: just a gap, or the clef/key/time signs.
+  const lead = bars.map((bar, i) => (i === 0 || clefChangesAt(i)
+    ? Math.max(...staveFor(i).map((st) => st.getNoteStartX() - st.getX())) + 4
+    : bar.onsets[0]?.left > 0 ? 5 : 10));
+  const GAP = 8;
+  const BAR_GAP = 6; // last note to the barline
+  const gapBefore = (o) => (o.left > 0 ? 4 : GAP); // an accidental brings its own margin
+  const END_LEAD = 14;
+  // Wide enough for the busiest spots, but capped so a few beats always show
+  // ahead of the playhead; anything still cramped is nudged right a little below.
+  const MAX_PX_PER_BEAT = 130;
+  let need = 44;
+  const flat = bars.flatMap((bar, i) => bar.onsets.map((o) => ({ ...o, bar: i })));
+  const pieceEnd = bars.at(-1).start + bars.at(-1).beats;
+  flat.forEach((a, k) => {
+    const b = flat[k + 1];
+    const [room, gap] = !b ? [a.right + GAP + END_LEAD, pieceEnd - a.beat]
+      : b.bar === a.bar ? [a.right + gapBefore(b) + b.left, b.beat - a.beat]
+        : [a.right + BAR_GAP + lead[b.bar] + b.left, bars[b.bar].start - a.beat];
+    if (gap > 1e-9) need = Math.max(need, room / gap);
+  });
+  const pxPerBeat = Math.ceil(Math.min(MAX_PX_PER_BEAT, need));
+  const start0 = bars[0].start;
+  const X0 = 20 + lead[0] + (bars[0].onsets[0]?.left ?? 0);
+  const X = (beat) => X0 + (beat - start0) * pxPerBeat;
+  // Where each note is drawn: at its time, unless the one before needs the room.
+  const noteX = new Map();
+  let edge = 20; // right edge (plus gap) of the last note placed
+  bars.forEach((bar, i) => {
+    const first = bar.onsets[0];
+    bar.x = Math.max(X(bar.start) - lead[i] - (first?.left ?? 0), i === 0 ? 20 : edge);
+    let min = bar.x + lead[i];
+    let prevRight = null;
+    bar.onsets.forEach((o) => {
+      const x = Math.max(X(o.beat), (prevRight == null ? min : prevRight + gapBefore(o)) + o.left);
+      noteX.set(Math.round(o.beat * 1e6), x);
+      prevRight = x + o.right;
+    });
+    edge = (prevRight ?? min) + BAR_GAP;
+  });
+  const endX = Math.max(X(pieceEnd), edge) + END_LEAD;
+  bars.forEach((bar, i) => { bar.width = (i + 1 < bars.length ? bars[i + 1].x : endX) - bar.x; });
+
   // The score is cut into chunks of a few bars, each its own SVG whose viewBox
   // is its slice of one long line (so drawing code uses the same coordinates).
   // Only chunks near the playhead are shown: a 30-bar piece would otherwise be
@@ -132,9 +215,8 @@ export async function createScore(host, { level, parsed, fingers = true }) {
   host.appendChild(strip);
   const barX = [];
   {
-    let bx = 20;
-    bars.forEach((bar, i) => { barX.push(bx); bx += bar.width + (i === 0 ? firstExtra : 0); });
-    barX.push(bx);
+    bars.forEach((bar) => barX.push(bar.x));
+    barX.push(endX);
   }
   const CHUNK_W = 1200;
   const chunks = [];
@@ -164,22 +246,14 @@ export async function createScore(host, { level, parsed, fingers = true }) {
   });
   const ctxOfBar = (i) => chunks[chunkOfBar[i]].ctx;
 
-  const anchors = []; // [beat, x] (unscaled)
-  let x = 20;
   const ties = [];
   bars.forEach((bar, i) => {
     const ctx = ctxOfBar(i);
-    const staves = layout.map(({ part }, s) => {
-      const clef = clefAt(part, i);
-      const w = bar.width + (i === 0 ? firstExtra : 0);
-      const st = new VF.Stave(x, top + s * STAVE_GAP, w);
-      if (i === 0) st.addClef(clef).addKeySignature(key).addTimeSignature(time);
-      else if (clef !== clefAt(part, i - 1)) st.addClef(clef, 'small');
-      if (i === 0 && parsed.repeatBeats) st.setBegBarType(VF.Barline.type.REPEAT_BEGIN);
+    const staves = staveFor(i, bar.x, top, bar.width);
+    staves.forEach((st) => {
       if (i === bars.length - 1) st.setEndBarType(parsed.repeatBeats ? VF.Barline.type.REPEAT_END : VF.Barline.type.END);
       st.setStyle({ strokeStyle: ink, fillStyle: ink });
       st.setContext(ctx).draw();
-      return st;
     });
     if (i === 0 && staves.length === 2) {
       new VF.StaveConnector(staves[0], staves[1]).setType('brace').setContext(ctx).draw();
@@ -188,9 +262,19 @@ export async function createScore(host, { level, parsed, fingers = true }) {
     if (staves.length === 2) {
       new VF.StaveConnector(staves[0], staves[1]).setType(i === bars.length - 1 ? 'boldDoubleRight' : 'singleRight').setContext(ctx).draw();
     }
-    const startX = staves[0].getNoteStartX();
-    const avail = staves[0].getNoteEndX() - startX - 14;
-    bar.fmt.format(bar.all, avail);
+    // Both hands' notes share x positions, so both staves start their notes at
+    // the same x (past a clef change in either).
+    const startX = Math.max(...staves.map((st) => st.getNoteStartX()));
+    staves.forEach((st) => st.setNoteStartX(startX));
+    bar.fmt.format(bar.all, staves[0].getNoteEndX() - startX - 14);
+    // Then put every note at its time: X(beat).
+    bar.voices.forEach((v) => v.events.forEach((e) => e._vf.getTickContext().setX(noteX.get(Math.round(e.beat * 1e6)) - startX - notePad)));
+    // A rest filling the whole bar sits in its middle, as printed music has it.
+    const mid = (startX + bar.x + bar.width) / 2;
+    bar.voices.forEach((v) => {
+      const [e] = v.events;
+      if (v.events.length === 1 && e.rest) e._vf.setXShift(mid - noteX.get(Math.round(e.beat * 1e6)) - e._vf.getGlyphWidth() / 2);
+    });
     bar.voices.forEach((v, s) => {
       v.voice.draw(ctx, staves[s]);
       // Beam plain notes by beat (by dotted quarter in 6/8); each triplet group beams on its own.
@@ -211,15 +295,10 @@ export async function createScore(host, { level, parsed, fingers = true }) {
         t.setContext(ctx).draw();
       });
     });
-    const mStart = parts[layout[0].part][i].start;
-    anchors.push([mStart, startX - 4]);
     bar.voices.forEach((v) => v.events.forEach((e) => {
       e._bar = i;
-      anchors.push([e.beat, e._vf.getAbsoluteX() + 6]);
       if (e.tie) ties.push(e);
     }));
-    x += bar.width + (i === 0 ? firstExtra : 0);
-    if (i === bars.length - 1) anchors.push([mStart + parts[layout[0].part][i].beats, staves[0].getNoteEndX() - 6]);
   });
 
   // Ties (drawn after all notes exist).
@@ -254,27 +333,11 @@ export async function createScore(host, { level, parsed, fingers = true }) {
     });
   }
 
-  // Beat → x map: monotonic anchors (unscaled px).
-  anchors.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
-  const pts = [];
-  for (const a of anchors) {
-    const last = pts.at(-1);
-    if (last && Math.abs(last[0] - a[0]) < 1e-6) continue;
-    if (last && a[1] <= last[1]) continue;
-    pts.push(a);
-  }
-  const firstSlope = pts.length > 1 ? (pts[1][1] - pts[0][1]) / (pts[1][0] - pts[0][0]) : 40;
-  const lastSlope = pts.length > 1 ? (pts.at(-1)[1] - pts.at(-2)[1]) / (pts.at(-1)[0] - pts.at(-2)[0]) : 40;
-  const beatToX = (b) => {
-    if (b <= pts[0][0]) return pts[0][1] + (b - pts[0][0]) * firstSlope;
-    if (b >= pts.at(-1)[0]) return pts.at(-1)[1] + (b - pts.at(-1)[0]) * lastSlope;
-    let lo = 0;
-    let hi = pts.length - 1;
-    while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (pts[mid][0] <= b) lo = mid; else hi = mid; }
-    const [b0, x0] = pts[lo];
-    const [b1, x1] = pts[hi];
-    return x0 + ((b - b0) / (b1 - b0)) * (x1 - x0);
-  };
+  // Beat → x (unscaled px): a straight line, so the scroll speed never changes.
+  // The +6 puts the playhead on the notehead rather than its left edge.
+  const beatToX = (b) => X(b) + 6;
+  // Furthest any note is drawn from its time (nudged where the music is crowded).
+  const drift = Math.max(0, ...bars.flatMap((bar) => bar.voices.flatMap((v) => v.events.map((e) => Math.abs(e._vf.getAbsoluteX() - X(e.beat))))));
 
   // ---------- sticky clef gutter ----------
   const gutter = document.createElement('div');
@@ -320,6 +383,8 @@ export async function createScore(host, { level, parsed, fingers = true }) {
     playX,
     scale,
     beatToX,
+    pxPerBeat,
+    drift,
     setBeat(beat) {
       // With repeat signs the second pass scrolls the same music again.
       const rb = parsed.repeatBeats;

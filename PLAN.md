@@ -193,6 +193,7 @@ The lesson layout is the same in all three: a fixed playhead about a third of th
 - Phase 7 content tweaks: Intermediate 2 plays parallel 10ths (octaves can't be scored), Intermediate 12 block chords are right hand only.
 - Using another piano (e.g. acoustic, 88 keys): recalibrate on it; press C2/C7 for the lowest/highest steps.
 - Phase 8: saved pianos (each with its own calibration, switchable on You and on a lesson's start card); updates wait for an "Update" tap; long scores are drawn in chunks and only the on-screen part is shown (60 fps at 4× CPU throttle).
+- After Phase 8: the score is spaced by time (same width for every beat in a piece, 44–130 px), so it scrolls at one steady speed; crowded spots nudge a note a few px rather than widen the whole piece, and whole-bar rests sit mid-bar. Drills only take a fresh strike after the prompt (a released key's lingering overtone used to answer it).
 - Phase 6 sources: Mutopia Project editions converted via LilyPond → MIDI, simplified to ≤2 notes per hand at once and fitted to C2–C7.
 
 ## 6. How the mic hears chords (Phase 7)

@@ -18,7 +18,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'prompt',
       injectRegister: false, // registered manually in src/core/sw.js
-      includeAssets: ['favicon.svg', 'icons/apple-touch-icon.png'],
+      includeAssets: ['favicon.png', 'icons/apple-touch-icon.png'],
       manifest: {
         name: 'Learning Piano',
         short_name: 'Piano',

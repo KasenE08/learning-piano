@@ -4,7 +4,6 @@
 import { html, el } from '../dom.js';
 import { icons } from '../icons.js';
 import * as mic from '../../audio/mic.js';
-import * as audio from '../../audio/engine.js';
 import { nameOf, midiOf } from '../../core/music.js';
 import { getCalibration } from '../../core/store.js';
 import { meter, setMeter } from './calibrate.js';
@@ -135,7 +134,7 @@ export function render(root) {
       if (import.meta.env.DEV) (window.__chordLog ||= []).push({ step, midi: e.midi, how: e.how, dropped: !!e.dropped, perf: Math.round(e.perf), heard: [...heard] });
       // Only a clear new strike is an answer: letting go of keys can look like an
       // attack to the detector, but the sound only gets quieter.
-      if (levelRise(e.perf) < 4 || (!heard.size && ((e.dropped && !e.pitchless) || e.how !== 'attack'))) return;
+      if (mic.riseDb(e.perf) < 4 || (!heard.size && ((e.dropped && !e.pitchless) || e.how !== 'attack'))) return;
       busy = true;
       notesHeard += heard.size;
       const ok = heard.size === midis.length;
@@ -151,20 +150,9 @@ export function render(root) {
       </div>`);
       setTimeout(next, ok ? 1200 : 2000);
     };
-    // Recent loudness, to tell a strike (it jumps) from a release.
-    const levels = [];
-    const offLevels = mic.onFrame((f, t) => {
-      levels.push([audio.contextToPerf(t), f.bandDb]);
-      while (levels.length > 200) levels.shift();
-    });
-    const levelRise = (perf) => {
-      const before = levels.filter(([t]) => t >= perf - 120 && t < perf - 10).map(([, d]) => d);
-      const after = levels.filter(([t]) => t >= perf && t <= perf + 120).map(([, d]) => d);
-      return before.length && after.length ? Math.max(...after) - Math.min(...before) : 0;
-    };
     // Judge each strike once enough of it has been heard.
     const offOnset = mic.onOnset((e) => setTimeout(() => judge(e), Math.max(0, e.perf + mic.ATTACK_MS - performance.now())));
-    twoOff = () => { offOnset(); offLevels(); };
+    twoOff = () => { offOnset(); };
     next();
   }
   startBtn.addEventListener('click', runChordCheck);

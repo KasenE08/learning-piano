@@ -29,6 +29,8 @@ const HIST = 98304;
 let hist = null;
 let histEnd = 0; // audio-clock time just after the newest sample
 let probeSpec = null;
+// Recent loudness ([perf ms, band dB] per frame), to tell a strike (it jumps) from a release.
+const levels = [];
 const frameListeners = new Set();
 const stateListeners = new Set();
 
@@ -105,6 +107,8 @@ export async function start() {
       hist.set(samples, HIST - samples.length);
       histEnd = t;
       const f = analyzer.analyze(ring);
+      levels.push([audio.contextToPerf(t), f.bandDb]);
+      if (levels.length > 200) levels.shift();
       frameListeners.forEach((fn) => fn(f, t, ring));
       if (!detecting) return;
       for (const ev of detector.push(f, t)) {
@@ -128,6 +132,18 @@ export async function start() {
     setState('error');
   }
   return state;
+}
+
+/**
+ * How much louder it got at `perfMs` (performance.now clock), in dB: loudest
+ * frame in the 120 ms after it minus the quietest in the 120 ms before. A key
+ * being struck jumps several dB; a key being let go only gets quieter.
+ * Needs 120 ms of audio after `perfMs`.
+ */
+export function riseDb(perfMs) {
+  const before = levels.filter(([t]) => t >= perfMs - 120 && t < perfMs - 10).map(([, d]) => d);
+  const after = levels.filter(([t]) => t >= perfMs && t <= perfMs + 120).map(([, d]) => d);
+  return before.length && after.length ? Math.max(...after) - Math.min(...before) : 0;
 }
 
 /**

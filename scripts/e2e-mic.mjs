@@ -15,8 +15,9 @@ const outDir = process.argv[2] || 'screenshots/mic';
 mkdirSync(outDir, { recursive: true });
 const tmp = (n) => join(tmpdir(), `lp-${n}.wav`);
 
-function wav(path, notes, seconds) {
+function wav(path, notes, seconds, post = () => {}) {
   const sig = render({ notes, seconds, noiseDb: -64 });
+  post(sig);
   const b = Buffer.alloc(44 + sig.length * 2);
   b.write('RIFF', 0); b.writeUInt32LE(36 + sig.length * 2, 4); b.write('WAVE', 8); b.write('fmt ', 12);
   b.writeUInt32LE(16, 16); b.writeUInt16LE(1, 20); b.writeUInt16LE(1, 22); b.writeUInt32LE(SR, 24);
@@ -207,6 +208,34 @@ async function micLesson(id, file, minAcc, extra = async () => {}, { mutate = (n
   }
   await extra(page);
   await shot(page, `lesson-mic-${id}${tag}`);
+  await browser.close();
+}
+
+// Find-the-key drill (Noob 1). Each C is held into the next prompt, then let go with
+// its octave overtone lingering for a moment, as a released key can: the detector
+// names that as a new note, but only a real strike may answer a prompt.
+if (!process.env.MIC_ONLY || process.env.MIC_ONLY.split(',').includes('noob-01')) {
+  const lvl = JSON.parse(readFileSync('src/content/levels/noob/01.json', 'utf8'));
+  const notes = lvl.prompts.map((name, i) => ({ midi: midiOf(name), at: 2.5 + i * 2.2, dur: 1.7, vel: 0.7 }));
+  // The note's 2nd partial goes on ringing after the key is let go (same level as
+  // in the synth's note at that moment, decaying over ~0.35 s).
+  const overtoneTail = (sig, n) => {
+    const tau = 0.35 + 1.4 * Math.max(0, (84 - n.midi) / 48);
+    const amp = (0.25 * n.vel * Math.exp(-n.dur / tau)) / 2 ** 0.9;
+    const f = 2 * 440 * 2 ** ((n.midi - 69) / 12) * (1 + 0.0016);
+    const at = n.at + n.dur;
+    for (let i = Math.floor(at * SR); i < sig.length; i++) { const t = i / SR - at; sig[i] += amp * Math.exp(-t / 0.35) * Math.sin(2 * Math.PI * f * (t + n.dur)); }
+  };
+  const f = wav(tmp('drill'), notes, 2.5 + notes.length * 2.2 + 2, (sig) => notes.forEach((n) => overtoneTail(sig, n)));
+  const settings = { metronome: true, sfx: true, inputMode: 'mic', introsSeen: ['noob-01'] };
+  const { browser, page } = await session(f, { width: 844, height: 390 }, settings, { noiseDb: -60, low: 36, high: 96, micLatencyMs: 170, spreadMs: 10, at: 1 });
+  await page.goto(`${base}#/lesson/noob-01`);
+  await page.waitForFunction(() => document.querySelector('[data-act="go"]') && !document.querySelector('[data-act="go"][disabled]'), null, { timeout: 20000 });
+  await page.click('[data-act="go"]');
+  await page.waitForSelector('.results', { timeout: 60000 });
+  const acc = Number((await page.textContent('.results__big')).replace(/\D/g, ''));
+  check(acc === 100, `noob-01 find-the-C drill: released keys don't answer the next prompt (${acc}%)`);
+  await shot(page, 'drill-mic-noob-01');
   await browser.close();
 }
 

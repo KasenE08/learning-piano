@@ -723,6 +723,7 @@ export function render(root, params) {
     dots.forEach((x) => { x.className = ''; });
     let hits = 0;
     let locked = false;
+    let askedAt = 0;
     const next = () => {
       if (drill !== d) return;
       if (d.done()) {
@@ -734,6 +735,7 @@ export function render(root, params) {
       dots.forEach((x, i) => x.classList.toggle('is-now', i === d.index));
       kb.setMarks({});
       showPrompt(d.current);
+      askedAt = performance.now();
       locked = false;
     };
     drillAnswer = (midi) => {
@@ -758,7 +760,20 @@ export function render(root, params) {
     };
     if (micMode() && mic.getState() === 'on') {
       mic.setDetecting(true);
-      micNotesOff = mic.onNote((e) => drillAnswer?.(e.midi));
+      // Only a fresh strike after the prompt appeared answers it (the sound must
+      // jump). Letting go of the last key can leave its overtone ringing for a
+      // moment, which the detector names as a new note (an octave or a 12th up).
+      const timers = new Set();
+      const offOnset = mic.onOnset((e) => {
+        if (e.how !== 'attack' || e.midi == null || e.perf < askedAt - 30) return;
+        const asked = askedAt;
+        const t = setTimeout(() => {
+          timers.delete(t);
+          if (asked === askedAt && !locked && mic.riseDb(e.perf) >= 4) drillAnswer?.(e.midi);
+        }, Math.max(0, e.perf + 130 - performance.now()));
+        timers.add(t);
+      });
+      micNotesOff = () => { offOnset(); timers.forEach(clearTimeout); };
     }
     next();
   }

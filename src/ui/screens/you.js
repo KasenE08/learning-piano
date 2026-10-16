@@ -1,7 +1,8 @@
 import { html, el, pad2 } from '../dom.js';
 import { icons } from '../icons.js';
 import { dock } from '../components/dock.js';
-import { getProgress, getSettings, saveSettings, getCalibration, saveProgress, saveCalibration } from '../../core/store.js';
+import { getProgress, getSettings, saveSettings, saveProgress, getPianos, savePianos } from '../../core/store.js';
+import { addPiano, renamePiano, removePiano, setActive, activePiano } from '../../core/pianos.js';
 import { makeBackup, parseBackup, backupFileName, describeBackup } from '../../core/backup.js';
 import { openSheet } from '../components/sheet.js';
 import { nameOf } from '../../core/music.js';
@@ -14,7 +15,6 @@ const standalone = () => window.matchMedia('(display-mode: standalone)').matches
 export function render(root) {
   const p = getProgress();
   const s = getSettings();
-  const cal = getCalibration();
   const { level } = playerLevel(p.xp);
   const screen = el(html`<main class="screen screen--portrait you">
     <header class="topbar"><span class="label">You</span></header>
@@ -27,11 +27,13 @@ export function render(root) {
     <ul class="rows">
       <li class="row"><span>${icons.mic}</span><span class="row__t">Play with<small>${s.inputMode === 'mic' ? 'Your keyboard, heard through the mic' : 'On-screen keys'}</small></span>
         <span class="seg seg--sm" role="radiogroup" aria-label="Input"><button class="seg__b ${s.inputMode === 'mic' ? 'is-on' : ''}" data-input="mic">Keyboard</button><button class="seg__b ${s.inputMode === 'mic' ? '' : 'is-on'}" data-input="tap">Taps</button></span></li>
-      <li class="row"><a class="row__link" href="#/calibrate"><span>◎</span><span class="row__t">Calibrate mic & keyboard<small>${cal ? `${nameOf(cal.low)}–${nameOf(cal.high)} · delay ${cal.micLatencyMs} ms · room ${Math.round(cal.noiseDb)} dB` : 'Not done yet · about a minute'}</small></span>${icons.chevron}</a></li>
       <li class="row"><a class="row__link" href="#/mictest"><span>♪</span><span class="row__t">Mic test<small>See which notes the app hears</small></span>${icons.chevron}</a></li>
       <li class="row"><span>${icons.metronome}</span><span class="row__t">Metronome during play<small>Count-in always plays</small></span><button class="switch ${s.metronome ? 'is-on' : ''}" data-set="metronome" role="switch" aria-checked="${s.metronome}"><i></i></button></li>
       <li class="row"><span>${icons.songs}</span><span class="row__t">Sound effects<small>Muted while the mic listens</small></span><button class="switch ${s.sfx ? 'is-on' : ''}" data-set="sfx" role="switch" aria-checked="${s.sfx}"><i></i></button></li>
     </ul>
+
+    <h2 class="group-title label">Pianos</h2>
+    <ul class="rows" data-pianos></ul>
 
     <h2 class="group-title label">Your data</h2>
     <ul class="rows">
@@ -57,10 +59,85 @@ export function render(root) {
     screen.querySelectorAll('[data-input]').forEach((x) => x.classList.toggle('is-on', x === b));
     b.closest('.row').querySelector('small').textContent = b.dataset.input === 'mic' ? 'Your keyboard, heard through the mic' : 'On-screen keys';
   }));
+  // ---------- pianos ----------
+  const calSummary = (cal) => (cal ? `${nameOf(cal.low)}–${nameOf(cal.high)} · delay ${cal.micLatencyMs} ms · room ${Math.round(cal.noiseDb)} dB` : 'Not calibrated yet · about a minute');
+  const pianoList = screen.querySelector('[data-pianos]');
+  function drawPianos() {
+    const ps = getPianos();
+    const act = activePiano(ps);
+    pianoList.replaceChildren(...ps.list.map((pn) => el(html`<li class="row piano ${pn.id === ps.active ? 'is-active' : ''}">
+      <button class="row__link" data-piano="${pn.id}" aria-pressed="${pn.id === ps.active}"><span class="piano__dot" aria-hidden="true"></span><span class="row__t">${pn.name}<small>${pn.id === ps.active ? 'In use · ' : ''}${calSummary(pn.calibration)}</small></span></button>
+      <button class="piano__edit" data-edit="${pn.id}" aria-label="Edit ${pn.name}">•••</button>
+    </li>`)),
+    el(html`<li class="row"><a class="row__link" href="#/calibrate"><span>◎</span><span class="row__t">Calibrate ${act.name}<small>Mic, room and timing for this piano</small></span>${icons.chevron}</a></li>`),
+    el(html`<li class="row"><button class="row__link" data-add><span>＋</span><span class="row__t">Add a piano<small>Another keyboard or an acoustic piano: each keeps its own calibration</small></span>${icons.chevron}</button></li>`));
+    pianoList.querySelectorAll('[data-piano]').forEach((b) => b.addEventListener('click', async () => {
+      await savePianos(setActive(getPianos(), b.dataset.piano));
+      drawPianos();
+    }));
+    pianoList.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', () => editPiano(b.dataset.edit)));
+    pianoList.querySelector('[data-add]').addEventListener('click', addPianoSheet);
+  }
+  function nameField(value = '', placeholder = '') {
+    return html`<input class="field" data-name type="text" maxlength="24" autocomplete="off" value="${value}" placeholder="${placeholder}" aria-label="Piano name">`;
+  }
+  function addPianoSheet() {
+    const body = el(html`<div class="lsheet">
+      <span class="label">New piano</span>
+      <h3 class="lsheet__t display">Add a piano</h3>
+      <p class="lsheet__sub">Give it a name, then calibrate it once. Switch pianos any time here or on a lesson's start card.</p>
+      ${nameField('', 'e.g. Acoustic piano')}
+      <div class="chips">${['Casio', 'Acoustic piano', 'School piano'].map((n) => html`<button class="chip" data-chip="${n}">${n}</button>`)}</div>
+      <div class="ready__btns"><button class="btn btn--primary" data-yes>Add and calibrate</button><button class="btn btn--ghost" data-no>Cancel</button></div>
+    </div>`);
+    const close = openSheet(body);
+    const input = body.querySelector('[data-name]');
+    body.querySelectorAll('[data-chip]').forEach((c) => c.addEventListener('click', () => { input.value = c.dataset.chip; }));
+    body.querySelector('[data-no]').addEventListener('click', close);
+    body.querySelector('[data-yes]').addEventListener('click', async () => {
+      await savePianos(addPiano(getPianos(), input.value));
+      close();
+      setTimeout(() => { location.hash = '#/calibrate/you'; }, 280);
+    });
+  }
+  function editPiano(id) {
+    const ps = getPianos();
+    const pn = ps.list.find((x) => x.id === id);
+    if (!pn) return;
+    const body = el(html`<div class="lsheet">
+      <span class="label">Piano</span>
+      <h3 class="lsheet__t display">${pn.name}</h3>
+      <p class="lsheet__sub">${calSummary(pn.calibration)}</p>
+      ${nameField(pn.name)}
+      <div class="ready__btns">
+        <button class="btn btn--primary" data-save>Save name</button>
+        <button class="btn btn--ghost" data-cal>Calibrate</button>
+        ${ps.list.length > 1 ? html`<button class="btn btn--ghost" data-del>Delete</button>` : ''}
+      </div>
+    </div>`);
+    const close = openSheet(body);
+    body.querySelector('[data-save]').addEventListener('click', async () => {
+      await savePianos(renamePiano(getPianos(), id, body.querySelector('[data-name]').value));
+      close();
+      drawPianos();
+    });
+    body.querySelector('[data-cal]').addEventListener('click', async () => {
+      await savePianos(setActive(getPianos(), id));
+      close();
+      setTimeout(() => { location.hash = '#/calibrate/you'; }, 280);
+    });
+    body.querySelector('[data-del]')?.addEventListener('click', async () => {
+      await savePianos(removePiano(getPianos(), id));
+      close();
+      drawPianos();
+    });
+  }
+  drawPianos();
+
   // ---------- backup ----------
   const message = (title, text) => openSheet(el(html`<div class="lsheet"><h3 class="lsheet__t display">${title}</h3><p class="lsheet__sub">${text}</p></div>`));
   screen.querySelector('[data-export]').addEventListener('click', async () => {
-    const data = makeBackup({ progress: getProgress(), settings: getSettings(), calibration: getCalibration() });
+    const data = makeBackup({ progress: getProgress(), settings: getSettings(), pianos: getPianos() });
     const name = backupFileName();
     const file = new File([JSON.stringify(data, null, 2)], name, { type: 'application/json' });
     try {
@@ -97,7 +174,7 @@ export function render(root) {
     body.querySelector('[data-yes]').addEventListener('click', async () => {
       await saveProgress(b.progress);
       if (b.settings) await saveSettings(b.settings);
-      if (b.calibration) await saveCalibration(b.calibration);
+      await savePianos(b.pianos);
       close();
       setTimeout(() => { location.hash = '#/'; }, 300);
     });

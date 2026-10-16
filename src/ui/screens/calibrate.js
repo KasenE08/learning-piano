@@ -5,7 +5,7 @@ import { icons } from '../icons.js';
 import * as mic from '../../audio/mic.js';
 import * as audio from '../../audio/engine.js';
 import { nameOf } from '../../core/music.js';
-import { getCalibration, saveCalibration, saveSettings } from '../../core/store.js';
+import { getCalibration, saveCalibration, saveSettings, getActivePiano } from '../../core/store.js';
 import { noiseFloor, levelVerdict, clickOffsets, latencyFromOffsets } from '../../engine/calibration.js';
 
 export const orientation = 'any';
@@ -39,7 +39,7 @@ export function render(root, params) {
   const screen = el(html`<main class="screen screen--any calib">
     <header class="topbar">
       <a class="circle-btn" href="${back}" aria-label="Close">${icons.close}</a>
-      <span class="label">Calibrate</span>
+      <span class="label">Calibrate · ${getActivePiano().name}</span>
       <span class="circle-btn" style="visibility:hidden"></span>
     </header>
     <ol class="steps" aria-label="Steps">${STEPS.map((s) => html`<li>${s}</li>`)}</ol>
@@ -274,7 +274,7 @@ export function render(root, params) {
         <div><dt class="label">Room</dt><dd class="display">${Math.round(saved.noiseDb)} dB</dd></div>
         <div><dt class="label">Delay</dt><dd class="display">${saved.micLatencyMs} ms</dd></div>
       </dl>
-      <p>Redo this any time from You → Calibrate, e.g. if you move the phone or the keyboard.</p>
+      <p>Saved for ${getActivePiano().name}. Redo it any time from You → Pianos, e.g. if you move the phone. Playing another piano? Add it there: each piano keeps its own calibration.</p>
       <div class="calib__btns">
         <a class="btn btn--primary" href="${back}">Done</a>
         <a class="btn btn--ghost" href="#/mictest">Test the mic</a>

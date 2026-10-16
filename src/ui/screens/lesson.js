@@ -4,7 +4,8 @@ import { icons, stars } from '../icons.js';
 import { createKeyboard, createKeyMap } from '../components/keyboard.js';
 import { createScore, renderNoteCard, staffLayout } from '../components/score.js';
 import { createDrill, drillPrompts } from '../../engine/drill.js';
-import { sections, songs, getSettings, saveSettings, getProgress, saveProgress, getCalibration } from '../../core/store.js';
+import { sections, songs, getSettings, saveSettings, getProgress, saveProgress, getCalibration, getPianos, getActivePiano, savePianos } from '../../core/store.js';
+import { setActive } from '../../core/pianos.js';
 import { mapState, recordAttempt, recordTest, recordSong, attemptXp, addXp, evaluateUnlocks, comboMultiplier, rankFor } from '../../core/progress.js';
 import { nameOf, midiOf } from '../../core/music.js';
 import { parseLevel, expectedNotes, noteRange, keyboardWindow, measureBeats, pulseBeats, micScoring, hasChords, onsetGroups } from '../../engine/notation.js';
@@ -213,6 +214,23 @@ export function render(root, params) {
     return `Keyboard mode hears chords and both hands.${hidden ? ' A note an octave above another one in the same chord can’t be told apart, so it isn’t scored.' : ''}${chordRule() === 'all' ? ' Advanced: a chord counts only if every note is right.' : ''}`;
   };
 
+  // ---------- which piano (saved calibrations) ----------
+  const pianoPicker = () => {
+    const ps = getPianos();
+    if (!micMode() || ps.list.length < 2) return '';
+    return html`<label class="piano-pick"><span class="label">Piano</span>
+      <select data-piano aria-label="Piano">${ps.list.map((pn) => html`<option value="${pn.id}" ${pn.id === ps.active ? 'selected' : ''}>${pn.name}${pn.calibration ? '' : ' (not calibrated)'}</option>`)}</select>
+    </label>`;
+  };
+  function wirePianoPicker(card, redraw) {
+    card.querySelector('[data-piano]')?.addEventListener('change', async (e) => {
+      await savePianos(setActive(getPianos(), e.target.value));
+      const cal = getCalibration();
+      if (cal && mic.getState() === 'on') mic.configure({ noiseDb: cal.noiseDb, low: cal.low, high: cal.high });
+      redraw();
+    });
+  }
+
   // ---------- flow ----------
   function ready(note = '') {
     if (isDrill()) return drillReady(note);
@@ -247,7 +265,8 @@ export function render(root, params) {
           ${info.isTest ? '' : html`<button class="btn btn--ghost" data-act="mode">${practice ? 'Scored play' : 'Practice'}</button>`}
         </div>
       </div>
-      ${micMode() && !getCalibration() ? html`<p class="ready__note">First, a 1-minute mic calibration. <a class="link" href="#/calibrate/lesson/${params.id}">Calibrate now →</a></p>` : ''}
+      ${pianoPicker()}
+      ${micMode() && !getCalibration() ? html`<p class="ready__note">First, a 1-minute mic calibration${getPianos().list.length > 1 ? ` for ${getActivePiano().name}` : ''}. <a class="link" href="#/calibrate/lesson/${params.id}">Calibrate now →</a></p>` : ''}
       ${practice ? html`<div class="prac">
         <div class="tempo-row">
           <span class="label">Tempo</span>
@@ -277,6 +296,7 @@ export function render(root, params) {
       if (b.dataset.input === 'tap') mic.stop();
       ready(note);
     }));
+    wirePianoPicker(p, () => ready(note));
     p.querySelector('[data-act="mode"]')?.addEventListener('click', () => {
       practice = !practice;
       if (!practice) tempo = level.tempo.default;
@@ -677,7 +697,8 @@ export function render(root, params) {
         <button class="seg__b ${micMode() ? 'is-on' : ''}" data-input="mic" role="radio" aria-checked="${micMode()}">${icons.mic} Keyboard</button>
         <button class="seg__b ${micMode() ? '' : 'is-on'}" data-input="tap" role="radio" aria-checked="${!micMode()}">Taps</button>
       </div>
-      ${micMode() && !getCalibration() ? html`<p class="ready__note">First, a 1-minute mic calibration. <a class="link" href="#/calibrate/lesson/${params.id}">Calibrate now →</a></p>` : ''}
+      ${pianoPicker()}
+      ${micMode() && !getCalibration() ? html`<p class="ready__note">First, a 1-minute mic calibration${getPianos().list.length > 1 ? ` for ${getActivePiano().name}` : ''}. <a class="link" href="#/calibrate/lesson/${params.id}">Calibrate now →</a></p>` : ''}
       <div class="ready__btns"><button class="btn btn--primary" data-act="go">${icons.play} Start</button></div>
       ${rec?.best != null ? html`<p class="ready__best">Best ${fmtPct(rec.best)}% ${stars(rec.stars)}</p>` : ''}
     </div>`);
@@ -687,6 +708,7 @@ export function render(root, params) {
       if (b.dataset.input === 'tap') mic.stop();
       drillReady(note);
     }));
+    wirePianoPicker(p, () => drillReady(note));
   }
 
   function startDrill() {

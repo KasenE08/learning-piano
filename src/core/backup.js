@@ -1,17 +1,20 @@
 // Export / import of everything stored on the device, as one JSON file.
 import { newProgress } from './progress.js';
+import { normalizePianos, activePiano } from './pianos.js';
 
 export const BACKUP_APP = 'learning-piano';
 export const BACKUP_VERSION = 1;
 
-export function makeBackup({ progress, settings, calibration }, now = new Date()) {
+export function makeBackup({ progress, settings, calibration, pianos }, now = new Date()) {
   return {
     app: BACKUP_APP,
     version: BACKUP_VERSION,
     exportedAt: now.toISOString(),
     progress,
     settings,
-    calibration: calibration ?? null,
+    // The active piano's calibration (what older versions of the app read) plus every saved piano.
+    calibration: (pianos ? activePiano(pianos).calibration : calibration) ?? null,
+    pianos: pianos ?? null,
   };
 }
 
@@ -35,6 +38,7 @@ export function parseBackup(text) {
     progress: { ...newProgress(), ...p, fresh: [] },
     settings: isObj(data.settings) ? data.settings : null,
     calibration: isObj(data.calibration) ? data.calibration : null,
+    pianos: isObj(data.pianos) ? normalizePianos(data.pianos) : normalizePianos(null, isObj(data.calibration) ? data.calibration : null),
     exportedAt: data.exportedAt || null,
   };
 }

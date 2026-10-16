@@ -13,10 +13,10 @@ export default defineConfig({
     // The mic AudioWorklet must be a real file: Safari won't load worklets from data: URLs.
     assetsInlineLimit: (file) => (file.endsWith('-worklet.js') ? false : undefined),
   },
-  define: { __APP_VERSION__: JSON.stringify(pkg.version) },
+  define: { __APP_VERSION__: JSON.stringify(process.env.APP_VERSION || pkg.version) },
   plugins: [
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       injectRegister: false, // registered manually in src/core/sw.js
       includeAssets: ['favicon.svg', 'icons/apple-touch-icon.png'],
       manifest: {

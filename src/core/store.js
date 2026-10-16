@@ -1,6 +1,7 @@
 // App state: progress + settings, loaded from IndexedDB, with change listeners.
 import * as db from './db.js';
 import { newProgress } from './progress.js';
+import * as pianos from './pianos.js';
 import sectionsData from '../content/sections.json';
 import songsData from '../content/songs.json';
 
@@ -9,13 +10,16 @@ export const songs = songsData.songs;
 
 const DEFAULT_SETTINGS = { metronome: true, sfx: true, inputMode: 'mic' };
 
-const state = { progress: newProgress(), settings: { ...DEFAULT_SETTINGS }, calibration: null };
+const state = { progress: newProgress(), settings: { ...DEFAULT_SETTINGS }, pianos: pianos.normalizePianos(null) };
 const listeners = new Set();
 
 export const getProgress = () => state.progress;
 export const getSettings = () => state.settings;
-/** { noiseDb, low, high, peakDb, micLatencyMs, spreadMs, at } or null */
-export const getCalibration = () => state.calibration;
+/** The active piano's calibration: { noiseDb, low, high, peakDb, micLatencyMs, spreadMs, at } or null */
+export const getCalibration = () => pianos.activePiano(state.pianos).calibration;
+/** Saved pianos: { active, list: [{ id, name, calibration }] } */
+export const getPianos = () => state.pianos;
+export const getActivePiano = () => pianos.activePiano(state.pianos);
 
 export function subscribe(fn) {
   listeners.add(fn);
@@ -27,10 +31,12 @@ function emit() {
 }
 
 export async function load() {
-  const [p, s, c] = await Promise.all([db.get('progress'), db.get('settings'), db.get('calibration')]);
+  const [p, s, c, pi] = await Promise.all([db.get('progress'), db.get('settings'), db.get('calibration'), db.get('pianos')]);
   if (p) state.progress = { ...newProgress(), ...p };
   if (s) state.settings = { ...DEFAULT_SETTINGS, ...s };
-  if (c) state.calibration = c;
+  // Before saved pianos there was one calibration: it becomes "My keyboard".
+  state.pianos = pianos.normalizePianos(pi, c ?? null);
+  if (!pi) await db.set('pianos', state.pianos);
   emit();
 }
 
@@ -40,10 +46,15 @@ export async function saveProgress(next) {
   await db.set('progress', next);
 }
 
+/** Saves a calibration on the active piano. */
 export async function saveCalibration(c) {
-  state.calibration = c;
+  await savePianos(pianos.setCalibration(state.pianos, c));
+}
+
+export async function savePianos(next) {
+  state.pianos = pianos.normalizePianos(next);
   emit();
-  await db.set('calibration', c);
+  await db.set('pianos', state.pianos);
 }
 
 export async function saveSettings(patch) {

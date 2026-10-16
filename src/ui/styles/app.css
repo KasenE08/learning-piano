@@ -179,6 +179,8 @@
 .stage { position: relative; flex: 1; min-height: 0; overflow: hidden; }
 .score { position: absolute; inset: 0; }
 .score__strip { position: absolute; left: 0; top: 0; will-change: transform; }
+.score__chunk { position: absolute; top: 0; }
+.score__chunk[hidden] { display: none; }
 .score__strip svg, .score__gutter svg { display: block; }
 .score__gutter {
   position: absolute; left: 0; top: 0; bottom: 0; z-index: 2; opacity: 0; transition: opacity 0.2s;
@@ -451,3 +453,25 @@ a.stop__main { color: inherit; }
 .intro--note h2 { font-size: 26px; }
 .intro .ready__btns { margin-top: 8px; }
 .intro .ready__btns .btn { height: 38px; }
+
+/* ---------- pianos (You) ---------- */
+.row.piano { display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 0 8px 0 0; }
+.piano .row__link { grid-template-columns: 30px 1fr; }
+.piano__dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--ink-3); justify-self: center; }
+.piano.is-active .piano__dot { border-color: var(--ink); background: var(--ink); box-shadow: var(--glow-sm), inset 0 0 0 3px #000; }
+.piano__edit { width: 40px; height: 40px; border-radius: 50%; color: var(--ink-2); font: 800 12px var(--font-body); letter-spacing: 0.1em; }
+.field { width: 100%; height: 46px; margin-top: 14px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--surface-3); background: var(--surface-2); color: var(--ink); font: 600 16px var(--font-body); }
+.field:focus { outline: none; border-color: var(--ink-2); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.chip { height: 32px; padding: 0 12px; border-radius: var(--pill); background: var(--surface-2); color: var(--ink-2); font: 700 12px var(--font-body); }
+.piano-pick { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.piano-pick select { flex: 1; height: 34px; padding: 0 10px; border-radius: var(--pill); border: 1px solid var(--surface-3); background: var(--surface-2); color: var(--ink); font: 700 13px var(--font-body); }
+
+/* ---------- update toast ---------- */
+.update-toast { position: fixed; z-index: 50; left: 50%; transform: translateX(-50%); top: calc(env(safe-area-inset-top) + 10px); width: min(420px, calc(100vw - 24px)); display: flex; align-items: center; gap: 10px; padding: 10px 10px 10px 16px; border-radius: var(--radius-md); background: var(--surface-1); border: 1px solid var(--surface-3); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7); animation: toast-in 0.3s var(--ease-out); }
+.update-toast > span { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.update-toast b { font-size: 18px; font-weight: 800; }
+.update-toast small { font: 600 12px var(--font-body); color: var(--ink-3); }
+.update-toast .btn { height: 38px; padding: 0 16px; }
+.update-toast__x { width: 32px; height: 32px; border-radius: 50%; color: var(--ink-3); font-size: 14px; }
+@keyframes toast-in { from { opacity: 0; transform: translate(-50%, -12px); } }

@@ -96,6 +96,13 @@ const SHOTS = [
   { name: 'p7-a01-mic-ready', path: '#/lesson/advanced-01', vp: L, mic: true },
   { name: 'p7-i02-tenths', path: '#/lesson/intermediate-02', vp: L, steps: [['beat', 3.5]] },
   { name: 'p7-mictest', path: '#/mictest', vp: P, steps: [['scroll', '[data-two]'], ['wait', 300]] },
+  // Phase 8 — pianos, updates
+  { name: 'p8-you-pianos', path: '#/you', vp: P, demo: true, pianos: true, steps: [['scroll', '[data-pianos]'], ['wait', 300]] },
+  { name: 'p8-add-piano', path: '#/you', vp: P, demo: true, pianos: true, steps: [['scroll', '[data-pianos]'], ['click', '[data-add]'], ['wait', 400], ['click', '[data-chip="School piano"]'], ['wait', 200]] },
+  { name: 'p8-edit-piano', path: '#/you', vp: P, demo: true, pianos: true, steps: [['scroll', '[data-pianos]'], ['click', '[data-edit="p2"]'], ['wait', 500]] },
+  { name: 'p8-lesson-piano-pick', path: '#/lesson/intermediate-12', vp: L, mic: true, pianos: true },
+  { name: 'p8-update-toast', path: '#/?toast', vp: P, demo: true },
+  { name: 'p8-long-score', path: '#/lesson/song-the-entertainer', vp: L, steps: [['hide', '.panel'], ['beat', 40]] },
 ];
 
 mkdirSync(outDir, { recursive: true });
@@ -121,17 +128,25 @@ for (const s of SHOTS.filter((x) => !only.length || only.includes(x.name))) {
     });
   }
   if (s.seen !== false) {
-    await page.addInitScript(([seen, mic]) => {
+    await page.addInitScript(([seen, mic, twoPianos]) => {
       const req = indexedDB.open('learning-piano', 1);
       req.onupgradeneeded = () => req.result.createObjectStore('kv');
       req.onsuccess = () => {
         const tx = req.result.transaction('kv', 'readwrite');
         tx.objectStore('kv').put({ metronome: true, sfx: true, inputMode: mic ? 'mic' : 'tap', introsSeen: seen }, 'settings');
         if (mic) tx.objectStore('kv').put({ noiseDb: -60, low: 36, high: 96, micLatencyMs: 120, spreadMs: 10, at: 1 }, 'calibration');
+        if (twoPianos) {
+          tx.objectStore('kv').put({ active: 'p1', list: [
+            { id: 'p1', name: 'Casio', calibration: { noiseDb: -61, low: 36, high: 96, micLatencyMs: 118, spreadMs: 9, at: 1 } },
+            { id: 'p2', name: 'Acoustic piano', calibration: { noiseDb: -54, low: 36, high: 96, micLatencyMs: 74, spreadMs: 12, at: 2 } },
+          ] }, 'pianos');
+        }
       };
-    }, [SEEN, !!s.mic]);
+    }, [SEEN, !!s.mic, !!s.pianos]);
   }
-  await page.goto(`http://localhost:5179/learning-piano/${s.demo ? '?demo' : ''}${s.path}`);
+  const [hashPath, extraQuery] = s.path.split('?');
+  const query = [s.demo ? 'demo' : '', extraQuery || ''].filter(Boolean).join('&');
+  await page.goto(`http://localhost:5179/learning-piano/${query ? `?${query}` : ''}${hashPath}`);
   await page.waitForSelector('#app > *');
   await page.evaluate(() => document.fonts.ready);
   if (s.vp === L && s.path.includes('lesson')) {
@@ -162,6 +177,7 @@ for (const s of SHOTS.filter((x) => !only.length || only.includes(x.name))) {
       await page.mouse.up();
     }
     if (act === 'beat') { await page.evaluate((b) => window.__lesson.score.setBeat(b), a); await page.waitForTimeout(150); }
+    if (act === 'hide') await page.evaluate((sel) => document.querySelectorAll(sel).forEach((e) => { e.style.visibility = 'hidden'; }), a);
     if (act === 'scroll') await page.evaluate((sel) => document.querySelector(sel).scrollIntoView({ block: 'center' }), a);
     if (act === 'upload') {
       const backup = { app: 'learning-piano', version: 1, exportedAt: '2026-10-01T10:00:00Z', progress: { version: 1, xp: 2600, levels: Object.fromEntries(Array.from({ length: 15 }, (_, i) => [`noob-${String(i + 1).padStart(2, '0')}`, { stars: 3, best: 97, attempts: 2 }])), tests: { noob: { passed: true, best: 92, attempts: 1 } }, songs: {} }, settings: { metronome: true }, calibration: null };

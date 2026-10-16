@@ -5,6 +5,39 @@ Vanilla JS + Vite, fully offline, installable on iPhone. No accounts, no backend
 
 Live: https://KasenE08.github.io/learning-piano/
 
+## How to use it
+
+**Install.** Open the link in Safari on your iPhone, tap Share, then *Add to Home Screen*.
+It runs full-screen and works offline after the first visit. When a new version is out, a
+*New version ready* banner appears: tap *Update* (or ignore it, it waits).
+
+**Set up your piano.** *You → Pianos*. Your first piano is called "My keyboard" (tap ••• to
+rename it). Tap *Calibrate*: about a minute of room noise, your lowest and highest keys, a
+loudness check and a timing check. Put the phone 6–12 inches from the keys. Playing more
+than one piano (say a Casio at home and an acoustic piano elsewhere)? *Add a piano* and
+calibrate it once; switch on the *You* screen or with the *Piano* picker on a lesson's
+start card. On an 88-key piano, press C2 and C7 for the lowest and highest keys.
+
+**Learn.** The *Map* runs Noob → Beginner → Intermediate → Advanced. Each level starts with
+short cards, then a Listen-through, then a count-in. Play along as the music scrolls under
+the playhead: 70% clears a level, 85% and 95% earn more stars. Pass a section test (85%) to
+skip ahead. Bonus songs unlock along the way, some hidden.
+
+**Keyboard or Taps.** *Keyboard* listens to your piano through the mic: single notes,
+chords and both hands. A note exactly an octave (or 12th, or two octaves) above another
+note of the same chord can't be told apart by any microphone, so it isn't scored, and the
+results say how many. *Taps* uses the on-screen keys. In Advanced, a chord only counts
+if every note is right.
+
+**Practise.** On a lesson, tap *Practice*: slow the tempo, pick bars to loop, play one hand
+at a time. Practice doesn't change your stars or XP.
+
+**Check the mic.** *You → Mic test* shows the notes it hears; the *Chord check* lights a
+chord's keys and shows which notes it heard.
+
+**Back up.** *You → Export backup* saves progress, settings and every piano's calibration
+to a file (Files, iCloud, AirDrop); *Import backup* restores it.
+
 ## Develop
 
 ```sh
@@ -13,6 +46,8 @@ npm run dev              # http://localhost:5173/learning-piano/  (add ?demo for
 npm test                 # unit tests (Vitest)
 npm run build            # production build into dist/
 npm run verify:offline   # build, then prove every screen loads with the network off
+npm run verify:update    # install v1, publish v2: the app offers the update and switches on tap
+npm run perf             # lesson load time and scroll smoothness at 4× CPU throttle (PERF_PROD=1 for the build)
 npm run shots -- <dir>   # iPhone screenshots (390×844 portrait, 844×390 landscape)
 npm run e2e:mic -- <dir> # fake-microphone browser tests: calibration, mic test, chord check, scored
                          # lessons with chords and both hands (MIC_ONLY=intermediate-15 runs one)

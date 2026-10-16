@@ -25,6 +25,10 @@ const screens = { home, map, lesson, songs, you, calibrate, mictest };
 
 async function boot() {
   await store.load();
+  if (import.meta.env.DEV && new URLSearchParams(location.search).has('toast')) {
+    const { showUpdateToast } = await import('./core/sw.js');
+    showUpdateToast(() => {});
+  }
   if (import.meta.env.DEV && new URLSearchParams(location.search).has('demo')) {
     const { demoProgress } = await import('./dev/demo.js');
     store.useTransientProgress(demoProgress());

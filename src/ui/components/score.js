@@ -123,21 +123,52 @@ export async function createScore(host, { level, parsed, fingers = true }) {
     return st.getNoteStartX();
   };
   const firstExtra = probe(true) + 6;
-  const totalW = 20 + bars.reduce((a, b) => a + b.width, 0) + firstExtra + 40;
+  // The score is cut into chunks of a few bars, each its own SVG whose viewBox
+  // is its slice of one long line (so drawing code uses the same coordinates).
+  // Only chunks near the playhead are shown: a 30-bar piece would otherwise be
+  // one image tens of thousands of pixels wide, slow to move on a phone.
   const strip = document.createElement('div');
   strip.className = 'score__strip';
   host.appendChild(strip);
-  const renderer = new VF.Renderer(strip, VF.Renderer.Backends.SVG);
-  renderer.resize(Math.ceil(totalW * scale), H);
-  const ctx = renderer.getContext();
-  ctx.scale(scale, scale);
-  ctx.setFillStyle(ink);
-  ctx.setStrokeStyle(ink);
+  const barX = [];
+  {
+    let bx = 20;
+    bars.forEach((bar, i) => { barX.push(bx); bx += bar.width + (i === 0 ? firstExtra : 0); });
+    barX.push(bx);
+  }
+  const CHUNK_W = 1200;
+  const chunks = [];
+  const chunkOfBar = [];
+  bars.forEach((_, i) => {
+    let c = chunks.at(-1);
+    if (!c || barX[i + 1] - c.x0 > CHUNK_W) {
+      c = { x0: i === 0 ? 0 : barX[i], bars: [] };
+      chunks.push(c);
+    }
+    c.bars.push(i);
+    c.x1 = i === bars.length - 1 ? barX[i + 1] + 40 : barX[i + 1];
+    chunkOfBar[i] = chunks.length - 1;
+  });
+  chunks.forEach((c) => {
+    c.el = document.createElement('div');
+    c.el.className = 'score__chunk';
+    c.el.style.left = `${(c.x0 * scale).toFixed(2)}px`;
+    strip.appendChild(c.el);
+    const r = new VF.Renderer(c.el, VF.Renderer.Backends.SVG);
+    r.resize(Math.ceil((c.x1 - c.x0) * scale), H);
+    c.ctx = r.getContext();
+    c.ctx.setViewBox(c.x0, 0, (Math.ceil((c.x1 - c.x0) * scale)) / scale, H / scale);
+    c.ctx.svg.style.overflow = 'visible'; // ties and brackets may run into the next chunk
+    c.ctx.setFillStyle(ink);
+    c.ctx.setStrokeStyle(ink);
+  });
+  const ctxOfBar = (i) => chunks[chunkOfBar[i]].ctx;
 
   const anchors = []; // [beat, x] (unscaled)
   let x = 20;
   const ties = [];
   bars.forEach((bar, i) => {
+    const ctx = ctxOfBar(i);
     const staves = layout.map(({ part }, s) => {
       const clef = clefAt(part, i);
       const w = bar.width + (i === 0 ? firstExtra : 0);
@@ -183,6 +214,7 @@ export async function createScore(host, { level, parsed, fingers = true }) {
     const mStart = parts[layout[0].part][i].start;
     anchors.push([mStart, startX - 4]);
     bar.voices.forEach((v) => v.events.forEach((e) => {
+      e._bar = i;
       anchors.push([e.beat, e._vf.getAbsoluteX() + 6]);
       if (e.tie) ties.push(e);
     }));
@@ -196,7 +228,7 @@ export async function createScore(host, { level, parsed, fingers = true }) {
     flat.forEach((e, i) => {
       const nx = flat[i + 1];
       if (e.tie && nx && !e.rest) {
-        new VF.StaveTie({ firstNote: e._vf, lastNote: nx._vf, firstIndexes: e.keys.map((_, k) => k), lastIndexes: nx.keys.map((_, k) => k) }).setContext(ctx).draw();
+        new VF.StaveTie({ firstNote: e._vf, lastNote: nx._vf, firstIndexes: e.keys.map((_, k) => k), lastIndexes: nx.keys.map((_, k) => k) }).setContext(ctxOfBar(e._bar)).draw();
       }
     });
   }
@@ -216,7 +248,7 @@ export async function createScore(host, { level, parsed, fingers = true }) {
         });
         tb.renderOptions.color = ink;
         tb.setStyle({ fillStyle: ink, strokeStyle: ink });
-        tb.setLine(3).setContext(ctx).draw();
+        tb.setLine(3).setContext(ctxOfBar(runStart.index)).draw();
         runStart = null;
       }
     });
@@ -298,6 +330,13 @@ export async function createScore(host, { level, parsed, fingers = true }) {
       // The gutter covers about one bar left of the playhead: show the clef of the bar under it.
       if (hasChanges) drawGutter(barAt(Math.max(0, local - 1)));
       strip.style.transform = `translate3d(${tx.toFixed(1)}px,0,0)`;
+      // Show only the chunks on screen (plus a margin either side).
+      const left = -tx / scale - 300;
+      const right = (W - tx) / scale + 600;
+      for (const c of chunks) {
+        const off = c.x1 < left || c.x0 > right;
+        if (c.el.hidden !== off) c.el.hidden = off;
+      }
       // Gutter appears once the first bar's own clefs have slid under it.
       gutter.classList.toggle('is-on', tx < -10);
     },

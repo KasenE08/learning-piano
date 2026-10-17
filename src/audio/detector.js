@@ -44,6 +44,9 @@ export function createNoteDetector(sampleRate, opts = {}) {
   let frames = 0;
   const seen = new Map(); // midi → last time it was the clear pitch (for resurfacing notes)
   const recentLevels = []; // last few band levels, to find the dip before an attack
+  // The pitch tracker can name a note an octave up (see analysis.js octaveBelow). That's
+  // decided at the strike; until the next one, this pitch means the note an octave down.
+  let octaveUp = null;
 
   const toMidi = (f) => {
     if (!f) return null;
@@ -68,7 +71,7 @@ export function createNoteDetector(sampleRate, opts = {}) {
       if (firstT == null) firstT = t;
       frames++;
       const loud = f.bandDb > gate();
-      const midi = f.clarity >= o.minClarity && loud ? toMidi(f.pitch) : null;
+      const named = f.clarity >= o.minClarity && loud ? toMidi(f.pitch) : null;
 
       // --- attack detection -------------------------------------------------
       const avg = fluxHist.length ? fluxHist.reduce((a, b) => a + b, 0) / fluxHist.length : 0;
@@ -83,7 +86,7 @@ export function createNoteDetector(sampleRate, opts = {}) {
         if (pending && !supersedes && pending.votes.length) settle(pending, out);
         const dip = Math.min(...recentLevels, supersedes ? pending.low : Infinity);
         lastOnset = t;
-        pending = { time: t - hop / 2, low: dip, swing: f.bandDb - dip, flux: f.flux, votes: [] };
+        pending = { time: t - hop / 2, low: dip, swing: f.bandDb - dip, flux: f.flux, votes: [], sub: new Set() };
       }
       fluxHist.push(f.flux);
       if (fluxHist.length > 12) fluxHist.shift();
@@ -93,7 +96,10 @@ export function createNoteDetector(sampleRate, opts = {}) {
       if (pending) {
         pending.low = Math.min(pending.low, f.bandDb);
         pending.swing = Math.max(pending.swing, f.bandDb - pending.low);
-        if (midi != null && t - pending.time >= 0.012) pending.votes.push(midi);
+        if (named != null && t - pending.time >= 0.012) {
+          pending.votes.push(named);
+          if (f.sub && named - 12 >= o.low) pending.sub.add(named);
+        }
         const v = pending.votes;
         // Don't settle mid-attack: the level (and so the re-strike check) is still rising.
         const agreed = v.length >= o.confirmFrames && v.slice(-o.confirmFrames).every((m) => m === v.at(-1)) && f.flux <= thr;
@@ -101,6 +107,7 @@ export function createNoteDetector(sampleRate, opts = {}) {
       }
 
       // --- pitch change without an attack -----------------------------------
+      const midi = named != null && named === octaveUp ? named - 12 : named;
       if (midi != null) {
         if (run && run.midi === midi) run.n++;
         else {
@@ -118,7 +125,7 @@ export function createNoteDetector(sampleRate, opts = {}) {
       } else if (!loud) {
         run = null;
       }
-      if (!loud) { sounding = null; seen.clear(); }
+      if (!loud) { sounding = null; seen.clear(); octaveUp = null; }
       prevLevel = f.bandDb;
       recentLevels.push(f.bandDb);
       if (recentLevels.length > 3) recentLevels.shift();
@@ -132,12 +139,18 @@ export function createNoteDetector(sampleRate, opts = {}) {
           lastOnset = -Infinity;
           return;
         }
-        // Most common vote wins (ties → the latest).
+        // Most common vote wins (ties → the latest). A pitch that showed the octave
+        // below's odd harmonics starting with this strike is that lower note.
+        // A bump within the same note (no real re-strike) keeps the earlier decision.
+        const keep = octaveUp != null && p.swing < o.reattackDb;
+        const up = (v) => p.sub.has(v) || (keep && v === octaveUp);
+        const real = (v) => (up(v) ? v - 12 : v);
         const count = new Map();
-        p.votes.forEach((m) => count.set(m, (count.get(m) || 0) + 1));
+        p.votes.forEach((v) => count.set(real(v), (count.get(real(v)) || 0) + 1));
         let best = null;
         count.forEach((c, m) => { if (!best || c >= best[1]) best = [m, c]; });
         const m = best[0];
+        octaveUp = up(m + 12) ? m + 12 : null;
         // Same pitch as a note that's ringing (or just was, e.g. a held bass note heard
         // again when a higher key is released): a new strike only if the level dipped and rose.
         const wasRinging = m === sounding || (seen.get(m) ?? -Infinity) > p.time - 1.5;
@@ -164,6 +177,7 @@ export function createNoteDetector(sampleRate, opts = {}) {
       sounding = null;
       lastEmit = -Infinity;
       run = null;
+      octaveUp = null;
     },
   };
 }

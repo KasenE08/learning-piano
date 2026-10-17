@@ -14,7 +14,7 @@ const rand = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return see
  * notes: [{ midi, at (s), dur (s, key held), vel (0..1) }]
  * clicks: [times]   noiseDb: background noise level
  */
-export function render({ notes = [], clicks = [], seconds, noiseDb = -60, fundamental = 1, phaseSeed = 7 }) {
+export function render({ notes = [], clicks = [], seconds, noiseDb = -60, fundamental = 1, odd = 1, phaseSeed = 7 }) {
   seed = phaseSeed;
   const n = Math.ceil(seconds * SR);
   const y = new Float32Array(n);
@@ -27,7 +27,7 @@ export function render({ notes = [], clicks = [], seconds, noiseDb = -60, fundam
     const vel = nt.vel ?? 0.6;
     const harmonics = [];
     for (let k = 1; k <= 10 && f0 * k < 9000; k++) {
-      const amp = (k === 1 ? fundamental : 1) / k ** 0.9;
+      const amp = ((k === 1 ? fundamental : 1) * (k % 2 ? odd : 1)) / k ** 0.9;
       harmonics.push([2 * Math.PI * f0 * k * (1 + 0.0004 * k * k), amp, (rand() + 0.5) * 6.28]);
     }
     for (let i = s0; i < end; i++) {
